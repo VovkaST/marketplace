@@ -18,6 +18,7 @@
 <html lang="ru"> <!--<![endif]-->
 
 {% load static %}
+{% load i18n %}
 
 <head>
     <title>Megano</title>
@@ -55,9 +56,9 @@ p.error-browser
             <div class="row ControlPanel-row">
                 <div class="row-block">
                     <div class="row ControlPanel-rowSplit">
-                        <div class="row-block"><a class="ControlPanel-title" href="#">Free Delivery</a>
+                        <div class="row-block"><a class="ControlPanel-title" href="#">{% trans "Free Delivery" %}</a>
                         </div>
-                        <div class="row-block hide_700"><span class="ControlPanel-title">Follow Us</span>
+                        <div class="row-block hide_700"><span class="ControlPanel-title">{% trans "Free Delivery" %}</span>
                             <ul class="menu menu_img menu_smallImg ControlPanel-menu">
                                 <li class="menu-item"><a class="menu-link" href="#"><img
                                         src="{% static 'img/icons/socialHeader/fb.svg' %}" alt="fb.svg"/></a>
@@ -80,8 +81,11 @@ p.error-browser
                 </div>
                 <nav class="row-block">
                     <div class="row ControlPanel-rowSplit">
-                        <div class="row-block"><a class="ControlPanel-title" href="account.html">Login / Register</a>
-                        </div>
+                        {% if request.user.is_authenticated %}
+                        <div class="row-block"><a class="ControlPanel-title" href="#">{% trans "Profile" %}</a></div>
+                        {% else %}
+                        <div class="row-block"><a class="ControlPanel-title" href="#">{% trans "Login / Register" %}</a></div>
+                        {% endif %}
                     </div>
                 </nav>
             </div>
@@ -103,31 +107,33 @@ p.error-browser
                                                                                       src="{% static 'img/logo.png' %}"
                                                                                       alt="logo.png"/></a>
             </div>
+
+            {% if request.user.is_authenticated %}
             <nav class="row-block row-block_right Header-menu">
                 <div class="menuModal" id="navigate">
                     <ul class="menu menu_main">
-                        <li class="menu-item"><a class="menu-link" href="index.html">Home</a>
+                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Home" %}</a>
                         </li>
                         <li class="menu-item"><span class="menu-label menu-label_danger">New</span><a class="menu-link"
-                                                                                                      href="shop.html">Shop</a>
+                                                                                                      href="#">{% trans "Shop" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="sale.html">Blog</a>
+                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Blog" %}</a>
                         </li>
                         <li class="menu-item"><span class="menu-label menu-label_success">Hot</span><a class="menu-link"
-                                                                                                       href="product.html">Gallery</a>
+                                                                                                       href="#">{% trans "Gallery" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="contacts.html">Contacts</a>
+                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Contacts" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="catalog.html">Purchase</a>
+                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Purchase" %}</a>
                         </li>
                     </ul>
                 </div>
             </nav>
             <div class="row-block">
-                <div class="CartBlock"><a class="CartBlock-block" href="compare.html"><img class="CartBlock-img"
+                <div class="CartBlock"><a class="CartBlock-block" href="#"><img class="CartBlock-img"
                                                                                            src="{% static 'img/icons/exchange.svg' %}"
                                                                                            alt="exchange.svg"/><span
-                        class="CartBlock-amount">4</span></a><a class="CartBlock-block" href="cart.html"><img
+                        class="CartBlock-amount">4</span></a><a class="CartBlock-block" href="#"><img
                         class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/><span
                         class="CartBlock-amount">0</span></a>
                     <div class="CartBlock-block"><span class="CartBlock-price">0.00$</span>
@@ -139,6 +145,8 @@ p.error-browser
                 </div>
                 <span></span><span></span><span></span></a>
             </div>
+            {% endif %}
+
         </div>
     </div>
     <div class="Header-searchWrap">
