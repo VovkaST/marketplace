@@ -58,3 +58,22 @@ class Goods(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Balances(models.Model):
+    seller = models.ForeignKey(
+        Sellers, verbose_name=_('Seller'), on_delete=models.CASCADE, related_name='balance_owner'
+    )
+    good = models.ForeignKey(
+        Goods, verbose_name=_('Good'), on_delete=models.CASCADE, related_name='good_balance'
+    )
+    quantity = models.IntegerField(_('Good`s quantity'), default=0)
+    price = models.DecimalField(_('Price'))
+
+    class Meta:
+        db_table = 'mp_balances'
+        verbose_name = _('Balance')
+        verbose_name_plural = _('Balances')
+
+    def __str__(self):
+        return f'{self.quantity} ({self.price})'
