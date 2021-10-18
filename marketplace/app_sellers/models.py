@@ -19,3 +19,23 @@ class Sellers(models.Model):
         if self.address:
             return f'{self.name} ({self.address})'
         return self.name
+
+
+class Goods(models.Model):
+    name = models.CharField(_('Good`s name'), max_length=255)
+    category = models.ForeignKey(
+        'GoodsCategories', verbose_name='Good category', on_delete=models.CASCADE, related_name='good_category'
+    )
+    limited = models.BooleanField(_('Limited edition'), default=False)
+    sales = models.IntegerField(_('Sales quantity'), default=0)
+    rating_average = models.IntegerField(_('Average rating value'), default=1)
+    rating_total = models.IntegerField(_('Total rating value'), default=0)
+    deleted = models.BooleanField(_('Deletion mark'), default=False)
+
+    class Meta:
+        db_table = 'mp_goods'
+        verbose_name = _('Good item')
+        verbose_name_plural = _('Good items')
+
+    def __str__(self):
+        return self.name
