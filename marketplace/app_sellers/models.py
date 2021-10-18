@@ -21,16 +21,35 @@ class Sellers(models.Model):
         return self.name
 
 
+class GoodsDescriptionsValues(models.Model):
+    value = models.CharField(_('Description value'), max_length=254)
+    feature = models.ForeignKey(
+        'GoodsDescriptionsValues', verbose_name=_('Description item'), on_delete=models.CASCADE,
+        related_name='description_feature'
+    )
+
+    class Meta:
+        db_table = 'mp_goods_descriptions_values'
+        verbose_name = _('Description value')
+        verbose_name_plural = _('Description values')
+
+    def __str__(self):
+        return self.value
+
+
 class Goods(models.Model):
     name = models.CharField(_('Good`s name'), max_length=255)
     category = models.ForeignKey(
-        'GoodsCategories', verbose_name='Good category', on_delete=models.CASCADE, related_name='good_category'
+        'GoodsCategories', verbose_name=_('Good category'), on_delete=models.CASCADE, related_name='good_category'
     )
     limited = models.BooleanField(_('Limited edition'), default=False)
     sales = models.IntegerField(_('Sales quantity'), default=0)
     rating_average = models.IntegerField(_('Average rating value'), default=1)
     rating_total = models.IntegerField(_('Total rating value'), default=0)
     deleted = models.BooleanField(_('Deletion mark'), default=False)
+    description = models.ManyToManyField(
+        GoodsDescriptionsValues, db_table='mp_goods_descriptions', related_name='good_descriptions'
+    )
 
     class Meta:
         db_table = 'mp_goods'
