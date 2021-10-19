@@ -1,9 +1,20 @@
+import random
+
 from django.shortcuts import render
 from django.views.generic.base import View
+
+from .models import Banner
 
 
 class MarketMain(View):
     """Представление главной страницы магазина"""
 
     def get(self, request):
-        return render(request, 'main/index.html')
+        # формирование баннера
+        all_active_banners = Banner.objects.filter(activity=True)
+        if all_active_banners.count() > 3:
+            banners = random.sample(all_active_banners, 3)
+        else:
+            banners = all_active_banners
+
+        return render(request, "main/index.html", context={"banners": banners})
