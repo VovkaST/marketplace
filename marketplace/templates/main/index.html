@@ -5,6 +5,7 @@
 
 {% block content %}
 
+{% if banners %}
 {% cache 10*60 banner_cache %}
 <div class="Header-slider">
     <div class="Slider Slider_main">
@@ -37,6 +38,7 @@
     </div>
 </div>
 {% endcache %}
+{% endif %}
 
 <div class="Middle">
     <div class="Section">
