@@ -37,6 +37,26 @@ class GoodsDescriptionsValues(models.Model):
         return self.value
 
 
+class GoodsCategories(models.Model):
+    name = models.CharField(_('Name'), max_length=255)
+    parent = models.ForeignKey(
+        'GoodsCategories', verbose_name=_('Parent category'), on_delete=models.CASCADE, related_name='parent_category'
+    )
+    deleted = models.BooleanField(_('Deletion mark'), default=False)
+    is_active = models.BooleanField(_('Active flag'), default=True)
+    order_index = models.IntegerField(_('Order index'), default=0)
+
+    class Meta:
+        db_table = 'mp_goods_categories'
+        verbose_name = _('Goods category')
+        verbose_name_plural = _('Goods categories')
+
+    def __str__(self):
+        if not self.is_active:
+            return f'{self.name} ({_("Not active")})'
+        return self.name
+
+
 class Goods(models.Model):
     name = models.CharField(_('Good`s name'), max_length=255)
     category = models.ForeignKey(
@@ -68,7 +88,7 @@ class Balances(models.Model):
         Goods, verbose_name=_('Good'), on_delete=models.CASCADE, related_name='good_balance'
     )
     quantity = models.IntegerField(_('Good`s quantity'), default=0)
-    price = models.DecimalField(_('Price'))
+    price = models.DecimalField(_('Price'), decimal_places=2, max_digits=10)
 
     class Meta:
         db_table = 'mp_balances'
