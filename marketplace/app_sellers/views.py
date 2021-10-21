@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from django.views import generic
 
-# Create your views here.
+from app_sellers.models import Sellers
+
+
+class SellerDetailView(generic.DetailView):
+    model = Sellers
