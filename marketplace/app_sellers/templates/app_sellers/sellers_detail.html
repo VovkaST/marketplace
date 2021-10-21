@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
+{% load cache %}
+{% load i18n %}
 
 {% block content %}
-
+    {% cache 86400 seller_info object.slug %}
+        {{ object.name }}
+    {% endcache %}
 {% endblock content %}

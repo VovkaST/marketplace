@@ -6,11 +6,14 @@ from app_sellers.models import (
     GoodsDescriptionsValues,
     Sellers,
 )
+from services.cache import reset_seller_page_cache
 
 
 @admin.register(Sellers)
 class SellersAdmin(admin.ModelAdmin):
-    pass
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        reset_seller_page_cache(seller=obj)
 
 
 @admin.register(GoodsDescriptionsValues)
