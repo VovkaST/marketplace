@@ -4,3 +4,5 @@ pre-commit==2.15.0
 black==21.9b0
 flake8==3.9.2
 isort==5.9.3
+pillow==8.4.0
+transliterate=1.10.2
