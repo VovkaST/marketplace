@@ -1,8 +1,6 @@
-import random
-
 from django.views.generic.base import ContextMixin, TemplateView
 
-from .models import Banner
+from marketplace.services.main_page import get_banners
 
 
 class BannerMixin(ContextMixin):
@@ -10,12 +8,7 @@ class BannerMixin(ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        all_active_banners = Banner.objects.filter(activity=True)
-        if all_active_banners.count() > 3:
-            banners = random.sample(all_active_banners, 3)
-        else:
-            banners = all_active_banners
+        banners = get_banners()
         context["banners"] = banners
         return context
 
