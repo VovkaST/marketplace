@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %} {% trans 'Registration' %}{% endblock %}
+
+{% block content %}
+    <h5>{% trans 'User registration' %}</h5>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% trans 'Registration' %}</button>
+    </form>
+{% endblock %}

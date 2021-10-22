@@ -5,7 +5,7 @@ from .models import Profile, UserAddress
 
 class ProfilesAdmin(admin.ModelAdmin):
     model = Profile
-    list_display = ["pk", "phone_number", "patronymic"]
+    list_display = ["phone_number", "patronymic"]
 
 
 class UserAddressAdmin(admin.ModelAdmin):
