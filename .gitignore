@@ -261,4 +261,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# media files
+media/
+
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,pycharm
