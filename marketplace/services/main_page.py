@@ -1,6 +1,6 @@
 import random
 
-from marketplace.main.models import Banner
+from main.models import Banner
 
 
 def get_banners():

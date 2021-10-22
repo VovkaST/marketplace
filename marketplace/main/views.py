@@ -1,6 +1,6 @@
 from django.views.generic.base import ContextMixin, TemplateView
 
-from marketplace.services.main_page import get_banners
+from services.main_page import get_banners
 
 
 class BannerMixin(ContextMixin):
