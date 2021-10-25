@@ -1,7 +1,7 @@
 from django.views.generic.base import ContextMixin, TemplateView
 
-from services.main_page import get_banners
-from services.cache_settings import MAIN_BANNERS_CACHE
+from services.main_page import *
+from services.cache_settings import *
 
 
 class BannerMixin(ContextMixin):
@@ -12,6 +12,16 @@ class BannerMixin(ContextMixin):
         banners = get_banners()
         context["banners"] = banners
         context["banners_cache_value"] = MAIN_BANNERS_CACHE
+        return context
+
+
+class CategoryMixin(ContextMixin):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = get_categories()
+        context['categories'] = categories
+        context['categories_cache_value'] = MAIN_CATEGORIES_CACHE
         return context
 
 

@@ -41,3 +41,35 @@ class Banner(models.Model):
         super().delete(*args, **kwargs)
         key_delete_banner = make_template_fragment_key("banner_cache")
         cache.delete(key_delete_banner)
+
+
+class GoodCategory(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_('Name'))
+    parent_category = models.ForeignKey('self',
+                                        null=True,
+                                        blank=True,
+                                        on_delete=models.CASCADE,
+                                        related_name='sub_category',
+                                        verbose_name=_('Parent Category'))
+    image = models.FileField(upload_to='images/categories')
+    deleted = models.BooleanField(verbose_name=_('Deleted'))
+    active = models.BooleanField(verbose_name=_('Active'))
+    order_index = models.IntegerField(verbose_name=_('Order Index'))
+
+    class Meta:
+        db_table = 'mp_goods_categories'
+        verbose_name = _('Good Category')
+        verbose_name_plural = _('Goods Categories')
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        key_save_category = make_template_fragment_key("category_cache")
+        cache.delete(key_save_category)
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        key_delete_category = make_template_fragment_key("category_cache")
+        cache.delete(key_delete_category)
