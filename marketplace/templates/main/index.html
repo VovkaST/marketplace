@@ -6,7 +6,7 @@
 {% block content %}
 
 {% if banners %}
-{% cache { banners_cache_value } banner_cache %}
+{% cache banners_cache_value banner_cache %}
 <div class="Header-slider">
     <div class="Slider Slider_main">
         <div class="Slider-box">
