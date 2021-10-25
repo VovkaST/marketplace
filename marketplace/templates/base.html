@@ -81,11 +81,13 @@ p.error-browser
                 </div>
                 <nav class="row-block">
                     <div class="row ControlPanel-rowSplit">
-                        {% if request.user.is_authenticated %}
-                        <div class="row-block"><a class="ControlPanel-title" href="#">{% trans "Profile" %}</a></div>
-                        {% else %}
-                        <div class="row-block"><a class="ControlPanel-title" href="#">{% trans "Login / Register" %}</a></div>
-                        {% endif %}
+			{% if request.user.is_authenticated %}
+			<div class="row-block"><a class="ControlPanel-title" href="{% url 'account' %}">Account</a></div>
+			<div class="row-block"><a class="ControlPanel-title" href="{% url 'logout' %}">Logout</a></div>
+			{% else %}
+			<div class="row-block"><a class="ControlPanel-title" href="{% url 'registration' %}">Register</a></div>
+			<div class="row-block"><a class="ControlPanel-title" href="{% url 'login' %}">Login</a></div>			
+			{% endif %}
                     </div>
                 </nav>
             </div>
