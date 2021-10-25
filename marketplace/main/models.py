@@ -19,7 +19,7 @@ class Banner(models.Model):
         blank=True,
         verbose_name=_("banner image"),
     )
-    link = models.CharField(verbose_name=_("banner link"))
+    link = models.CharField(max_length=256, verbose_name=_("banner link"))
     created_date = models.DateTimeField(
         auto_now_add=True, verbose_name=_("banner created date")
     )
