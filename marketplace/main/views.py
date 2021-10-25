@@ -1,9 +1,19 @@
-from django.shortcuts import render
-from django.views.generic.base import View
+from django.views.generic.base import ContextMixin, TemplateView
+
+from marketplace.services.main_page import get_banners
 
 
-class MarketMain(View):
+class BannerMixin(ContextMixin):
+    """Выбор баннеров и занесение их в context"""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        banners = get_banners()
+        context["banners"] = banners
+        return context
+
+
+class MarketMain(TemplateView, BannerMixin):
     """Представление главной страницы магазина"""
 
-    def get(self, request):
-        return render(request, 'main/index.html')
+    template_name = "main/index.html"
