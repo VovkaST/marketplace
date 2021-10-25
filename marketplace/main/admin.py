@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Banner
+from .models import *
+
+
+@admin.register(GoodCategory)
+class StockTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'parent_category', 'deleted', 'active', 'order_index')
 
 
 class BannerAdmin(admin.ModelAdmin):
