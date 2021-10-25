@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-$8w6i(@kgxy*c-ajx9v$bc-ety&tfl!w@i5a$4xk_55_4^rj$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['teamdiploma.ru']
 
 # Application definition
 
@@ -37,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main.apps.MainConfig',
+    'services.apps.ServicesConfig'
 ]
 
 MIDDLEWARE = [
@@ -50,11 +51,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'marketplace.urls'
-
+DIR_BASE_TEMPLATE = os.path.join(BASE_DIR, "templates")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [DIR_BASE_TEMPLATE],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,17 +70,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'marketplace.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -99,7 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -113,11 +111,18 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static")
+]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
