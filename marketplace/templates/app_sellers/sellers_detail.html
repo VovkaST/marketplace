@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block content %}
-    {% cache cache_settings.seller_info_cache_life_time seller_info object.slug %}
+    {% cache cache_settings.seller_info_life_time seller_info object.slug %}
         {{ object.name }}
     {% endcache %}
 {% endblock content %}
