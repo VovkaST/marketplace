@@ -1,6 +1,6 @@
 import random
 
-from main.models import Banner
+from main.models import Banner, GoodCategory
 
 
 def get_banners():
@@ -13,3 +13,13 @@ def get_banners():
     else:
         banners = all_active_banners
     return banners
+
+
+def get_categories():
+    """
+    Получение категорий
+    """
+
+    categories = GoodCategory.objects.only('name', 'image').filter(active=True, parent_category=None).order_by(
+        'order_index')
+    return categories
