@@ -5,7 +5,7 @@ from services.utils import slugify
 
 
 class Sellers(models.Model):
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_('Seller name'), max_length=254)
     address = models.CharField(_('Address'), max_length=254)
     email = models.EmailField(_('E-mail address'), max_length=255)
