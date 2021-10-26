@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from services.utils import slugify
+from main.models import GoodCategory
 
 
 class Sellers(models.Model):
@@ -43,30 +44,10 @@ class GoodsDescriptionsValues(models.Model):
         return self.value
 
 
-class GoodsCategories(models.Model):
-    name = models.CharField(_('Name'), max_length=255)
-    parent = models.ForeignKey(
-        'GoodsCategories', verbose_name=_('Parent category'), on_delete=models.CASCADE, related_name='parent_category'
-    )
-    deleted = models.BooleanField(_('Deletion mark'), default=False)
-    is_active = models.BooleanField(_('Active flag'), default=True)
-    order_index = models.IntegerField(_('Order index'), default=0)
-
-    class Meta:
-        db_table = 'mp_goods_categories'
-        verbose_name = _('Goods category')
-        verbose_name_plural = _('Goods categories')
-
-    def __str__(self):
-        if not self.is_active:
-            return f'{self.name} ({_("Not active")})'
-        return self.name
-
-
 class Goods(models.Model):
     name = models.CharField(_('Good`s name'), max_length=255)
     category = models.ForeignKey(
-        'GoodsCategories', verbose_name=_('Good category'), on_delete=models.CASCADE, related_name='good_category'
+        GoodCategory, verbose_name=_('Good category'), on_delete=models.CASCADE, related_name='good_category'
     )
     limited = models.BooleanField(_('Limited edition'), default=False)
     sales = models.IntegerField(_('Sales quantity'), default=0)

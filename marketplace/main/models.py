@@ -45,12 +45,12 @@ class Banner(models.Model):
 
 class GoodCategory(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('Name'))
-    parent_category = models.ForeignKey('self',
-                                        null=True,
-                                        blank=True,
-                                        on_delete=models.CASCADE,
-                                        related_name='sub_category',
-                                        verbose_name=_('Parent Category'))
+    parent = models.ForeignKey('self',
+                               null=True,
+                               blank=True,
+                               on_delete=models.CASCADE,
+                               related_name='sub_category',
+                               verbose_name=_('Parent Category'))
     image = models.FileField(upload_to='images/categories')
     deleted = models.BooleanField(verbose_name=_('Deleted'))
     active = models.BooleanField(verbose_name=_('Active'))
@@ -62,6 +62,8 @@ class GoodCategory(models.Model):
         verbose_name_plural = _('Goods Categories')
 
     def __str__(self):
+        if not self.active:
+            return f'{self.name} ({_("Not active")})'
         return self.name
 
     def save(self, *args, **kwargs):

@@ -5,7 +5,7 @@ from .models import GoodCategory, Banner
 
 @admin.register(GoodCategory)
 class StockTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent_category', 'deleted', 'active', 'order_index')
+    list_display = ('name', 'parent', 'deleted', 'active', 'order_index')
 
 
 class BannerAdmin(admin.ModelAdmin):

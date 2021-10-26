@@ -20,6 +20,6 @@ def get_categories():
     Получение категорий
     """
 
-    categories = GoodCategory.objects.only('name', 'image').filter(active=True, parent_category=None).order_by(
+    categories = GoodCategory.objects.only('name', 'image').filter(active=True, parent=None).order_by(
         'order_index')
-    return categories
+    return categories.all()
