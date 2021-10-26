@@ -165,7 +165,7 @@ p.error-browser
                     </div>
                     <div class="CategoriesButton-content">
                     {% if categories %}
-                    {% cache categories_cache_value category_cache %}
+                    {% cache cache_settings.categories_cache_value category_cache %}
                     {% for category in categories %}
                         {% if category.sub_category.all %}
                         <div class="CategoriesButton-link">-->
