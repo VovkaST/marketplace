@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
-from services.models import slugify
+from services.utils import slugify
 
 
 class Sellers(models.Model):
