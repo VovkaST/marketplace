@@ -1,6 +1,6 @@
 import random
 
-from main.models import *
+from main.models import Banner, GoodCategory
 
 
 def get_banners():
