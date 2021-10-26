@@ -9,7 +9,7 @@ def get_banners():
     """
     all_active_banners = Banner.objects.filter(activity=True)
     if all_active_banners.count() > 3:
-        banners = random.sample(all_active_banners, 3)
+        banners = random.choices(all_active_banners, k=3)
     else:
         banners = all_active_banners
     return banners
