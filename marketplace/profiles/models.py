@@ -40,3 +40,27 @@ class UserAddress(models.Model):
 
     def __str__(self):
         return f"{self.country}, {self.town}, {self.region}, {self.street}, {self.apartment}"
+
+
+class ViewHistory(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="view_history",
+        verbose_name=_("User"),
+    )
+    goods = models.ForeignKey(
+        "Goods",
+        on_delete=models.CASCADE,
+        related_name="views_history",
+        verbose_name=_("Goods"),
+    )
+    viewed_at = models.DateTimeField(_("Viewed at"), auto_now_add=True)
+    compare = models.BooleanField(_("Compare"), default=False)
+
+    class Meta:
+        verbose_name = _("View history")
+        verbose_name_plural = _("Views history")
+
+    def __str__(self):
+        return f"{self.user}, {self.goods}, {self.viewed_at}"
