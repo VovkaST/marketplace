@@ -51,9 +51,9 @@ class GoodCategory(models.Model):
                                on_delete=models.CASCADE,
                                related_name='sub_category',
                                verbose_name=_('Parent Category'))
-    image = models.FileField(upload_to='images/categories')
-    deleted = models.BooleanField(verbose_name=_('Deleted'))
-    active = models.BooleanField(verbose_name=_('Active'))
+    image = models.FileField(upload_to='images/categories', null=True, blank=True)
+    deleted = models.BooleanField(verbose_name=_('Deleted'), default=False)
+    active = models.BooleanField(verbose_name=_('Active'), default=True)
     order_index = models.IntegerField(verbose_name=_('Order Index'))
 
     class Meta:
@@ -65,6 +65,13 @@ class GoodCategory(models.Model):
         if not self.active:
             return f'{self.name} ({_("Not active")})'
         return self.name
+
+    @property
+    def photo_url(self):
+        try:
+            return self.image.url
+        except ValueError:
+            return self.image.storage.url('no-avatar.jpg')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
