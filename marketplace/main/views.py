@@ -1,6 +1,6 @@
 from django.views.generic.base import ContextMixin, TemplateView
 from services.cache_settings import cache_settings
-from services.main_page import get_banners, get_categories
+from services.main_page import get_banners, get_categories, get_top_goods
 
 
 class CacheSettingsMixin(ContextMixin):
@@ -32,7 +32,16 @@ class CategoryMixin(ContextMixin):
         return context
 
 
-class MarketMain(TemplateView, BannerMixin, CategoryMixin, CacheSettingsMixin):
+class TopGoodsMixin(ContextMixin):
+    """Миксин топ-товаров"""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["top_goods"] = get_top_goods()
+        return context
+
+
+class MarketMain(TemplateView, BannerMixin, CategoryMixin, TopGoodsMixin, CacheSettingsMixin):
     """Представление главной страницы магазина"""
 
     template_name = "main/index.html"

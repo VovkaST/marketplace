@@ -1,5 +1,6 @@
 import random
 
+from app_sellers.models import Goods
 from main.models import Banner, GoodCategory
 
 
@@ -23,3 +24,8 @@ def get_categories():
     categories = GoodCategory.objects.only('name', 'image').filter(active=True, parent=None).order_by(
         'order_index')
     return categories.all()
+
+
+def get_top_goods():
+    """Получение топ-товаров"""
+    return Goods.objects.actual().filter().order_by('-rating_total').select_related('category')[:8]

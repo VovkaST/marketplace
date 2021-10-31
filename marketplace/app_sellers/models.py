@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
+from services.querysets import SoftDeleter
 from services.utils import slugify
 from main.models import GoodCategory
 
@@ -32,7 +33,7 @@ class GoodsDescriptionsValues(models.Model):
     value = models.CharField(_('Description value'), max_length=254)
     feature = models.ForeignKey(
         'GoodsDescriptionsValues', verbose_name=_('Description item'), on_delete=models.CASCADE,
-        related_name='description_feature'
+        related_name='description_feature', null=True, blank=True
     )
 
     class Meta:
@@ -41,6 +42,8 @@ class GoodsDescriptionsValues(models.Model):
         verbose_name_plural = _('Description values')
 
     def __str__(self):
+        if self.feature:
+            return f'{self.feature.value}: {self.value}'
         return self.value
 
 
@@ -57,6 +60,8 @@ class Goods(models.Model):
     description = models.ManyToManyField(
         GoodsDescriptionsValues, db_table='mp_goods_descriptions', related_name='good_descriptions'
     )
+
+    objects = SoftDeleter.as_manager()
 
     class Meta:
         db_table = 'mp_goods'
