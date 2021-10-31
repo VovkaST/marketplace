@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from app_sellers.models import Goods
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -50,7 +52,7 @@ class ViewHistory(models.Model):
         verbose_name=_("User"),
     )
     goods = models.ForeignKey(
-        "Goods",
+        Goods,
         on_delete=models.CASCADE,
         related_name="views_history",
         verbose_name=_("Goods"),
