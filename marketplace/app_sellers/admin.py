@@ -18,7 +18,7 @@ class SellersAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsDescriptionsValues)
 class GoodsDescriptionsValuesAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('value', 'feature', )
 
 
 @admin.register(Goods)

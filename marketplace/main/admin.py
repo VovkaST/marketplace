@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import GoodCategory, Banner
+from main.models import GoodCategory, Banner
 
 
 @admin.register(GoodCategory)

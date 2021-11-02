@@ -170,7 +170,7 @@ p.error-browser
                         <div class="CategoriesButton-link">-->
                             <a href="#">
                                 <div class="CategoriesButton-icon"><img
-                                        src="{{ category.image.url }}"
+                                        src="{{ category.image_url }}"
                                         alt="1.svg"/>
                                 </div>
 
@@ -180,7 +180,7 @@ p.error-browser
                                         {% for sub in category.sub_category.all %}
                                         <a class="CategoriesButton-link" href="#">
                                             <div class="CategoriesButton-icon"><img
-                                                    src="{{ sub.image.url }}"
+                                                    src="{{ sub.image_url }}"
                                                     alt="1.svg"/>
                                             </div>
                                             <span class="CategoriesButton-text">{{ sub.name }}</span>
