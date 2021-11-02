@@ -44,25 +44,25 @@
         </div>
         <div class="Section-content">
           <div class="Account">
-            <div class="Account-group">
+            <div class="Account-group account_section">
               <div class="Account-column">
                 {% if request.user.profile.avatar %}
-                <div class="Account-avatar"><img src="{{ request.user.profile.avatar.url }}" alt="card.jpg"/>
+                    <div class="Account-avatar">
+                        <img src="{{ request.user.profile.avatar.url }}" alt="card.jpg"/>
+                    </div>
                 {% endif %}
-                </div>
               </div>
               <div class="Account-column">
                 <div class="Account-name">
-                  {% if request.user.is_authenticated %}
-                    {{request.user.first_name}} {{request.user.profile.patronymic}} {{request.user.last_name}}
-                    {{request.user.profile.phone}} {{request.user.profile.mail}}
-                  {% endif %}
+                    <div class="account-column__row">{{ account.last_name }} {{ account.first_name }} {{ account.profile.patronymic }}</div>
+                    <div class="account-column__row">{{ account.profile.phone_number }}</div>
+                    <div class="account-column__row">{{ account.email }}</div>
                 </div><a class="Account-editLink" href="{% url 'profile' %}">Редактировать профиль</a>
               </div>
             </div>
             <div class="Account-group">
               <div class="Account-column Account-column_full">
-                <div class="Order Order_anons">
+                <div class="Order Order_anons account_section">
                   <div class="Order-personal">
                     <div class="row">
                       <div class="row-block"><a class="Order-title" href="oneorder.html">Заказ&#32;<span class="Order-numberOrder">№200</span>&#32;от&#32;<span class="Order-dateOrder">21.07.2020</span></a>

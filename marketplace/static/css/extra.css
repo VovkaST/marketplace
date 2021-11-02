@@ -24,11 +24,12 @@
     margin-top: 20px;
   }
 }
+.account-column__row {
+    line-height: 2em;
+}
 .Account-avatar {
-  max-width: 200px;
-  max-height: 200px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
+  max-width: 130px;
+  max-height: 130px;
 }
 @media screen and (max-width: 480px) {
   .Account-avatar {
@@ -42,12 +43,12 @@
   max-width: 100%;
   max-height: 100%;
 }
-.Account-name {
-  font-size: 36px;
-  font-weight: 400;
-  color: #424650;
-  line-height: 1.2em;
-}
+/*.Account-name {*/
+/*  font-size: 36px;*/
+/*  font-weight: 400;*/
+/*  color: #424650;*/
+/*  line-height: 1.2em;*/
+/*}*/
 .Account-name + .Account-editLink {
   display: inline-block;
 }
@@ -3124,7 +3125,8 @@ a.Cart-title {
   color: #f26d7d;
   font-size: 18px;
 }
-.Order_anons {
+/*.Order_anons {*/
+.account_section {
   border: 1px solid #e0e0e0;
   padding: 20px;
 }

@@ -2,10 +2,12 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from app_sellers.models import Goods
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user", verbose_name=_("User")
+        User, on_delete=models.CASCADE, related_name="profile", verbose_name=_("User")
     )
     avatar = models.ImageField(upload_to="files/", blank=True, verbose_name=_("Avatar"))
     patronymic = models.CharField(
@@ -14,11 +16,11 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=17, verbose_name=_("Phone"))
 
     class Meta:
-        verbose_name_plural = _("Users")
-        verbose_name = _("User")
+        verbose_name_plural = _("Profiles")
+        verbose_name = _("Profile")
 
     def __str__(self):
-        return f"{self.pk}, {self.phone_number}, {self.patronymic}"
+        return f"{self.user}, {self.phone_number}, {self.patronymic}"
 
 
 class UserAddress(models.Model):
@@ -50,7 +52,7 @@ class ViewHistory(models.Model):
         verbose_name=_("User"),
     )
     goods = models.ForeignKey(
-        "Goods",
+        Goods,
         on_delete=models.CASCADE,
         related_name="views_history",
         verbose_name=_("Goods"),

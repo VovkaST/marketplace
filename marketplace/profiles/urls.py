@@ -1,11 +1,16 @@
-from django.urls import path
-from .views import AccountView, UpdateProfile, LogoutViews, LoginViews, RegistrationView
+from django.urls import path, include
+from profiles.views import (
+    AccountView,
+    ClientLoginView,
+    RegistrationView,
+    UpdateProfile,
+)
 
 
 urlpatterns = [
     path('account/', AccountView.as_view(), name='account'),
     path('profile/', UpdateProfile.as_view(), name='profile'),
     path('registration/', RegistrationView.as_view(), name='registration'),
-    path('login/', LoginViews.as_view(), name='login'),
-    path('logout/', LogoutViews.as_view(), name='logout')
+    path('login/', ClientLoginView.as_view(), name='login'),
+    path('', include('django.contrib.auth.urls')),
 ]
