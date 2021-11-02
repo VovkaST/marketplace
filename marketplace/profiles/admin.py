@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import Profile, UserAddress
+from profiles.models import Profile, UserAddress
 
 
 class ProfilesAdmin(admin.ModelAdmin):
     model = Profile
-    list_display = ["phone_number", "patronymic"]
+    list_display = ["user", "phone_number", "patronymic"]
 
 
 class UserAddressAdmin(admin.ModelAdmin):

@@ -1,6 +1,9 @@
+import re
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from .models import UserAddress
@@ -19,14 +22,26 @@ class RegisterForm(UserCreationForm):
         fields = ["username", "first_name", "last_name", "password1", "password2"]
 
 
-class ChangeInfo(forms.ModelForm):
-    mail = forms.CharField(max_length=30, help_text=_("Mail"))
-    phone = forms.CharField(max_length=30, help_text=_("Phone"))
-    avatar = forms.ImageField(required=False, help_text=_("Avatar"))
+class ChangeInfoForm(forms.ModelForm):
+    phone = forms.CharField(max_length=30)
+    avatar = forms.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name"]
+        fields = ["first_name", "last_name", "email"]
+
+    def clean_phone(self):
+        phone = re.sub(r'\D', '', self.cleaned_data['phone'])
+        if len(phone) != 11:
+            raise ValidationError(_('Invalid phone format'), code='invalid')
+        return phone[1:]
+
+    def save(self, commit=True):
+        super().save(commit=commit)
+        self.instance.profile.phone_number = self.cleaned_data['phone']
+        self.instance.profile.avatar = self.cleaned_data['avatar']
+        self.instance.profile.save()
+        return self.instance
 
 
 class AddressForm(forms.ModelForm):

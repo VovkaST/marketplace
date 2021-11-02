@@ -1,76 +1,56 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.views import View, generic
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from django.views import generic
 
-from .forms import ChangeInfo, RegisterForm
-from .models import Profile
+from profiles.forms import ChangeInfoForm, RegisterForm
+from profiles.models import Profile
 
 
-class AccountView(generic.ListView):
+class AccountView(generic.DetailView):
     model = Profile
     template_name = "profiles/account.html"
-    context_object_name = "accounts"
+    context_object_name = "account"
 
-    def get_object(self):
-        pass
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
 class UpdateProfile(generic.UpdateView):
-    model = User
-    form_class = ChangeInfo
+    form_class = ChangeInfoForm
     template_name = "profiles/profile.html"
-    context_object_name = "profiles"
+    context_object_name = "profile"
+    success_url = reverse_lazy('profile')
 
-    def get_object(self):
-        pass
+    def get_initial(self):
+        obj = self.get_object()
+        initial = super().get_initial()
+        initial.update({
+            'phone': obj.profile.phone_number,
+            'avatar': obj.profile.avatar,
+        })
+        return initial
 
-    def get_absolute_url(self):
-        return HttpResponseRedirect("/account/profile/")
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
-class LoginViews(LoginView):
+class ClientLoginView(LoginView):
     template_name = "profiles/base_login_form.html"
 
 
-class LogoutViews(LogoutView):
-    pass
+class RegistrationView(generic.FormView):
+    form_class = RegisterForm
 
-
-class RegistrationView(View):
-    def get(self, request, *args, **kwargs):
-        form = RegisterForm()
-        return render(request, "profiles/base_registration.html", {"form": form})
-
-    def post(self, request, *args, **kwargs):
-        if request.method == "POST":
-            form = RegisterForm(request.POST, request.FILES)
-            if form.is_valid():
-                user = form.save()
-                mail = form.cleaned_data.get("mail")
-                phone = form.cleaned_data.get("phone")
-                avatar = form.cleaned_data.get("avatar")
-                patronymic = form.cleaned_data.get("patronymic")
-                first_name = form.cleaned_data.get("first_name")
-                last_name = form.cleaned_data.get("last_name")
-                Profile.objects.create(
-                    user=user,
-                    mail=mail,
-                    phone=phone,
-                    avatar=avatar,
-                    patronymic=patronymic,
-                    first_name=first_name,
-                    last_name=last_name,
-                )
-                username = form.cleaned_data.get("username")
-                password = form.cleaned_data.get("password1")
-                user = authenticate(username=username, password=password)
-                login(request, user)
-                return render(request, "profiles/account.html", {"form": form})
-            else:
-                form = RegisterForm()
-                return render(
-                    request, "profiles/base_registration.html", {"form": form}
-                )
+    def form_valid(self, form):
+        Profile.objects.create(**{
+            'user': form.save(),
+            'phone_number': form.cleaned_data.get("phone"),
+            'avatar': form.cleaned_data.get("avatar"),
+            'patronymic': form.cleaned_data.get("patronymic"),
+        })
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password1")
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return super().form_valid(form=form)
