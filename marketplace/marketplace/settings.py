@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
+    "app_orders.apps.AppOrdersConfig",
 ]
 
 MIDDLEWARE = [
