@@ -39,19 +39,19 @@ class PaymentMethods(models.Model):
 
 
 class Orders(models.Model):
-    user = models.ForeignKey(User, verbose_name=_('User'), on_delete=models.CASCADE, related_name='user_orders'),
-    total_sum = models.DecimalField(_('Total sum'), default=0, decimal_places=2, max_digits=19),
-    date_time = models.DateTimeField(_('Date, time'), default=timezone.now()),
+    user = models.ForeignKey(User, verbose_name=_('User'), on_delete=models.CASCADE, related_name='user_orders')
+    total_sum = models.DecimalField(_('Total sum'), default=0, decimal_places=2, max_digits=19)
+    date_time = models.DateTimeField(_('Date, time'), default=timezone.now())
     delivery = models.ForeignKey(
         DeliveryMethods, verbose_name=_('Delivery methods'), on_delete=models.CASCADE, related_name='delivery_method'
-    ),
+    )
     payment = models.ForeignKey(
         PaymentMethods, verbose_name=_('Payment methods'), on_delete=models.CASCADE, related_name='payment_method'
-    ),
-    payment_state = models.BooleanField(_('Payment state'), default=False),
-    city = models.CharField(_('City'), max_length=255),
-    address = models.CharField(_('Address'), max_length=1000),
-    comment = models.CharField(_('Comment'), max_length=255),
+    )
+    payment_state = models.BooleanField(_('Payment state'), default=False)
+    city = models.CharField(_('City'), max_length=255)
+    address = models.CharField(_('Address'), max_length=1000)
+    comment = models.CharField(_('Comment'), max_length=255)
     deleted = models.BooleanField(_("Deletion mark"), default=False)
 
     objects = SoftDeleter.as_manager()
@@ -70,11 +70,11 @@ class Orders(models.Model):
 
 
 class OrderItems(models.Model):
-    order = models.ForeignKey(Orders, verbose_name=_('Order'), on_delete=models.CASCADE, related_name='order'),
-    seller = models.ForeignKey(Sellers, verbose_name=_('Seller'), on_delete=models.CASCADE, related_name='seller'),
-    good = models.ForeignKey(Goods, verbose_name=_('Good'), on_delete=models.CASCADE, related_name='good'),
-    quantity = models.IntegerField(_('Quantity'), default=1),
-    price = models.DecimalField(_('Price'), decimal_places=2, max_digits=19),
+    order = models.ForeignKey(Orders, verbose_name=_('Order'), on_delete=models.CASCADE, related_name='order')
+    seller = models.ForeignKey(Sellers, verbose_name=_('Seller'), on_delete=models.CASCADE, related_name='seller')
+    good = models.ForeignKey(Goods, verbose_name=_('Good'), on_delete=models.CASCADE, related_name='good')
+    quantity = models.IntegerField(_('Quantity'), default=1)
+    price = models.DecimalField(_('Price'), decimal_places=2, max_digits=19)
     total_price = models.DecimalField(_('Total price'), decimal_places=2, max_digits=19)
 
     def __str__(self):
