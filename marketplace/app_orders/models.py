@@ -41,7 +41,7 @@ class PaymentMethods(models.Model):
 class Orders(models.Model):
     user = models.ForeignKey(User, verbose_name=_('User'), on_delete=models.CASCADE, related_name='user_orders')
     total_sum = models.DecimalField(_('Total sum'), default=0, decimal_places=2, max_digits=19)
-    date_time = models.DateTimeField(_('Date, time'), default=timezone.now())
+    date_time = models.DateTimeField(_('Date, time'), default=timezone.now)
     delivery = models.ForeignKey(
         DeliveryMethods, verbose_name=_('Delivery methods'), on_delete=models.CASCADE, related_name='delivery_method'
     )

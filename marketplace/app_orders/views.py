@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.views import generic
 
-# Create your views here.
+from app_orders.models import Orders
+
+
+class OrderCreateView(generic.CreateView):
+    model = Orders
+    fields = '__all__'
+    template_name = 'app_orders/order_create.html'
