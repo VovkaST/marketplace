@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['teamdiploma.ru']
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "custom_admin.apps.AppAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
