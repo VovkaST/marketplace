@@ -14,7 +14,7 @@ def registration(request: WSGIRequest, registration_form: RegisterForm):
     """
     Profile.objects.create(**{
         'user': registration_form.save(),
-        'phone_number': registration_form.cleaned_data.get("phone"),
+        'phone_number': registration_form.cleaned_data.get("phone_number"),
         'avatar': registration_form.cleaned_data.get("avatar"),
         'patronymic': registration_form.cleaned_data.get("patronymic"),
     })
