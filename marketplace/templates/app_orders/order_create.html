@@ -2,5 +2,9 @@
 {% load i18n %}
 
 {% block content %}
-    {{ form.as_p }}
+    <form action="{{ view.success_url }}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% trans 'Next' %}</button>
+    </form>
 {% endblock content %}

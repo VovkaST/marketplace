@@ -19,7 +19,7 @@
 
 {% load static i18n cache %}
 <head>
-    <title>Megano</title>
+    <title>Megano{% if page_title %}: {{ page_title }}{% endif %}</title>
     <meta name="description" content="Описание страницы">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -227,10 +227,9 @@ p.error-browser
 	{% endblock %}
 </header>
 
-
-{% block content %}
-{% endblock %}
-
+<div class="Middle">
+    {% block content %}{% endblock %}
+</div>
 
 <footer class="Footer">
 	{% block footer %}
