@@ -14,7 +14,7 @@ class RegisterForm(UserCreationForm):
     last_name = forms.CharField(max_length=30, help_text=_("Last Name"))
     mail = forms.CharField(max_length=30, help_text=_("Mail"))
     phone_number = forms.CharField(max_length=30, help_text=_("Phone number"))
-    patronymic = forms.CharField(max_length=30, help_text=_("Patronymic"))
+    patronymic = forms.CharField(max_length=30, help_text=_("Patronymic"), required=False)
     avatar = forms.ImageField(required=False, help_text=_("Avatar"))
 
     class Meta:

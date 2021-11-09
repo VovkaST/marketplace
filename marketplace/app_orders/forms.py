@@ -6,15 +6,22 @@ from app_orders.models import (
     DeliveryMethods,
     PaymentMethods,
 )
+from services.auth import is_user_exists
 
 
 class OrderStep1AuthorizedForm(forms.ModelForm):
-    patronymic = forms.CharField(max_length=150)
+    patronymic = forms.CharField(max_length=150, required=False)
     phone = forms.CharField(max_length=30)
 
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email"]
+
+    def is_valid(self):
+        super().is_valid()
+        if not is_user_exists(email=self.cleaned_data['email']):
+            self.add_error('email', _('User with such email address already exists.'))
+        return super().is_valid()
 
 
 class OrderStep1NotAuthorizedForm(OrderStep1AuthorizedForm):

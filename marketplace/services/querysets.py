@@ -10,3 +10,14 @@ class SoftDeleter(models.QuerySet):
 
     def recover(self):
         self.update(deleted=False)
+
+
+class OrdersQuerySet(SoftDeleter):
+    def user_order(self, user):
+        return self.filter(user=user)
+
+    def incomplete_order(self, user, related=False):
+        queryset = self.user_order(user=user).filter(payment_state=False)
+        if related:
+            queryset.select_related('delivery', 'payment', 'user')
+        return queryset.first()

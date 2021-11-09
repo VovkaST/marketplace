@@ -8,7 +8,7 @@ from app_sellers.models import (
     Goods,
     Sellers,
 )
-from services.querysets import SoftDeleter
+from services.querysets import OrdersQuerySet
 
 
 class DeliveryMethods(models.Model):
@@ -43,18 +43,20 @@ class Orders(models.Model):
     total_sum = models.DecimalField(_('Total sum'), default=0, decimal_places=2, max_digits=19)
     date_time = models.DateTimeField(_('Date, time'), default=timezone.now)
     delivery = models.ForeignKey(
-        DeliveryMethods, verbose_name=_('Delivery methods'), on_delete=models.CASCADE, related_name='delivery_method'
+        DeliveryMethods, verbose_name=_('Delivery methods'), on_delete=models.CASCADE, related_name='delivery_method',
+        blank=True, null=True
     )
     payment = models.ForeignKey(
-        PaymentMethods, verbose_name=_('Payment methods'), on_delete=models.CASCADE, related_name='payment_method'
+        PaymentMethods, verbose_name=_('Payment methods'), on_delete=models.CASCADE, related_name='payment_method',
+        blank=True, null=True
     )
     payment_state = models.BooleanField(_('Payment state'), default=False)
-    city = models.CharField(_('City'), max_length=255)
-    address = models.CharField(_('Address'), max_length=1000)
-    comment = models.CharField(_('Comment'), max_length=255)
+    city = models.CharField(_('City'), max_length=255, blank=True)
+    address = models.CharField(_('Address'), max_length=1000, blank=True)
+    comment = models.CharField(_('Comment'), max_length=255, blank=True)
     deleted = models.BooleanField(_("Deletion mark"), default=False)
 
-    objects = SoftDeleter.as_manager()
+    objects = OrdersQuerySet.as_manager()
 
     def __str__(self):
         return _('%(begin_date)s &ndash; %(total_sum)s. %(pay_state)s.') % {
