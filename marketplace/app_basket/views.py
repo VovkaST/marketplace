@@ -45,7 +45,7 @@ class BasketView(BasketViewMixin, BasketHandlingBaseView):
         return self.form_valid(form=form)
 
     def form_valid(self, form):
-        sale = perform_purchase(request=self.request)
+        perform_purchase(request=self.request)
         return super().form_valid(form=form)
 
 

@@ -1,5 +1,5 @@
 from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import Sum
+from django.db.models import Sum, F, FloatField
 
 from app_basket.models import Basket
 
@@ -37,3 +37,15 @@ def delete_item_from_basket(request: WSGIRequest):
 
 def add_item_to_basket(request):
     pass
+
+
+def get_basket_total_sum(request: WSGIRequest) -> int:
+    """Calculate quantity of goods in user Basket.
+
+    :param request: http-request instance.
+    :return: quantity of goods in user Basket.
+    """
+    quantity = Basket.objects\
+        .user_basket(request=request)\
+        .aggregate(total=Sum(F('quantity') * F('reservation__price'), output_field=FloatField()))
+    return int(quantity['total'] or 0)
