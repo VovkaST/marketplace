@@ -1,7 +1,10 @@
+from decimal import Decimal
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Sum, F, FloatField
 
 from app_basket.models import Basket
+from marketplace.settings import DECIMAL_SUM_TEMPLATE
 
 
 def get_goods_quantity_in_basket(request: WSGIRequest) -> int:
@@ -39,7 +42,7 @@ def add_item_to_basket(request):
     pass
 
 
-def get_basket_total_sum(request: WSGIRequest) -> int:
+def get_basket_total_sum(request: WSGIRequest) -> Decimal:
     """Calculate quantity of goods in user Basket.
 
     :param request: http-request instance.
@@ -48,4 +51,4 @@ def get_basket_total_sum(request: WSGIRequest) -> int:
     quantity = Basket.objects\
         .user_basket(request=request)\
         .aggregate(total=Sum(F('quantity') * F('reservation__price'), output_field=FloatField()))
-    return int(quantity['total'] or 0)
+    return Decimal(quantity['total'] or 0).quantize(DECIMAL_SUM_TEMPLATE)

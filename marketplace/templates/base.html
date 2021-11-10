@@ -137,7 +137,7 @@ p.error-browser
                         class="CartBlock-amount">4</span></a><a class="CartBlock-block" href="#"><img
                         class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/><span
                         class="CartBlock-amount">{{ request.goods_in_basket|default:'0' }}</span></a>
-                    <div class="CartBlock-block"><span class="CartBlock-price">0.00$</span>
+                    <div class="CartBlock-block"><span class="CartBlock-price">{{ request.basket_total_sum|default:'0.00' }}$</span>
                     </div>
                 </div>
             </div>
