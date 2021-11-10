@@ -36,10 +36,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "main.apps.MainConfig",
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
+    "app_basket.apps.AppBasketConfig",
 ]
 
 MIDDLEWARE = [

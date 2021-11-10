@@ -10,3 +10,12 @@ class SoftDeleter(models.QuerySet):
 
     def recover(self):
         self.update(deleted=False)
+
+
+class BasketQuerySet(models.QuerySet):
+    def user_basket(self, request):
+        if request.user.is_authenticated:
+            filters = {'user': request.user}
+        else:
+            filters = {'session': request.session.session_key}
+        return self.filter(**filters)
