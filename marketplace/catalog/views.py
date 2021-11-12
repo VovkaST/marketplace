@@ -1,20 +1,31 @@
 import django_filters
-from app_sellers.models import Goods
+from app_sellers.models import Balances, Goods
+from django.db.models import Count
 from django.views.generic import ListView
 from django_filters.widgets import LinkWidget, RangeWidget
 
 
 class CatalogFilter(django_filters.FilterSet):
-
     sales = django_filters.RangeFilter(widget=RangeWidget())
-
-    # manufacturer = django_filters.ModelChoiceFilter(queryset=Manufacturer.objects.all())
-
     name = django_filters.CharFilter(lookup_expr="icontains")
 
+    reviews_count = django_filters.RangeFilter(widget=RangeWidget())
+
+    # manufacturer = django_filters.ModelChoiceFilter(queryset=Manufacturer.objects.all())
     # activity = django_filters.BooleanFilter(widget=BooleanWidget())
 
-    o = django_filters.OrderingFilter(fields=["sales", "name"], widget=LinkWidget)
+    o = django_filters.OrderingFilter(
+        fields=(
+            # ('reviews_count', 'reviews_count'),
+            "reviews_count",
+            "sales",
+            "name",
+        ),
+        # field_labels={
+        #     'reviews_count': 'Qty of reviews',
+        # },
+        widget=LinkWidget,
+    )
 
     class Meta:
         model = Goods
@@ -42,10 +53,12 @@ class FilteredListView(ListView):
 
 
 class CatalogView(FilteredListView):
-    model = Goods
+    # model = Goods
+    # queryset = Goods.objects.annotate_with_reviews_count()
+    queryset = Goods.objects.annotate(reviews_count=Count("good_balance"))
     template_name = "catalog/catalog.html"
     filterset_class = CatalogFilter
-    paginate_by = 4
+    paginate_by = 3
 
     def get_queryset(self):
         queryset = super().get_queryset()

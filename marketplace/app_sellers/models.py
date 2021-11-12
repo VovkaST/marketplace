@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext as _
+from main.models import GoodCategory
 from services.querysets import SoftDeleter
 from services.utils import slugify
-from main.models import GoodCategory
 
 
 class Sellers(models.Model):
@@ -48,7 +48,7 @@ class GoodsDescriptionsValues(models.Model):
 
     def __str__(self):
         if self.feature:
-            return f'{self.feature.value}: {self.value}'
+            return f"{self.feature.value}: {self.value}"
         return self.value
 
 
@@ -72,6 +72,7 @@ class Goods(models.Model):
     )
 
     objects = SoftDeleter.as_manager()
+    # objects = GoodsQuerySet.as_manager()
 
     class Meta:
         db_table = "mp_goods"
