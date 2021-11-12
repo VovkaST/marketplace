@@ -146,8 +146,7 @@
             </div>
             <div class="Section-content">
                 <header class="Section-header">
-                    <h2 class="Section-title">Popular Products
-                    </h2>
+                    <h2 class="Section-title">Popular Products</h2>
                 </header>
                 <div class="Cards">
                     {% for good in top_goods %}
@@ -170,7 +169,8 @@
                                         </a>
                                         <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
                                             {% csrf_token %}
-                                            <a class="Card-btn submitter" href="#" data-id="{{ good.balance_id }}">
+                                            <input type="hidden" name="data-id" value="{{ good.balance_id }}">
+                                            <a class="Card-btn submitter" href="#">
                                                 <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
                                             </a>
                                         </form>

@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Sum, F, FloatField
+from django.utils import timezone
 
 from app_basket.models import Basket
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
@@ -38,8 +39,35 @@ def delete_item_from_basket(request: WSGIRequest):
     pass
 
 
-def add_item_to_basket(request):
-    pass
+def add_item_to_basket(request: WSGIRequest, reservation_id_key: str = 'data-id') -> dict:
+    """Add goods item into user`s basket.
+
+    :param request: http-request instance.
+    :param reservation_id_key: Reservation ID key name in request POST-data.
+    :return: Errors dict.
+    """
+    error = dict()
+    reservation = request.POST.get(reservation_id_key)
+    quantity = request.POST.get('quantity', 1)
+    searchable = {
+        'reservation_id': reservation,
+        'user': request.user if request.user.is_authenticated else None,
+        'session': request.session.session_key
+    }
+    defaults = {
+        'quantity': quantity,
+        'modified_at': timezone.now(),
+    }
+    try:
+        obj, created = Basket.objects.get_or_create(defaults=defaults, **searchable)
+        if not created:
+            obj.quantity += int(quantity)
+            obj.save(force_update=True)
+    except Exception as exc:
+        error = {
+            'message': exc.args[0],
+        }
+    return error
 
 
 def get_basket_total_sum(request: WSGIRequest) -> Decimal:
