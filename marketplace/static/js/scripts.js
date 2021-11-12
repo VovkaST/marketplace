@@ -914,8 +914,8 @@ function ajaxSendJson(form, success_handler=undefined) {
 }
 
 function setBasketFullness(quantity, total_sum) {
-    $('.CartBlock-amount').text(quantity);
-    $('.CartBlock-price').text(total_sum);
+    $('#basket__quantity').text(quantity);
+    $('#basket__sum').text(total_sum);
 }
 
 function responseBasketAdd(response) {

@@ -131,13 +131,17 @@ p.error-browser
                 </div>
             </nav>
             <div class="row-block">
-                <div class="CartBlock"><a class="CartBlock-block" href="#"><img class="CartBlock-img"
-                                                                                           src="{% static 'img/icons/exchange.svg' %}"
-                                                                                           alt="exchange.svg"/><span
-                        class="CartBlock-amount">4</span></a><a class="CartBlock-block" href="#"><img
-                        class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/><span
-                        class="CartBlock-amount">{{ request.goods_in_basket|default:'0' }}</span></a>
-                    <div class="CartBlock-block"><span class="CartBlock-price">{{ request.basket_total_sum|default:'0.00' }}$</span>
+                <div class="CartBlock">
+                    <a class="CartBlock-block" href="#">
+                        <img class="CartBlock-img" src="{% static 'img/icons/exchange.svg' %}" alt="exchange.svg"/>
+                        <span class="CartBlock-amount">4</span>
+                    </a>
+                    <a class="CartBlock-block" href="#">
+                        <img class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/>
+                        <span class="CartBlock-amount" id="basket__quantity">{{ request.goods_in_basket|default:'0' }}</span>
+                    </a>
+                    <div class="CartBlock-block">
+                        <span class="CartBlock-price" id="basket__sum">{{ request.basket_total_sum|default:'0.00' }}$</span>
                     </div>
                 </div>
             </div>
