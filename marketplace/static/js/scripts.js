@@ -891,6 +891,86 @@ Categories().init();
 
 })(jQuery);
 
+
+/* Функции работы с данными сайта */
+let CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
+
+
+function ajaxSendJson(form, success_handler=undefined) {
+    $.ajax({
+        url: form.attr('action'),
+        type: form.attr('method'),
+        dataType: 'json',
+        data: form.serialize(),
+        headers:{
+            "X-CSRFToken": CSRF_TOKEN,
+        },
+        success: function(response){
+            if (!success_handler) return;
+            response.form = form;
+            success_handler(response);
+        },
+    });
+}
+
+function setBasketFullness(quantity, total_sum) {
+    $('.CartBlock-amount').text(quantity);
+    $('.CartBlock-price').text(total_sum);
+}
+
+function responseBasketAdd(response) {
+    if (response.success) {
+        setBasketFullness(response.basket_fullness, response.basket_sum);
+        // response.form.find('input[name="quantity"]').val('');
+        alert('Товар успешно добавлен в корзину!');
+    } else
+        alert(`Ошибка: ${response.error.message}`);
+    return response.success;
+}
+
+// function responseBasketChangeItem(response) {
+//     if (response.success) {
+//         let $row = response.form.closest('.basket-item-row');
+//         setBasketFullness(response.basket_fullness);
+//         recalculateBasketRow($row);
+//         recalculateBasketTotalSum();
+//     } else
+//         alert(`Ошибка: ${response.error.message}`);
+//     return response.success;
+// }
+//
+// function responseBasketDelete(response) {
+//     if (response.success) {
+//         response.form.closest('tr').remove();
+//         setBasketFullness(response.basket_fullness);
+//         recalculateBasketTotalSum();
+//     } else
+//         alert(`Ошибка: ${response.error.message}`);
+//     return response.success;
+// }
+
+
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
+
+    $('.basket-form__add').submit(function(){
+        ajaxSendJson($(this), responseBasketAdd);
+        return false;
+    });
+
+    $('.submitter').click(function(event){
+        event.preventDefault();
+        $(this).closest('form').submit();
+    });
+
+    // $('.basket-item__quantity').change(function(){
+    //     let $this = $(this);
+    //     if (!$this.val()) $this.val(1);
+    //     ajaxSendJson($this.closest('form'), responseBasketChangeItem);
+    // });
+    //
+    // $('.basket-delete').submit(function(){
+    //     ajaxSendJson($(this), responseBasketDelete);
+    //     return false;
+    // });
 });

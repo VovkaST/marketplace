@@ -161,16 +161,19 @@
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
-                                        <span class="Card-price">$85.00</span>
+                                        <span class="Card-price">&#8381;{{ good.price|floatformat:2 }}</span>
                                     </div>
                                     <div class="Card-category">{{ good.category.name }}</div>
                                     <div class="Card-hover">
                                         <a class="Card-btn" href="#">
                                             <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
                                         </a>
-                                        <a class="Card-btn" href="#">
-                                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
-                                        </a>
+                                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                            {% csrf_token %}
+                                            <a class="Card-btn submitter" href="#" data-id="{{ good.balance_id }}">
+                                                <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                                            </a>
+                                        </form>
                                         <a class="Card-btn" href="compare.html">
                                             <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
                                         </a>

@@ -9,6 +9,7 @@ from app_basket.models import Basket
 from services.basket import (
     add_item_to_basket,
     delete_item_from_basket,
+    get_basket_total_sum,
     get_goods_quantity_in_basket,
     patch_item_in_basket,
     perform_purchase,
@@ -56,6 +57,7 @@ class BasketPatchItemView(BasketViewMixin, BasketHandlingBaseView):
             'success': not error,
             'error': error,
             'basket_fullness': get_goods_quantity_in_basket(request=request),
+            'basket_sum': get_basket_total_sum(request=request),
         })
 
 
@@ -66,6 +68,7 @@ class BasketDeleteItemView(BasketViewMixin, BasketHandlingBaseView):
             'success': not error,
             'error': error,
             'basket_fullness': get_goods_quantity_in_basket(request=request),
+            'basket_sum': get_basket_total_sum(request=request),
         })
 
 
@@ -76,4 +79,5 @@ class BasketAddItemView(BasketViewMixin, BasketHandlingBaseView):
             'success': not error,
             'error': error,
             'basket_fullness': get_goods_quantity_in_basket(request=request),
+            'basket_sum': get_basket_total_sum(request=request),
         })
