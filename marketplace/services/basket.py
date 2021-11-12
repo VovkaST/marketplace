@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.contrib.auth.models import User
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Sum, F, FloatField
 from django.utils import timezone
@@ -39,20 +40,21 @@ def delete_item_from_basket(request: WSGIRequest):
     pass
 
 
-def add_item_to_basket(request: WSGIRequest, reservation_id_key: str = 'data-id') -> dict:
-    """Add goods item into user`s basket.
+def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
+    """Добавляет товар из баланса продавцов в пользовательскую корзину.
 
-    :param request: http-request instance.
-    :param reservation_id_key: Reservation ID key name in request POST-data.
+    :param user: Экземпляр АВТОРИЗОВАННОГО пользователя или None
+                 в случае анонимного пользователя.
+    :param session: Строка идентификатора сессии.
+    :param reservation_id: Идентификатор баланса продавца.
+    :param quantity: Количество единиц товара.
     :return: Errors dict.
     """
     error = dict()
-    reservation = request.POST.get(reservation_id_key)
-    quantity = request.POST.get('quantity', 1)
     searchable = {
-        'reservation_id': reservation,
-        'user': request.user if request.user.is_authenticated else None,
-        'session': request.session.session_key
+        'reservation_id': reservation_id,
+        'user': user,
+        'session': session
     }
     defaults = {
         'quantity': quantity,
@@ -61,7 +63,7 @@ def add_item_to_basket(request: WSGIRequest, reservation_id_key: str = 'data-id'
     try:
         obj, created = Basket.objects.get_or_create(defaults=defaults, **searchable)
         if not created:
-            obj.quantity += int(quantity)
+            obj.quantity += quantity
             obj.save(force_update=True)
     except Exception as exc:
         error = {

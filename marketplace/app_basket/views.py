@@ -74,7 +74,11 @@ class BasketDeleteItemView(BasketViewMixin, BasketHandlingBaseView):
 
 class BasketAddItemView(BasketViewMixin, BasketHandlingBaseView):
     def post(self, request, *args, **kwargs):
-        error = add_item_to_basket(request=request)
+        reservation = request.POST.get('data-id')
+        quantity = int(request.POST.get('quantity', 1))
+        session = request.session.session_key
+        user = request.user if request.user.is_authenticated else None
+        error = add_item_to_basket(user=user, session=session, reservation_id=reservation, quantity=quantity)
         return JsonResponse({
             'success': not error,
             'error': error,
