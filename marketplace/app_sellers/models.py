@@ -92,6 +92,7 @@ class GoodsImage(models.Model):
     image = models.ImageField(upload_to="goods-images/", verbose_name=_("Image"))
 
     class Meta:
+        db_table = 'mp_goods_images'
         verbose_name = _("Goods image")
         verbose_name_plural = _("Goods images")
 
