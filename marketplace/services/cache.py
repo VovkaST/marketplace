@@ -14,14 +14,6 @@ from services.cache_settings import (
 BASKET_LIFE_TIME = cache_settings['basket_life_time']
 
 
-def set_or_get_cache(key: str, value, lifetime: int):
-    if key not in cache:
-        cache.set(key, value, lifetime)
-        return value
-    else:
-        return cache.get(key)
-
-
 def reset_seller_page_cache(seller: Sellers):
     """Reset cache on detailed view seller`s page"""
     key = make_template_fragment_key('seller_info', seller.slug)
@@ -37,14 +29,16 @@ def basket_cache_save(session_id, user_id: None, lifetime=BASKET_LIFE_TIME) -> d
     """
     goods_quantity_cache_key = f'{GOODS_IN_BASKET_CACHE_PREFIX}_{session_id}'
     total_sum_cache_key = f'{BASKET_TOTAL_SUM_CACHE_PREFIX}_{session_id}'
-    meta = get_basket_meta(session_id=session_id, user_id=user_id)
-    set_or_get_cache(
-        key=goods_quantity_cache_key, value=meta['goods_quantity'], lifetime=lifetime
-    )
-    set_or_get_cache(
-        key=total_sum_cache_key, value=meta['total_sum'], lifetime=lifetime
-    )
-    return meta
+    if goods_quantity_cache_key not in cache \
+            or total_sum_cache_key not in cache:
+        meta = get_basket_meta(session_id=session_id, user_id=user_id)
+        cache.set(goods_quantity_cache_key, meta['goods_quantity'], lifetime)
+        cache.set(total_sum_cache_key, meta['total_sum'], lifetime)
+        return meta
+    return {
+        'goods_quantity': cache.get(goods_quantity_cache_key),
+        'total_sum': cache.get(total_sum_cache_key),
+    }
 
 
 def basket_cache_clear(session_id: str, username: str = None):

@@ -1,8 +1,7 @@
-from django.db.models import F
 from django.http import JsonResponse
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views import generic
-from django.views.generic.base import ContextMixin
 
 from app_basket.forms import PurchasePerformForm
 from app_basket.models import Basket
@@ -22,14 +21,11 @@ class BasketViewMixin(ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        goods = Basket.objects\
-            .user_basket(user_id=self.request.user.id, session_id=self.request.session.session_key)\
-            .select_related('reservation__good')\
-            .annotate(sum=F('reservation__price') * F('quantity'))
         context.update({
-            'goods': goods,
-            'total_sum': sum([item.balance.price * item.quantity for item in goods]),
             'cache_key': get_username_or_session_key(self.request),
+            **get_basket_meta(
+                session_id=self.request.session.session_key, user_id=self.request.user.id, items=True
+            ),
         })
         return context
 

@@ -83,14 +83,15 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     return error
 
 
-def get_basket_meta(session_id: str, user_id=None) -> dict:
+def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
     """Получает количественные показатели пользовательской корзины.
 
     :param session_id: Идентификатор сессии.
     :param user_id: Идентификатор пользователя.
-    :return: quantity of goods in user Basket.
+    :param items: Флаг необходимости получения списка товаров.
+    :return: Мета-данные пользовательской корзины.
     """
-    meta = Basket.objects\
+    data = Basket.objects\
         .user_basket(user_id=user_id, session_id=session_id)\
         .aggregate(
             goods_quantity=Sum('quantity', output_field=IntegerField()),
@@ -99,7 +100,22 @@ def get_basket_meta(session_id: str, user_id=None) -> dict:
                 output_field=DecimalField(decimal_places=2, max_digits=19)
             )
         )
-    return {
-        'goods_quantity': meta['goods_quantity'] or 0,
-        'total_sum': Decimal(meta['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE),
+    meta = {
+        'goods_quantity': data['goods_quantity'] or 0,
+        'total_sum': Decimal(data['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE),
     }
+    if items:
+        data = Basket.objects \
+            .user_basket(user_id=user_id, session_id=session_id) \
+            .select_related('reservation__good')
+        meta.update({'items': list()})
+        for item in data:
+            meta['items'].append({
+                'reservation_id': item.reservation_id,
+                'quantity': item.quantity,
+                'price': item.reservation.price,
+                'total_price': Decimal(item.quantity) * item.reservation.price,
+                'good_name': item.reservation.good.name,
+                'good_image': item.reservation.good.good_images,
+            })
+    return meta
