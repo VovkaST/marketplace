@@ -2,21 +2,12 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import Sum, F, FloatField
+from django.db.models import DecimalField, F, IntegerField, Sum
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from app_basket.models import Basket
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
-
-
-def get_goods_quantity_in_basket(request: WSGIRequest) -> int:
-    """Calculate quantity of goods in user Basket.
-
-    :param request: http-request instance.
-    :return: quantity of goods in user Basket.
-    """
-    quantity = Basket.objects.user_basket(request=request).aggregate(Sum('quantity'))
-    return int(quantity['quantity__sum'] or 0)
 
 
 def is_enough_shop_balances(basket) -> bool:
@@ -32,8 +23,28 @@ def perform_purchase(request: WSGIRequest):
     pass
 
 
-def patch_item_in_basket(request: WSGIRequest):
-    pass
+def patch_item_in_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
+    """Patch goods item quantity in user`s basket.
+
+    :param request: http-request instance.
+    :param balance_id_key: Balance ID key name in request POST-data.
+    :return: Errors dict.
+    """
+    error = dict()
+    searchable = {
+        'reservation_id': reservation_id,
+        'user': user,
+        'session': session
+    }
+    try:
+        updated = Basket.objects.filter(**searchable).update(quantity=quantity)
+        if not updated:
+            raise Exception(_('Item not found in basket.'))
+    except Exception as exc:
+        error = {
+            'message': exc.args[0],
+        }
+    return error
 
 
 def delete_item_from_basket(request: WSGIRequest):
@@ -72,13 +83,23 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     return error
 
 
-def get_basket_total_sum(request: WSGIRequest) -> Decimal:
-    """Calculate quantity of goods in user Basket.
+def get_basket_meta(session_id: str, user_id=None) -> dict:
+    """Получает количественные показатели пользовательской корзины.
 
-    :param request: http-request instance.
+    :param session_id: Идентификатор сессии.
+    :param user_id: Идентификатор пользователя.
     :return: quantity of goods in user Basket.
     """
-    quantity = Basket.objects\
-        .user_basket(request=request)\
-        .aggregate(total=Sum(F('quantity') * F('reservation__price'), output_field=FloatField()))
-    return Decimal(quantity['total'] or 0).quantize(DECIMAL_SUM_TEMPLATE)
+    meta = Basket.objects\
+        .user_basket(user_id=user_id, session_id=session_id)\
+        .aggregate(
+            goods_quantity=Sum('quantity', output_field=IntegerField()),
+            total_sum=Sum(
+                F('quantity') * F('reservation__price'),
+                output_field=DecimalField(decimal_places=2, max_digits=19)
+            )
+        )
+    return {
+        'goods_quantity': meta['goods_quantity'] or 0,
+        'total_sum': Decimal(meta['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE),
+    }

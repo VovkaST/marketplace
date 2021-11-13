@@ -1,4 +1,5 @@
 from django import forms
+from django.core.handlers.wsgi import WSGIRequest
 from django.utils.translation import gettext_lazy as _
 
 from app_basket.models import Basket
@@ -9,14 +10,8 @@ class PurchasePerformForm(forms.Form):
     basket_purchase = forms.Field(widget=forms.HiddenInput(), required=False)
 
     def is_valid(self, *args, **kwargs):
-        request = kwargs.get('request')
-        basket = Basket.objects.user_basket(request)
-        if request:
-            if request.basket_total_sum >= request.user.balance:
-                self.add_error(
-                    '__all__',
-                    _('Not enough balances! Top up your balance or remove some items from basket.')
-                )
+        request: WSGIRequest = kwargs.get('request')
+        basket = Basket.objects.user_basket(user_id=request.user.id, session_id=request.session.session_key)
         if basket:
             if not is_enough_shop_balances(basket):
                 self.add_error(

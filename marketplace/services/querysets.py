@@ -13,9 +13,9 @@ class SoftDeleter(models.QuerySet):
 
 
 class BasketQuerySet(models.QuerySet):
-    def user_basket(self, request):
-        if request.user.is_authenticated:
-            filters = {'user': request.user}
+    def user_basket(self, session_id: str, user_id=None):
+        if user_id:
+            filters = {'user_id': user_id}
         else:
-            filters = {'session': request.session.session_key}
+            filters = {'session': session_id}
         return self.filter(**filters)

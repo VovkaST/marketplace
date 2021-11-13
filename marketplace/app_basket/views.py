@@ -9,11 +9,11 @@ from app_basket.models import Basket
 from services.basket import (
     add_item_to_basket,
     delete_item_from_basket,
-    get_basket_total_sum,
-    get_goods_quantity_in_basket,
+    get_basket_meta,
     patch_item_in_basket,
     perform_purchase,
 )
+from services.cache import basket_cache_save, basket_cache_clear
 from services.utils import get_username_or_session_key
 
 
@@ -22,9 +22,10 @@ class BasketViewMixin(ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        goods = Basket.objects.user_basket(self.request).select_related('reservation__good').annotate(
-            sum=F('reservation__price') * F('quantity')
-        )
+        goods = Basket.objects\
+            .user_basket(user_id=self.request.user.id, session_id=self.request.session.session_key)\
+            .select_related('reservation__good')\
+            .annotate(sum=F('reservation__price') * F('quantity'))
         context.update({
             'goods': goods,
             'total_sum': sum([item.balance.price * item.quantity for item in goods]),
@@ -56,8 +57,7 @@ class BasketPatchItemView(BasketViewMixin, BasketHandlingBaseView):
         return JsonResponse({
             'success': not error,
             'error': error,
-            'basket_fullness': get_goods_quantity_in_basket(request=request),
-            'basket_sum': get_basket_total_sum(request=request),
+            **get_basket_meta(session_id=request.session.session_key, user_id=request.user.id),
         })
 
 
@@ -67,8 +67,7 @@ class BasketDeleteItemView(BasketViewMixin, BasketHandlingBaseView):
         return JsonResponse({
             'success': not error,
             'error': error,
-            'basket_fullness': get_goods_quantity_in_basket(request=request),
-            'basket_sum': get_basket_total_sum(request=request),
+            **get_basket_meta(session_id=request.session.session_key, user_id=request.user.id),
         })
 
 
@@ -79,9 +78,10 @@ class BasketAddItemView(BasketViewMixin, BasketHandlingBaseView):
         session = request.session.session_key
         user = request.user if request.user.is_authenticated else None
         error = add_item_to_basket(user=user, session=session, reservation_id=reservation, quantity=quantity)
+        basket_cache_clear(username=user.username, session_id=session)
+        meta = basket_cache_save(user_id=user.id, session_id=session)
         return JsonResponse({
             'success': not error,
             'error': error,
-            'basket_fullness': get_goods_quantity_in_basket(request=request),
-            'basket_sum': get_basket_total_sum(request=request),
+            **meta
         })

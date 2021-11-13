@@ -920,7 +920,7 @@ function setBasketFullness(quantity, total_sum) {
 
 function responseBasketAdd(response) {
     if (response.success) {
-        setBasketFullness(response.basket_fullness, response.basket_sum);
+        setBasketFullness(response.goods_quantity, response.total_sum);
         // response.form.find('input[name="quantity"]').val('');
         alert('Товар успешно добавлен в корзину!');
     } else

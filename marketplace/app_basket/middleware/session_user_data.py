@@ -1,4 +1,4 @@
-from services.cache import basket_cache
+from services.cache import basket_cache_save
 
 
 class SessionDataCollector:
@@ -6,5 +6,7 @@ class SessionDataCollector:
         self.get_response = get_response
 
     def __call__(self, request):
-        basket_cache(request=request)
+        if not request.session.session_key:
+            request.session.create()
+        basket_cache_save(session_id=request.session.session_key, user_id=request.user.id)
         return self.get_response(request)
