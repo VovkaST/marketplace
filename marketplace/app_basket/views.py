@@ -38,7 +38,11 @@ class BasketView(PageInfoMixin, generic.TemplateView):
 
 class BasketPatchItemView(generic.View):
     def post(self, request, *args, **kwargs):
-        error = patch_item_in_basket(request=request)
+        reservation_id = request.POST.get('basket_item_patch')
+        quantity = request.POST.get('quantity')
+        error = patch_item_in_basket(
+            user=request.user, session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
+        )
         return JsonResponse({
             'success': not error,
             'error': error,

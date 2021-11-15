@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
+{% block csrf %}{% csrf_token %}{% endblock %}
+
 {% block content %}
 
     <div class="Section">
@@ -27,14 +29,14 @@
                                 {{ item.name }}
                                 <div class="basket-item__shop note-text">{{ item.seller.name }}</div>
                             </td>
-                            <td class="text-right basket-item__price">&#8381;{{ item.price|floatformat:2 }}</td>
+                            <td class="text-right">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></td>
                             <td>
                                 <form action="{% url 'basket_patch_item' %}" method="post">
                                     <input type="hidden" name="basket_item_patch" value="{{ item.reservation_id }}">
                                     <input type="number" name="quantity" min="1" value="{{ item.quantity|floatformat:0 }}" class="basket-item__quantity">
                                 </form>
                             </td>
-                            <td class="text-right basket-item__sum">&#8381;{{ item.total_price|floatformat:2 }}</td>
+                            <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
                             <td class="text-center">
                                 <form action="{% url 'basket_delete_item' %}" method="post" class="basket-delete">
                                     <input type="hidden" name="basket_item_delete" value="{{ item.reservation_id }}">
