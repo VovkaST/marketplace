@@ -12,7 +12,17 @@ from services.basket import (
     get_basket_meta,
     patch_item_in_basket,
 )
-from services.cache import basket_cache_save
+from services.cache import basket_cache_save, basket_cache_clear
+
+
+class BasketMetaMixin:
+    def get_meta(self):
+        user = self.request.user
+        session = self.request.session.session_key
+        meta = get_basket_meta(session_id=session, user_id=user.id)
+        basket_cache_clear(session_id=session)
+        basket_cache_save(session_id=session, **meta)
+        return meta
 
 
 class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
@@ -31,61 +41,41 @@ class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
         })
         return context
 
-    # def post(self, request, *args, **kwargs):
-    #     form = self.get_form()
-    #     if not form.is_valid(request=self.request):
-    #         return self.form_invalid(form)
-    #     return self.form_valid(form=form)
-    #
-    # def form_valid(self, form):
-    #     perform_purchase(request=self.request)
-    #     return super().form_valid(form=form)
 
-
-class BasketPatchItemView(generic.View):
+class BasketPatchItemView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('basket_item_patch')
         quantity = request.POST.get('quantity')
-        user = request.user
-        session = request.session.session_key
         error = patch_item_in_basket(
-            session=session, reservation_id=reservation_id, quantity=quantity
+            session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
         )
-        meta = get_basket_meta(session_id=session, user_id=user.id)
-        basket_cache_save(user_id=user.id, session_id=session, **meta)
         return JsonResponse({
             'success': not error,
             'error': error,
-            **meta,
+            **self.get_meta(),
         })
 
 
-class BasketDeleteItemView(generic.View):
+class BasketDeleteItemView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
-        user = request.user
-        session = request.session.session_key
         reservation_id = request.POST.get('basket_item_delete')
-        error = delete_item_from_basket(session=session, reservation_id=reservation_id)
-        meta = get_basket_meta(session_id=session, user_id=user.id)
-        basket_cache_save(user_id=user.id, session_id=session, **meta)
+        error = delete_item_from_basket(session=request.session.session_key, reservation_id=reservation_id)
         return JsonResponse({
             'success': not error,
             'error': error,
-            **meta,
+            **self.get_meta(),
         })
 
 
-class BasketAddItemView(generic.View):
+class BasketAddItemView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
         reservation = request.POST.get('data-id')
         quantity = int(request.POST.get('quantity', 1))
         session = request.session.session_key
         user = request.user if request.user.is_authenticated else None
         error = add_item_to_basket(user=user, session=session, reservation_id=reservation, quantity=quantity)
-        meta = get_basket_meta(session_id=session, user_id=self.request.user.id)
-        basket_cache_save(session_id=session, **meta)
         return JsonResponse({
             'success': not error,
             'error': error,
-            **meta
+            **self.get_meta()
         })
