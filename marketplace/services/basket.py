@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 
 from app_basket.models import Basket
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
+from services.cache import basket_cache_clear
 
 
 def is_enough_shop_balances(basket) -> bool:
@@ -81,7 +82,7 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     error = dict()
     searchable = {
         'reservation_id': reservation_id,
-        'user_id': user.id,
+        'user_id': user.id if user else None,
         'session': session,
     }
     try:
@@ -147,3 +148,31 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
         'total_sum': total_sum,
         'items': items_list,
     }
+
+
+def merge_baskets(old_session: str, new_session: str, user: User):
+    """Объединение корзин неавторизованного пользователя с
+    корзиной после авторизации. Если у него были до этого
+    отложены товары в корзине, то корзины сливаются.
+
+    :param old_session: id сессии до авторизации.
+    :param new_session: id сессии после авторизации.
+    :param user: экземпляр авторизованного пользователя.
+    """
+    Basket.objects.user_basket(user_id=user.id).update(session=new_session)
+    anon_user_goods = Basket.objects.filter(session=old_session)
+    duplicates = list()
+    for good in anon_user_goods:
+        exist_good = Basket.objects.user_basket(user_id=user.id).get(reservation=good.reservation)
+        if exist_good:
+            exist_good.quantity += good.quantity
+            exist_good.save(force_update=True, update_fields=['quantity'])
+            duplicates.append(good.id)
+        else:
+            good.session = new_session
+            good.user = user
+            good.save(force_update=True, update_fields=['session', 'user'])
+    if duplicates:
+        Basket.objects.filter(id__in=duplicates).delete()
+    if duplicates or anon_user_goods:
+        basket_cache_clear(session_id=old_session, keys=['goods_quantity', 'total_sum', 'items'])

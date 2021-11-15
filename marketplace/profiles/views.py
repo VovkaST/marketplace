@@ -3,9 +3,13 @@ from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views import generic
 
-from profiles.forms import ChangeInfoForm, RegisterForm
+from profiles.forms import (
+    ChangeInfoForm,
+    RegisterForm,
+)
 from profiles.models import Profile
 from services.auth import registration
+from services.basket import merge_baskets
 
 
 class AccountView(LoginRequiredMixin, generic.DetailView):
@@ -38,6 +42,13 @@ class UpdateProfile(LoginRequiredMixin, generic.UpdateView):
 
 class ClientLoginView(LoginView):
     template_name = "profiles/base_login_form.html"
+
+    def form_valid(self, form):
+        old_session_key = self.request.session.session_key
+        response = super().form_valid(form=form)
+        new_session_key = self.request.session.session_key
+        merge_baskets(old_session=old_session_key, new_session=new_session_key, user=self.request.user)
+        return response
 
 
 class RegistrationView(generic.FormView):

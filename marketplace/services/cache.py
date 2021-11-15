@@ -40,13 +40,14 @@ def get_basket_cache(session_id: str, keys=None) -> dict:
     }
 
 
-def basket_cache_clear(session_id: str, username: str = None):
+def basket_cache_clear(session_id: str = None, username: str = None, keys=None):
     """Clear user`s basket cache.
 
     :param session_id: Current session key.
     :param username: Current user`s name.
+    :param keys: Список имен сохраненных переменных.
     """
     user_key = username or session_id
     cache.delete(make_template_fragment_key('basket', (user_key, get_language())))
-    # cache.delete(f'{GOODS_IN_BASKET_CACHE_PREFIX}_{session_id}')
-    # cache.delete(f'{BASKET_TOTAL_SUM_CACHE_PREFIX}_{session_id}')
+    for key in keys:
+        cache.delete(f'basket_{session_id}_{key}')

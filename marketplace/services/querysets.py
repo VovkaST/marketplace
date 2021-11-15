@@ -13,8 +13,13 @@ class SoftDeleter(models.QuerySet):
 
 
 class BasketQuerySet(models.QuerySet):
-    def user_basket(self, session_id: str, user_id=None):
-        if user_id:
+    def user_basket(self, session_id: str = None, user_id: int = None):
+        if all([user_id, session_id]):
+            filters = {
+                'user_id': user_id,
+                'session': session_id,
+            }
+        elif user_id:
             filters = {'user_id': user_id}
         else:
             filters = {'session': session_id}

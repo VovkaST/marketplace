@@ -12,7 +12,10 @@ from services.basket import (
     get_basket_meta,
     patch_item_in_basket,
 )
-from services.cache import basket_cache_save, basket_cache_clear
+from services.cache import (
+    basket_cache_clear,
+    basket_cache_save,
+)
 
 
 class BasketMetaMixin:
@@ -20,7 +23,7 @@ class BasketMetaMixin:
         user = self.request.user
         session = self.request.session.session_key
         meta = get_basket_meta(session_id=session, user_id=user.id)
-        basket_cache_clear(session_id=session, username=user.username)
+        basket_cache_clear(session_id=session, username=user.username, keys=meta.values())
         basket_cache_save(session_id=session, **meta)
         return meta
 
