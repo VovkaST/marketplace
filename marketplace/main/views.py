@@ -3,6 +3,17 @@ from services.cache_settings import cache_settings
 from services.main_page import get_banners, get_categories, get_top_goods
 
 
+class PageInfoMixin(ContextMixin):
+    page_title = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'page_title': self.page_title
+        })
+        return context
+
+
 class CacheSettingsMixin(ContextMixin):
     """Миксин для настроек кэша"""
 
