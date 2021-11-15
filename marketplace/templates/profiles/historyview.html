@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block content %}
+<div class="Middle Middle_top">
+    <div class="Middle-top">
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">{% trans 'Views history' %}
+                </h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
+                    </li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Views history' %}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="Section Section_column Section_columnLeft">
+        <div class="wrap">
+
+            {% include 'profiles/navigation.html' %}
+
+            <div class="Section-content">
+                <div class="Cards">
+                    {% for product in viewed_products %}
+                    <div class="Card">
+                        <a class="Card-picture" href="{# url product detail #}">
+                            {% if product.good_images %}
+                            <img src="{{ product.good_images.first.image.url }}" alt="{{ product.name }} image"/>
+                            {% else %}
+                            <img src="{% static 'img/content/home/pepe.jpg' %}" alt="pepe.jpg"/>
+                            {% endif %}
+                        </a>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">{{ product.name }}</a>
+                            </strong>
+                            <div class="Card-description">
+                                <div class="Card-cost"><span class="Card-priceOld">{{ product.biggest_price }}</span><span
+                                        class="Card-price">{{ product.lowest_price }}</span>
+                                </div>
+                                <div class="Card-category">{{ product.category }}
+                                </div>
+                                <div class="Card-hover">
+                                    <a class="Card-btn" href="{# url add to favorites #}">
+                                        <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
+                                    </a>
+
+                                    <a class="Card-btn" href="{# url add to cart #}">
+                                        <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                                    </a>
+
+                                    <a class="Card-btn" href="{# url add to compare #}">
+                                        <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Card-sale">{{ product.prices_diff }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

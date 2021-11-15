@@ -46,11 +46,12 @@ def is_goods_in_view_history(user, goods):
         return False
 
 
-def get_goods_in_view_history(user, start_date, end_date):
+def get_goods_in_view_history(user, start_date, end_date, limit=20):
     """
     :user: UserObject
     :start_date: datetime
     :end_date: datetime
+    :end_date: int
     Function to used to get goods from user view history
     :return: list[GooodsObject(1), GoodsObject(2), ...]
     """
@@ -59,6 +60,8 @@ def get_goods_in_view_history(user, start_date, end_date):
         views_queryset = views_queryset.filter(viewed_at__gte=start_date)
     if end_date:
         views_queryset = views_queryset.filter(viewed_at__lte=end_date)
+    if limit:
+        views_queryset = views_queryset[:limit]
     viewed_goods = [view_history.goods for view_history in views_queryset]
     return viewed_goods
 

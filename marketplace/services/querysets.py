@@ -24,3 +24,10 @@ class BasketQuerySet(models.QuerySet):
         else:
             filters = {'session': session_id}
         return self.filter(**filters)
+
+# class GoodsQuerySet(SoftDeleter):
+# class GoodsQuerySet(models.QuerySet):
+#     def annotate_with_reviews_count(self):
+#         return self.annotate(
+#             reviews_count=Count('good_balance'),
+#         )
