@@ -972,16 +972,16 @@ function responseBasketChangeItem(response) {
     return response.success;
 }
 
-//
-// function responseBasketDelete(response) {
-//     if (response.success) {
-//         response.form.closest('tr').remove();
-//         setBasketFullness(response.basket_fullness);
-//         recalculateBasketTotalSum();
-//     } else
-//         alert(`Ошибка: ${response.error.message}`);
-//     return response.success;
-// }
+
+function responseBasketDelete(response) {
+    if (response.success) {
+        response.form.closest('tr').remove();
+        setBasketFullness(response.goods_quantity, response.total_sum);
+        recalculateBasketTotalSum();
+    } else
+        alert(`Ошибка: ${response.error.message}`);
+    return response.success;
+}
 
 
 $(function() {
@@ -1002,9 +1002,9 @@ $(function() {
         if (!$this.val()) $this.val(1);
         ajaxSendJson($this.closest('form'), responseBasketChangeItem);
     });
-    //
-    // $('.basket-delete').submit(function(){
-    //     ajaxSendJson($(this), responseBasketDelete);
-    //     return false;
-    // });
+
+    $('.basket-delete').submit(function(){
+        ajaxSendJson($(this), responseBasketDelete);
+        return false;
+    });
 });

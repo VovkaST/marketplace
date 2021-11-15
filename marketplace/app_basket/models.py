@@ -32,3 +32,4 @@ class Basket(models.Model):
         indexes = [
             models.Index(fields=['session'], name='idx_session_basket'),
         ]
+        unique_together = ['session', 'reservation']

@@ -2538,7 +2538,12 @@ button.link {
 }
 
 
-.note-text {
+.note {
     font-size: 0.8em;
+}
+.note-gray {
     color: #8d8d8d;
+}
+.note-red {
+    color: #ffa457;
 }

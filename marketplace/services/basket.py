@@ -1,9 +1,12 @@
 from decimal import Decimal
 
 from django.contrib.auth.models import User
-from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import DecimalField, F, IntegerField, Sum
-from django.utils import timezone
+from django.db.models import (
+    DecimalField,
+    F,
+    IntegerField,
+    Sum,
+)
 from django.utils.translation import gettext as _
 
 from app_basket.models import Basket
@@ -19,43 +22,9 @@ def is_enough_shop_balances(basket) -> bool:
     return all([goods_item.quantity >= goods_item.balance.quantity for goods_item in basket])
 
 
-def perform_purchase(request: WSGIRequest):
-    pass
+def patch_item_in_basket(session: str, reservation_id: str, quantity: int = 1) -> dict:
+    """Изменяет количество единиц товара в пользовательской корзине.
 
-
-def patch_item_in_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
-    """Patch goods item quantity in user`s basket.
-
-    :param request: http-request instance.
-    :param balance_id_key: Balance ID key name in request POST-data.
-    :return: Errors dict.
-    """
-    error = dict()
-    searchable = {
-        'reservation_id': reservation_id,
-        'user': user,
-        'session': session
-    }
-    try:
-        updated = Basket.objects.filter(**searchable).update(quantity=quantity)
-        if not updated:
-            raise Exception(_('Item not found in basket.'))
-    except Exception as exc:
-        error = {
-            'message': exc.args[0],
-        }
-    return error
-
-
-def delete_item_from_basket(request: WSGIRequest):
-    pass
-
-
-def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
-    """Добавляет товар из баланса продавцов в пользовательскую корзину.
-
-    :param user: Экземпляр АВТОРИЗОВАННОГО пользователя или None
-                 в случае анонимного пользователя.
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :param quantity: Количество единиц товара.
@@ -64,22 +33,67 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     error = dict()
     searchable = {
         'reservation_id': reservation_id,
-        'user': user,
-        'session': session
-    }
-    defaults = {
-        'quantity': quantity,
-        'modified_at': timezone.now(),
+        'session': session,
     }
     try:
-        obj, created = Basket.objects.get_or_create(defaults=defaults, **searchable)
-        if not created:
-            obj.quantity += quantity
-            obj.save(force_update=True)
+        updated = Basket.objects.filter(**searchable).update(quantity=quantity)
+        if not updated:
+            raise Exception(_('Item not found in basket.'))
     except Exception as exc:
-        error = {
+        error.update({
             'message': exc.args[0],
-        }
+        })
+    return error
+
+
+def delete_item_from_basket(session: str, reservation_id: str):
+    """Удаляет товар из пользовательской корзины.
+
+    :param session: Строка идентификатора сессии.
+    :param reservation_id: Идентификатор баланса продавца.
+    :return: Ошибки в виде словаря.
+    """
+    error = dict()
+    searchable = {
+        'reservation_id': reservation_id,
+        'session': session
+    }
+    try:
+        deleted, _ = Basket.objects.filter(**searchable).delete()
+        if not deleted:
+            raise Exception(_('Item not found in basket.'))
+    except Exception as exc:
+        error.update({
+            'message': exc.args[0],
+        })
+    return error
+
+
+def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
+    """Добавляет товар из баланса продавцов в пользовательскую корзину.
+
+    :param user: Экземпляр пользователя.
+    :param session: Строка идентификатора сессии.
+    :param reservation_id: Идентификатор баланса продавца.
+    :param quantity: Количество единиц товара.
+    :return: Ошибки в виде словаря.
+    """
+    error = dict()
+    searchable = {
+        'reservation_id': reservation_id,
+        'user_id': user.id,
+        'session': session,
+    }
+    try:
+        obj, created = Basket.objects.get_or_create(**searchable, defaults={'quantity': quantity})
+        if not created:
+            return patch_item_in_basket(
+                session=session, reservation_id=reservation_id, quantity=obj.quantity + quantity
+            )
+    except Exception as exc:
+        error.update({
+            'message': exc.args[0],
+        })
     return error
 
 
@@ -91,35 +105,45 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
     :param items: Флаг необходимости получения списка товаров.
     :return: Мета-данные пользовательской корзины.
     """
-    data = Basket.objects\
-        .user_basket(user_id=user_id, session_id=session_id)\
-        .aggregate(
-            goods_quantity=Sum('quantity', output_field=IntegerField()),
-            total_sum=Sum(
-                F('quantity') * F('reservation__price'),
-                output_field=DecimalField(decimal_places=2, max_digits=19)
+    total_sum = 0
+    items_list = list()
+    if not items:
+        data = Basket.objects\
+            .user_basket(user_id=user_id, session_id=session_id)\
+            .aggregate(
+                goods_quantity=Sum('quantity', output_field=IntegerField()),
+                total_sum=Sum(
+                    F('quantity') * F('reservation__price'),
+                    output_field=DecimalField(decimal_places=2, max_digits=19)
+                )
             )
-        )
-    meta = {
-        'goods_quantity': data['goods_quantity'] or 0,
-        'total_sum': Decimal(data['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE),
-    }
-    if items:
+        goods_quantity = data['goods_quantity'] or 0
+        total_sum = Decimal(data['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE)
+    else:
         data = Basket.objects \
-            .user_basket(user_id=user_id, session_id=session_id) \
+            .user_basket(session_id=session_id) \
             .select_related('reservation__good', 'reservation__seller')
-        meta.update({'items': list()})
+        goods_quantity = len(data)
         for item in data:
-            meta['items'].append({
+            total_price = Decimal(item.quantity) * item.reservation.price
+            item_data = {
                 'reservation_id': item.reservation_id,
                 'quantity': item.quantity,
                 'price': item.reservation.price,
-                'total_price': Decimal(item.quantity) * item.reservation.price,
+                'total_price': total_price,
                 'name': item.reservation.good.name,
                 'image': item.reservation.good.good_images,
+                'available': item.reservation.quantity,
+                'is_enough': item.reservation.quantity and item.quantity <= item.reservation.quantity,
                 'seller': {
                     'name': item.reservation.seller.name,
                     'image': item.reservation.seller.image,
                 },
-            })
-    return meta
+            }
+            items_list.append(item_data)
+            total_sum += total_price
+    return {
+        'goods_quantity': goods_quantity,
+        'total_sum': total_sum,
+        'items': items_list,
+    }
