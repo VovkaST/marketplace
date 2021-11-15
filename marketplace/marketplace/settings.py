@@ -17,7 +17,7 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(bool, ["teamdiploma.ru"]),
+    ALLOWED_HOSTS=(str, "teamdiploma.ru"),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,7 +33,7 @@ SECRET_KEY = "django-insecure-$8w6i(@kgxy*c-ajx9v$bc-ety&tfl!w@i5a$4xk_55_4^rj$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
+    "catalog.apps.CatalogConfig",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
