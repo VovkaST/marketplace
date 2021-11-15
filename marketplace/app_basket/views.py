@@ -1,53 +1,42 @@
 from django.http import JsonResponse
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import generic
 
-from app_basket.forms import PurchasePerformForm
-from app_basket.models import Basket
+from main.views import PageInfoMixin
 from services.basket import (
     add_item_to_basket,
     delete_item_from_basket,
     get_basket_meta,
     patch_item_in_basket,
-    perform_purchase,
 )
 from services.cache import basket_cache_save, basket_cache_clear
-from services.utils import get_username_or_session_key
 
 
-class BasketViewMixin(ContextMixin):
-    template_name = 'app_shops/basket.html'
+class BasketView(PageInfoMixin, generic.TemplateView):
+    template_name = 'app_basket/basket_detail.html'
+    page_title = _('Basket')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'cache_key': get_username_or_session_key(self.request),
             **get_basket_meta(
                 session_id=self.request.session.session_key, user_id=self.request.user.id, items=True
             ),
         })
         return context
 
-
-class BasketHandlingBaseView(generic.FormView):
-    form_class = PurchasePerformForm
-    success_url = reverse_lazy('index')
-
-
-class BasketView(BasketViewMixin, BasketHandlingBaseView):
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if not form.is_valid(request=self.request):
-            return self.form_invalid(form)
-        return self.form_valid(form=form)
-
-    def form_valid(self, form):
-        perform_purchase(request=self.request)
-        return super().form_valid(form=form)
+    # def post(self, request, *args, **kwargs):
+    #     form = self.get_form()
+    #     if not form.is_valid(request=self.request):
+    #         return self.form_invalid(form)
+    #     return self.form_valid(form=form)
+    #
+    # def form_valid(self, form):
+    #     perform_purchase(request=self.request)
+    #     return super().form_valid(form=form)
 
 
-class BasketPatchItemView(BasketViewMixin, BasketHandlingBaseView):
+class BasketPatchItemView(generic.View):
     def post(self, request, *args, **kwargs):
         error = patch_item_in_basket(request=request)
         return JsonResponse({
@@ -57,7 +46,7 @@ class BasketPatchItemView(BasketViewMixin, BasketHandlingBaseView):
         })
 
 
-class BasketDeleteItemView(BasketViewMixin, BasketHandlingBaseView):
+class BasketDeleteItemView(generic.View):
     def post(self, request, *args, **kwargs):
         error = delete_item_from_basket(request=request)
         return JsonResponse({
@@ -67,7 +56,7 @@ class BasketDeleteItemView(BasketViewMixin, BasketHandlingBaseView):
         })
 
 
-class BasketAddItemView(BasketViewMixin, BasketHandlingBaseView):
+class BasketAddItemView(generic.View):
     def post(self, request, *args, **kwargs):
         reservation = request.POST.get('data-id')
         quantity = int(request.POST.get('quantity', 1))

@@ -2536,3 +2536,9 @@ button.link {
 .wrap-content {
   margin: 0 auto;
 }
+
+
+.note-text {
+    font-size: 0.8em;
+    color: #8d8d8d;
+}

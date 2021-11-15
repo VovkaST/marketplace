@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+
+    <div class="Section">
+        <div class="wrap">
+            <div class="Section-content">
+                <header class="Section-header">
+                    <h2 class="Section-title">{% trans 'Basket' %}</h2>
+                </header>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">{% trans 'Item name' %}</th>
+                        <th scope="col">{% trans 'Price' %}</th>
+                        <th scope="col">{% trans 'Quantity' %}</th>
+                        <th scope="col">{% trans 'Sum' %}</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr class="basket-item-row">
+                            <td>
+                                {{ item.name }}
+                                <div class="basket-item__shop note-text">{{ item.seller.name }}</div>
+                            </td>
+                            <td class="text-right basket-item__price">&#8381;{{ item.price|floatformat:2 }}</td>
+                            <td>
+                                <form action="{% url 'basket_patch_item' %}" method="post">
+                                    <input type="hidden" name="basket_item_patch" value="{{ item.reservation_id }}">
+                                    <input type="number" name="quantity" min="1" value="{{ item.quantity|floatformat:0 }}" class="basket-item__quantity">
+                                </form>
+                            </td>
+                            <td class="text-right basket-item__sum">&#8381;{{ item.total_price|floatformat:2 }}</td>
+                            <td class="text-center">
+                                <form action="{% url 'basket_delete_item' %}" method="post" class="basket-delete">
+                                    <input type="hidden" name="basket_item_delete" value="{{ item.reservation_id }}">
+                                    <button type="submit" class="btn btn_danger btn_round">{% trans 'Delete' %}</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="font-weight-bold">{% trans 'Total' %}</th>
+                        <th class="text-right font-weight-bold basket__total-sum">&#8381;{{ total_sum|floatformat:2 }}</th>
+                        <th class="text-right"></th>
+                    </tr>
+                </tfoot>
+            </table>
+            <a href="" class="btn btn_round btn_success">{% trans 'Order' %}</a>
+        </div>
+    </div>
+
+{% endblock content %}

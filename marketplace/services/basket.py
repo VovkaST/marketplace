@@ -107,7 +107,7 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
     if items:
         data = Basket.objects \
             .user_basket(user_id=user_id, session_id=session_id) \
-            .select_related('reservation__good')
+            .select_related('reservation__good', 'reservation__seller')
         meta.update({'items': list()})
         for item in data:
             meta['items'].append({
@@ -115,7 +115,11 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
                 'quantity': item.quantity,
                 'price': item.reservation.price,
                 'total_price': Decimal(item.quantity) * item.reservation.price,
-                'good_name': item.reservation.good.name,
-                'good_image': item.reservation.good.good_images,
+                'name': item.reservation.good.name,
+                'image': item.reservation.good.good_images,
+                'seller': {
+                    'name': item.reservation.seller.name,
+                    'image': item.reservation.seller.image,
+                },
             })
     return meta
