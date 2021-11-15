@@ -20,7 +20,7 @@ class BasketMetaMixin:
         user = self.request.user
         session = self.request.session.session_key
         meta = get_basket_meta(session_id=session, user_id=user.id)
-        basket_cache_clear(session_id=session)
+        basket_cache_clear(session_id=session, username=user.username)
         basket_cache_save(session_id=session, **meta)
         return meta
 
