@@ -28,4 +28,10 @@ def get_categories():
 
 def get_top_goods():
     """Получение топ-товаров"""
-    return Goods.objects.actual().filter().order_by('-rating_total').select_related('category')[:8]
+    return Goods.objects.raw('''
+        SELECT b.id "balance_id", b.good_id "id", min(b.price) "price", g.name
+          FROM mp_balances b
+          JOIN mp_goods g
+                ON b.good_id = g.id
+         GROUP BY b.good_id
+    ''').prefetch_related('category', 'good_images')

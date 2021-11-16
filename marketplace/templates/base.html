@@ -18,6 +18,8 @@
 <html lang="ru"> <!--<![endif]-->
 
 {% load static i18n cache %}
+{% get_current_language as LANGUAGE_CODE %}
+
 <head>
     <title>Megano</title>
     <meta name="description" content="Описание страницы">
@@ -37,6 +39,7 @@
     <!--[if lt IE 9]>
     <script src="{http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 	{% block head %}{% endblock %}
+	{% block csrf %}{% endblock %}
 </head>
 <body class="Site">
 <!--if lt IE 8
@@ -131,13 +134,17 @@ p.error-browser
                 </div>
             </nav>
             <div class="row-block">
-                <div class="CartBlock"><a class="CartBlock-block" href="#"><img class="CartBlock-img"
-                                                                                           src="{% static 'img/icons/exchange.svg' %}"
-                                                                                           alt="exchange.svg"/><span
-                        class="CartBlock-amount">4</span></a><a class="CartBlock-block" href="#"><img
-                        class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/><span
-                        class="CartBlock-amount">0</span></a>
-                    <div class="CartBlock-block"><span class="CartBlock-price">0.00$</span>
+                <div class="CartBlock">
+                    <a class="CartBlock-block" href="#">
+                        <img class="CartBlock-img" src="{% static 'img/icons/exchange.svg' %}" alt="exchange.svg"/>
+                        <span class="CartBlock-amount">4</span>
+                    </a>
+                    <a class="CartBlock-block" href="{% url 'basket' %}">
+                        <img class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/>
+                        <span class="CartBlock-amount" id="basket__quantity">{{ request.goods_in_basket|default:'0' }}</span>
+                    </a>
+                    <div class="CartBlock-block">
+                        <span class="CartBlock-price" id="basket__sum">&#8381;{{ request.basket_total_sum|default:'0.00' }}</span>
                     </div>
                 </div>
             </div>
@@ -347,7 +354,7 @@ p.error-browser
 <!--        +breadcrumbs('Главная','Портфолио')-->
 <!--    +Article('portfolio')-->
 <!---->
-<script src="{% static 'plg/jQuery/jquery-3.5.0.slim.min.js' %}"></script>
+<script src="{% static 'plg/jQuery/jquery-3.5.1.min.js' %}"></script>
 <script src="{% static 'plg/form/jquery.form.js' %}"></script>
 <script src="{% static 'plg/form/jquery.maskedinput.min.js' %}"></script>
 <script src="{% static 'plg/range/ion.rangeSlider.min.js' %}"></script>
