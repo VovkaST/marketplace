@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n cache %}
+{% load i18n cache static %}
 
 {% block csrf %}{% csrf_token %}{% endblock %}
 
@@ -12,6 +12,7 @@
                     <h2 class="Section-title">{% trans 'Basket' %}</h2>
                 </header>
             </div>
+
             {% if items %}
                 {% cache cache_settings.basket_life_time basket cache_key LANGUAGE_CODE %}
                     <table class="table table-hover">
@@ -19,41 +20,38 @@
                             <tr>
                                 <th scope="col">{% trans 'Item name' %}</th>
                                 <th scope="col">{% trans 'Price' %}</th>
+                                <th scope="col">{% trans 'Seller' %}</th>
                                 <th scope="col">{% trans 'Quantity' %}</th>
-                                <th scope="col">{% trans 'Sum' %}</th>
-                                <th scope="col"></th>
+                                <th scope="col" colspan="2">{% trans 'Sum' %}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for item in items %}
-                                <tr class="basket-item-row">
-                                    <td>
-                                        {{ item.name }}
-                                        <div class="basket-item__shop note note-gray">{{ item.seller.name }}</div>
-                                    </td>
-                                    <td class="text-right">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></td>
-                                    <td>
-                                        <form action="{% url 'basket_patch_item' %}" method="post">
-                                            <input type="hidden" name="basket_item_patch" value="{{ item.reservation_id }}">
-                                            <input type="number" name="quantity" min="1" max="{{ item.available }}" value="{{ item.quantity|floatformat:0 }}" class="basket-item__quantity">
-                                        </form>
-                                        <span class="note note-red">{% trans 'Available to order' %}: {{ item.available }}</span>
-                                    </td>
-                                    <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
-                                    <td class="text-center">
-                                        <form action="{% url 'basket_delete_item' %}" method="post" class="basket-delete">
-                                            <input type="hidden" name="basket_item_delete" value="{{ item.reservation_id }}">
-                                            <button type="submit" class="btn btn_danger btn_round">{% trans 'Delete' %}</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                            <form action="#">
+                                {% for item in items %}
+                                    <tr class="basket-item-row" prefix="{{ item.form.prefix }}">
+                                        <td>{{ item.name }}</td>
+                                        <td class="text-right">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></td>
+                                        <td>{{ item.form.sellers }}</td>
+                                        <td>
+                                            {{ item.form.quantity }}
+                                            <div class="note note-red">{% trans 'Available to order' %}: {{ item.available }}</div>
+                                        </td>
+                                        <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
+                                        <td class="text-center">
+                                            {{ item.form.reservation_id }}
+                                            <button type="button" class="btn btn_danger btn_round delete-row" action="basket-delete" url="{% url 'basket_delete_item' %}">{% trans 'Delete' %}</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                {{ items_formset.management_form }}
+                            </form>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="3" class="font-weight-bold">{% trans 'Total' %}</th>
-                                <th class="text-right font-weight-bold basket__total-sum">&#8381;{{ total_sum|floatformat:2 }}</th>
-                                <th class="text-right"></th>
+                                <th colspan="4" class="font-weight-bold">{% trans 'Total' %}</th>
+                                <th class="text-right font-weight-bold basket__total-sum" colspan="2">
+                                    &#8381;{{ total_sum|floatformat:2 }}
+                                </th>
                             </tr>
                         </tfoot>
                     </table>
@@ -66,3 +64,16 @@
     </div>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script type="text/javascript">
+        $(function() {
+
+            $('.basket-item-row').formset({
+                addCssClass: null,
+                prefix: PREFIX,
+            });
+        })
+    </script>
+{% endblock %}

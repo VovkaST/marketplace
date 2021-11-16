@@ -893,7 +893,8 @@ Categories().init();
 
 
 /* Функции работы с данными сайта */
-let CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
+const PREFIX = 'basket_item'
+const CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
 // let locale = $('select[name="language"] option[selected]')[0].value;
 let locale = 'RU';
 let IntlSettings = {
@@ -908,12 +909,8 @@ function toFloat(number) {
 }
 
 
-function recalculateBasketRow($row) {
-    let price = toFloat($row.find('.basket-item__price').text());
-    let quantity = Number($row.find('.basket-item__quantity').val());
-    $row.find('.basket-item__sum').text(
-        new Intl.NumberFormat( locale, IntlSettings ).format(quantity * price)
-    );
+function recalculateBasketRow($row, item) {
+    $row.find('.basket-item__sum').text(item.total_price);
 }
 
 
@@ -944,6 +941,36 @@ function ajaxSendJson(form, success_handler=undefined) {
 }
 
 
+function ajax(url, data, success, element) {
+    $.ajax({
+        url: url,
+        type: 'post',
+        dataType: 'json',
+        data: data,
+        headers:{
+            "X-CSRFToken": CSRF_TOKEN,
+        },
+        success: function(response) {
+            if (!success) return;
+            response.elem = element;
+            success(response);
+        },
+    });
+}
+
+
+function getFormsetData(selector) {
+    let data = {},
+        nameRegex = new RegExp(`${PREFIX}-\\d+-(\\w+)$`)
+    $(selector).each(function() {
+        let el = $(this),
+            name = nameRegex.exec(el.attr('name'))[1];
+        data[name] = el.val()
+    });
+    return data
+}
+
+
 function setBasketFullness(quantity, total_sum) {
     $('#basket__quantity').text(quantity);
     $('#basket__sum').text(total_sum);
@@ -963,9 +990,9 @@ function responseBasketAdd(response) {
 
 function responseBasketChangeItem(response) {
     if (response.success) {
-        let $row = response.form.closest('.basket-item-row');
+        let $row = response.elem.closest('.basket-item-row');
         setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketRow($row);
+        recalculateBasketRow($row, response.changed_item);
         recalculateBasketTotalSum();
     } else
         alert(`Ошибка: ${response.error.message}`);
@@ -998,9 +1025,12 @@ $(function() {
     });
 
     $('.basket-item__quantity').change(function(){
-        let $this = $(this);
-        if (!$this.val()) $this.val(1);
-        ajaxSendJson($this.closest('form'), responseBasketChangeItem);
+        let $$ = $(this),
+            idRegex = new RegExp(`id_${PREFIX}-(\\d+)-`),
+            idx = idRegex.exec($$.attr('id'))[1],
+            url = $$.attr('url'),
+            formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
+        ajax(url, formset_data, responseBasketChangeItem, $$);
     });
 
     $('.basket-delete').submit(function(){

@@ -10,6 +10,7 @@ from services.basket import (
     add_item_to_basket,
     delete_item_from_basket,
     get_basket_meta,
+    init_basket_formset,
     patch_item_in_basket,
 )
 from services.cache import (
@@ -36,25 +37,26 @@ class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         session = self.request.session.session_key
+        meta = get_basket_meta(session_id=session, user_id=user.id, items=True)
         context.update({
             'cache_key': user.username if user.is_authenticated else session,
-            **get_basket_meta(
-                session_id=session, user_id=user.id, items=True
-            ),
+            'items_formset': init_basket_formset(items=meta['items']),
+            **meta,
         })
         return context
 
 
 class BasketPatchItemView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
-        reservation_id = request.POST.get('basket_item_patch')
+        reservation_id = request.POST.get('reservation_id')
         quantity = request.POST.get('quantity')
-        error = patch_item_in_basket(
+        obj_data, error = patch_item_in_basket(
             session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
         )
         return JsonResponse({
             'success': not error,
             'error': error,
+            'changed_item': obj_data,
             **self.get_meta(),
         })
 

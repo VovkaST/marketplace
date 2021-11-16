@@ -9,7 +9,9 @@ from django.db.models import (
 )
 from django.utils.translation import gettext as _
 
+from app_basket.forms import BasketFormSet
 from app_basket.models import Basket
+from app_sellers.models import Goods, Sellers
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
 from services.cache import basket_cache_clear
 
@@ -23,28 +25,36 @@ def is_enough_shop_balances(basket) -> bool:
     return all([goods_item.quantity >= goods_item.balance.quantity for goods_item in basket])
 
 
-def patch_item_in_basket(session: str, reservation_id: str, quantity: int = 1) -> dict:
+def patch_item_in_basket(session: str, reservation_id: str, quantity: int = 1) -> tuple:
     """Изменяет количество единиц товара в пользовательской корзине.
 
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :param quantity: Количество единиц товара.
-    :return: Errors dict.
+    :return: Данные измененного объекта и сообщение об ошибке.
     """
-    error = dict()
+    obj_data, error = None, None
+
     searchable = {
         'reservation_id': reservation_id,
         'session': session,
     }
     try:
-        updated = Basket.objects.filter(**searchable).update(quantity=quantity)
-        if not updated:
+        obj = Basket.objects.filter(**searchable).select_related('reservation').first()
+        if not obj:
             raise Exception(_('Item not found in basket.'))
+        obj.quantity = quantity
+        obj.save(force_update=True, update_fields=['quantity'])
+        obj_data = {
+            'good_id': obj.reservation.good_id,
+            'available': obj.reservation.quantity,
+            'quantity': quantity,
+            'price': obj.reservation.price,
+            'total_price': (Decimal(quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
+        }
     except Exception as exc:
-        error.update({
-            'message': exc.args[0],
-        })
-    return error
+        error = exc.args[0],
+    return obj_data, error
 
 
 def delete_item_from_basket(session: str, reservation_id: str):
@@ -129,7 +139,8 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
             total_price = Decimal(item.quantity) * item.reservation.price
             item_data = {
                 'reservation_id': item.reservation_id,
-                'quantity': item.quantity,
+                'good_id': item.reservation.good_id,
+                'quantity': int(item.quantity or 1),
                 'price': item.reservation.price,
                 'total_price': total_price,
                 'name': item.reservation.good.name,
@@ -137,9 +148,11 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
                 'available': item.reservation.quantity,
                 'is_enough': item.reservation.quantity and item.quantity <= item.reservation.quantity,
                 'seller': {
+                    'id': item.reservation.seller.id,
                     'name': item.reservation.seller.name,
                     'image': item.reservation.seller.image,
                 },
+                'other_sellers': get_available_sellers(good=item.reservation.good)
             }
             items_list.append(item_data)
             total_sum += total_price
@@ -148,6 +161,13 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
         'total_sum': total_sum,
         'items': items_list,
     }
+
+
+def get_available_sellers(good: Goods):
+    sellers = Sellers.objects\
+        .filter(balance_owner__good_id=good.id, balance_owner__quantity__gt=0)\
+        .values('id', 'name', 'balance_owner__price')
+    return {seller['id']: f'{seller["name"]} ({seller["balance_owner__price"]})' for seller in sellers}
 
 
 def merge_baskets(old_session: str, new_session: str, user: User):
@@ -176,3 +196,21 @@ def merge_baskets(old_session: str, new_session: str, user: User):
         Basket.objects.filter(id__in=duplicates).delete()
     if duplicates or anon_user_goods:
         basket_cache_clear(session_id=old_session, keys=['goods_quantity', 'total_sum', 'items'])
+
+
+def init_basket_formset(items):
+    initial = [
+        {
+            'reservation_id': item.get('reservation_id'),
+            'quantity': item.get('quantity'),
+            'good_id': item.get('good_id'),
+            'max_quantity': item.get('available', 1),
+        }
+        for item in items
+    ]
+    formset = BasketFormSet(
+        initial=initial,
+        prefix='basket_item'
+    )
+    [items[i].update({'form': form}) for i, form in enumerate(formset)]
+    return formset
