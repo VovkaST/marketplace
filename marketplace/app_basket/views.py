@@ -21,6 +21,10 @@ from services.cache import (
 
 
 class BasketMetaMixin:
+    """Миксин обработки корзины. Получает ее мета-данные
+    (кол-во товаров, общая сумма товаров в корзине), сбрасывает
+    кэш и обновляет данные в нем."""
+
     def get_meta(self):
         user = self.request.user
         session = self.request.session.session_key
@@ -48,6 +52,8 @@ class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
 
 
 class BasketPatchItemQuantityView(BasketMetaMixin, generic.View):
+    """Изменение количества товара в корзине."""
+
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         quantity = request.POST.get('quantity')
@@ -63,6 +69,8 @@ class BasketPatchItemQuantityView(BasketMetaMixin, generic.View):
 
 
 class BasketPatchItemSellerView(BasketMetaMixin, generic.View):
+    """Выбор товара у другого продавца."""
+
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         seller_id = request.POST.get('seller')
@@ -78,6 +86,8 @@ class BasketPatchItemSellerView(BasketMetaMixin, generic.View):
 
 
 class BasketDeleteItemView(BasketMetaMixin, generic.View):
+    """Удаление товара из корзины"""
+
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         error = delete_item_from_basket(session=request.session.session_key, reservation_id=reservation_id)
@@ -89,6 +99,8 @@ class BasketDeleteItemView(BasketMetaMixin, generic.View):
 
 
 class BasketAddItemView(BasketMetaMixin, generic.View):
+    """Добавление товара в корзину."""
+
     def post(self, request, *args, **kwargs):
         reservation = request.POST.get('data-id')
         quantity = int(request.POST.get('quantity', 1))

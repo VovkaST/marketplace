@@ -7,7 +7,7 @@ from services.querysets import BasketQuerySet
 
 
 class Basket(models.Model):
-    """User`s basket of goods"""
+    """Пользовательская корзина"""
 
     user = models.ForeignKey(
         User, verbose_name=_('User'), related_name='user_basket', on_delete=models.CASCADE, null=True, blank=True
