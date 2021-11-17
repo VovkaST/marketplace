@@ -909,17 +909,13 @@ function toFloat(number) {
 }
 
 
-function recalculateBasketRow($row, item) {
+function setBasketRowTotalPrice($row, item) {
     $row.find('.basket-item__sum').text(item.total_price);
 }
 
 
-function recalculateBasketTotalSum() {
-    let total_sum = 0;
-    $('.basket-item__sum').each(function(){
-        total_sum += toFloat(this.textContent);
-    });
-    $('.basket__total-sum').text(new Intl.NumberFormat( locale, IntlSettings ).format(total_sum));
+function setBasketTotalSum(totalSum) {
+    $('.basket__total-sum').text(totalSum);
 }
 
 
@@ -941,8 +937,11 @@ function ajaxSendJson(form, success_handler=undefined) {
 }
 
 
-function ajax(url, data, success, element) {
+function ajax(url, data, success, element, async=true) {
+    let isSuccess = true,
+        jqXHRResponse = null
     $.ajax({
+        async: async,
         url: url,
         type: 'post',
         dataType: 'json',
@@ -950,12 +949,26 @@ function ajax(url, data, success, element) {
         headers:{
             "X-CSRFToken": CSRF_TOKEN,
         },
-        success: function(response) {
-            if (!success) return;
+        success: function(response, status, jqXHR) {
+            jqXHRResponse = response
             response.elem = element;
-            success(response);
+            if (!success) return;
+            success(response)
+            isSuccess = jqXHRResponse.success;
+            console.log({
+                status: status,
+                jqXHR: jqXHR
+            })
         },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert(`AJAX-request error: ${textStatus}`);
+            isSuccess = false;
+        }
     });
+    return {
+        isSuccess: isSuccess,
+        jqXHRResponse: jqXHRResponse,
+    };
 }
 
 
@@ -971,19 +984,30 @@ function getFormsetData(selector) {
 }
 
 
+function collectItemData($item) {
+    let idx = extractFormIdx($item.attr('id')),
+        url = $item.attr('url'),
+        formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
+    return {
+        url: url,
+        formset_data: formset_data,
+    }
+}
+
+
 function setBasketFullness(quantity, total_sum) {
     $('#basket__quantity').text(quantity);
     $('#basket__sum').text(total_sum);
 }
 
 
-function setSeller($row, data) {
+function basketSetSeller($row, data) {
     let formPrefix = $row.attr('prefix');
     $row.find('.basket-item__price').text(data.price);
     $row.find('.basket-item__available').text(data.available)
     $(`[name="${formPrefix}-reservation_id"]`).val(data.reservation_id)
-    recalculateBasketRow($row, data);
-    recalculateBasketTotalSum();
+    setBasketRowTotalPrice($row, data);
+    setBasketTotalSum();
 }
 
 
@@ -1002,8 +1026,8 @@ function responseBasketChangeItemQuantity(response) {
     if (response.success) {
         let $row = response.elem.closest('.basket-item-row');
         setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketRow($row, response.changed_item);
-        recalculateBasketTotalSum();
+        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketTotalSum();
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;
@@ -1013,24 +1037,25 @@ function responseBasketChangeItemQuantity(response) {
 function responseBasketChangeItemSeller(response) {
     if (response.success) {
         let $row = response.elem.closest('.basket-item-row');
-        setSeller($row, response.changed_item)
+        basketSetSeller($row, response.changed_item)
         setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketRow($row, response.changed_item);
-        recalculateBasketTotalSum();
+        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketTotalSum();
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;
 }
 
 
-function responseBasketDelete(response) {
-    if (response.success) {
-        response.form.closest('tr').remove();
-        setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketTotalSum();
-    } else
-        alert(`Ошибка: ${response.error.message}`);
-    return response.success;
+function basketDeleteItem($row) {
+    let delButton = $row.find('.delete-row'),
+        data = collectItemData(delButton),
+        result = ajax(data.url, data.formset_data, null, delButton, false);
+    setBasketFullness(result.jqXHRResponse.goods_quantity, result.jqXHRResponse.total_sum);
+    setBasketTotalSum(result.jqXHRResponse.total_sum);
+    if (!result.jqXHRResponse.success)
+        alert(`Error: ${result.jqXHRResponse.error.message}`)
+    return result.jqXHRResponse.success;
 }
 
 
@@ -1053,16 +1078,6 @@ $(function() {
         $(this).closest('form').submit();
     });
 
-    function collectItemData($item) {
-        let idx = extractFormIdx($item.attr('id')),
-            url = $item.attr('url'),
-            formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
-        return {
-            url: url,
-            formset_data: formset_data,
-        }
-    }
-
     $('.basket-item__quantity').change(function(){
         let $$ = $(this),
             data = collectItemData($$)
@@ -1076,7 +1091,7 @@ $(function() {
     });
 
     $('.basket-delete').submit(function(){
-        ajaxSendJson($(this), responseBasketDelete);
+        ajaxSendJson($(this), basketDeleteItem);
         return false;
     });
 });

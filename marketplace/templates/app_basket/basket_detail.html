@@ -41,7 +41,7 @@
                                         <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
                                         <td class="text-center">
                                             {{ item.form.reservation_id }}
-                                            <button type="button" class="btn btn_danger btn_round delete-row" action="basket-delete" url="{% url 'basket_delete_item' %}">{% trans 'Delete' %}</button>
+                                            <button type="button" id="{{ item.form.prefix }}-delete_button" class="btn btn_danger btn_round delete-row" url="{% url 'basket_delete_item' %}">{% trans 'Delete' %}</button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -75,6 +75,7 @@
             $('.basket-item-row').formset({
                 addCssClass: null,
                 prefix: PREFIX,
+                beforeRemove: basketDeleteItem,
             });
         })
     </script>
