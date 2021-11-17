@@ -79,7 +79,7 @@ class BasketPatchItemSellerView(BasketMetaMixin, generic.View):
 
 class BasketDeleteItemView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
-        reservation_id = request.POST.get('basket_item_delete')
+        reservation_id = request.POST.get('reservation_id')
         error = delete_item_from_basket(session=request.session.session_key, reservation_id=reservation_id)
         return JsonResponse({
             'success': not error,

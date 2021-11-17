@@ -955,10 +955,6 @@ function ajax(url, data, success, element, async=true) {
             if (!success) return;
             success(response)
             isSuccess = jqXHRResponse.success;
-            console.log({
-                status: status,
-                jqXHR: jqXHR
-            })
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(`AJAX-request error: ${textStatus}`);
@@ -1068,17 +1064,19 @@ function extractFormIdx(attrValue) {
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
 
-    $('.basket-form__add').submit(function(){
-        ajaxSendJson($(this), responseBasketAdd);
-        return false;
+    $('.basket-form__add').submit(function() {
+        let $form = $(this);
+        // ajaxSendJson($(this), responseBasketAdd);
+        result = ajax($form.attr('action'), $form.serialize(), responseBasketAdd);
+        return result.isSuccess;
     });
 
-    $('.submitter').click(function(event){
+    $('.submitter').click(function(event) {
         event.preventDefault();
         $(this).closest('form').submit();
     });
 
-    $('.basket-item__quantity').change(function(){
+    $('.basket-item__quantity').change(function() {
         let $$ = $(this),
             data = collectItemData($$)
         ajax(data.url, data.formset_data, responseBasketChangeItemQuantity, $$);
@@ -1090,8 +1088,10 @@ $(function() {
         ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
     });
 
-    $('.basket-delete').submit(function(){
-        ajaxSendJson($(this), basketDeleteItem);
+    $('.basket-delete').submit(function() {
+        let $form = $(this);
+        // ajaxSendJson($(this), basketDeleteItem);
+        result = ajax($form.attr('action'), $form.serialize(), basketDeleteItem);
         return false;
     });
 });
