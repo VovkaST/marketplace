@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from app_sellers.models import Balances
@@ -18,7 +17,7 @@ class Basket(models.Model):
         Balances, on_delete=models.CASCADE, related_name='reservation_item', verbose_name=_('Reservation')
     )
     quantity = models.FloatField(_('Quantity'), default=0)
-    modified_at = models.DateTimeField(_('Modifying date, time'), default=timezone.now, editable=False)
+    modified_at = models.DateTimeField(_('Modifying date, time'), editable=False, auto_now=True)
 
     objects = BasketQuerySet.as_manager()
 
