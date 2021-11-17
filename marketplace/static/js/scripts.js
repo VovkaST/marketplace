@@ -1066,9 +1066,8 @@ $(function() {
 
     $('.basket-form__add').submit(function() {
         let $form = $(this);
-        // ajaxSendJson($(this), responseBasketAdd);
-        result = ajax($form.attr('action'), $form.serialize(), responseBasketAdd);
-        return result.isSuccess;
+        ajax($form.attr('action'), $form.serialize(), responseBasketAdd);
+        return false;
     });
 
     $('.submitter').click(function(event) {
@@ -1086,12 +1085,5 @@ $(function() {
         let $$ = $(this),
             data = collectItemData($$)
         ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
-    });
-
-    $('.basket-delete').submit(function() {
-        let $form = $(this);
-        // ajaxSendJson($(this), basketDeleteItem);
-        result = ajax($form.attr('action'), $form.serialize(), basketDeleteItem);
-        return false;
     });
 });

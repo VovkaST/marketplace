@@ -57,7 +57,7 @@ def patch_item_quantity(session: str, reservation_id: str, quantity: int = 1) ->
             'total_price': (Decimal(quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
         }
     except Exception as exc:
-        error = exc.args[0],
+        error = exc.args[0]
     return obj_data, error
 
 
@@ -128,7 +128,7 @@ def delete_item_from_basket(session: str, reservation_id: str):
     return error
 
 
-def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> dict:
+def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> tuple:
     """Добавляет товар из баланса продавцов в пользовательскую корзину.
 
     :param user: Экземпляр пользователя.
@@ -137,7 +137,7 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     :param quantity: Количество единиц товара.
     :return: Ошибки в виде словаря.
     """
-    error = dict()
+    obj_data, error = None, None
     searchable = {
         'reservation_id': reservation_id,
         'user_id': user.id if user else None,
@@ -149,11 +149,16 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
             return patch_item_quantity(
                 session=session, reservation_id=reservation_id, quantity=obj.quantity + quantity
             )
+        obj_data = {
+            'good_id': obj.reservation.good_id,
+            'available': obj.reservation.quantity,
+            'quantity': quantity,
+            'price': obj.reservation.price,
+            'total_price': (Decimal(quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
+        }
     except Exception as exc:
-        error.update({
-            'message': exc.args[0],
-        })
-    return error
+        error = exc.args[0]
+    return obj_data, error
 
 
 def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
