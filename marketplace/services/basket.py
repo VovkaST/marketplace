@@ -253,6 +253,7 @@ def init_basket_formset(items):
             'quantity': item.get('quantity'),
             'good_id': item.get('good_id'),
             'max_quantity': item.get('available', 1),
+            'seller': item['seller']['id'],
         }
         for item in items
     ]

@@ -980,6 +980,7 @@ function setBasketFullness(quantity, total_sum) {
 function setSeller($row, data) {
     let formPrefix = $row.attr('prefix');
     $row.find('.basket-item__price').text(data.price);
+    $row.find('.basket-item__available').text(data.available)
     $(`[name="${formPrefix}-reservation_id"]`).val(data.reservation_id)
     recalculateBasketRow($row, data);
     recalculateBasketTotalSum();

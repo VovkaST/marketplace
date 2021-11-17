@@ -34,7 +34,9 @@
                                         <td>{{ item.form.seller }}</td>
                                         <td>
                                             {{ item.form.quantity }}
-                                            <div class="note note-red">{% trans 'Available to order' %}: {{ item.available }}</div>
+                                            <div class="note note-red">
+                                                {% trans 'Available to order' %}: <span class="basket-item__available">{{ item.available }}</span>
+                                            </div>
                                         </td>
                                         <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
                                         <td class="text-center">
