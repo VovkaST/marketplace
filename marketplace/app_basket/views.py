@@ -11,7 +11,8 @@ from services.basket import (
     delete_item_from_basket,
     get_basket_meta,
     init_basket_formset,
-    patch_item_in_basket,
+    patch_item_seller,
+    patch_item_quantity,
 )
 from services.cache import (
     basket_cache_clear,
@@ -46,12 +47,27 @@ class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
         return context
 
 
-class BasketPatchItemView(BasketMetaMixin, generic.View):
+class BasketPatchItemQuantityView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         quantity = request.POST.get('quantity')
-        obj_data, error = patch_item_in_basket(
+        obj_data, error = patch_item_quantity(
             session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
+        )
+        return JsonResponse({
+            'success': not error,
+            'error': error,
+            'changed_item': obj_data,
+            **self.get_meta(),
+        })
+
+
+class BasketPatchItemSellerView(BasketMetaMixin, generic.View):
+    def post(self, request, *args, **kwargs):
+        reservation_id = request.POST.get('reservation_id')
+        seller_id = request.POST.get('seller')
+        obj_data, error = patch_item_seller(
+            session=request.session.session_key, reservation_id=reservation_id, seller=seller_id
         )
         return JsonResponse({
             'success': not error,

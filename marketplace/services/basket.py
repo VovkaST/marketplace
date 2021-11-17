@@ -11,7 +11,11 @@ from django.utils.translation import gettext as _
 
 from app_basket.forms import BasketFormSet
 from app_basket.models import Basket
-from app_sellers.models import Goods, Sellers
+from app_sellers.models import (
+    Balances,
+    Goods,
+    Sellers,
+)
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
 from services.cache import basket_cache_clear
 
@@ -25,7 +29,7 @@ def is_enough_shop_balances(basket) -> bool:
     return all([goods_item.quantity >= goods_item.balance.quantity for goods_item in basket])
 
 
-def patch_item_in_basket(session: str, reservation_id: str, quantity: int = 1) -> tuple:
+def patch_item_quantity(session: str, reservation_id: str, quantity: int = 1) -> tuple:
     """Изменяет количество единиц товара в пользовательской корзине.
 
     :param session: Строка идентификатора сессии.
@@ -51,6 +55,50 @@ def patch_item_in_basket(session: str, reservation_id: str, quantity: int = 1) -
             'quantity': quantity,
             'price': obj.reservation.price,
             'total_price': (Decimal(quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
+        }
+    except Exception as exc:
+        error = exc.args[0],
+    return obj_data, error
+
+
+def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> tuple:
+    """Изменяет продавца товара в пользовательской корзине.
+
+    :param session: Строка идентификатора сессии.
+    :param reservation_id: Идентификатор баланса продавца.
+    :param seller: ...
+    :return: Данные измененного объекта и сообщение об ошибке.
+    """
+    obj_data, error = None, None
+
+    searchable = {
+        'reservation_id': reservation_id,
+        'session': session,
+    }
+    try:
+        obj = Basket.objects.filter(**searchable).select_related('reservation', 'reservation__seller').first()
+        if not obj:
+            raise Exception(_('Item not found in basket.'))
+        obj_balance = Balances.objects\
+            .filter(seller_id=seller, good=obj.reservation.good)\
+            .select_related('seller')\
+            .first()
+        if not obj_balance:
+            raise Exception(_('Seller not found.'))
+        obj.reservation = obj_balance
+        obj.save(force_update=True, update_fields=['reservation'])
+        obj_data = {
+            'reservation_id': obj_balance.id,
+            'good_id': obj.reservation.good_id,
+            'available': obj.reservation.quantity,
+            'quantity': obj.quantity,
+            'price': obj.reservation.price,
+            'total_price': (Decimal(obj.quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
+            'seller': {
+                'id': obj.reservation.seller.id,
+                'name': obj.reservation.seller.name,
+                'image': None,
+            },
         }
     except Exception as exc:
         error = exc.args[0],
@@ -98,7 +146,7 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     try:
         obj, created = Basket.objects.get_or_create(**searchable, defaults={'quantity': quantity})
         if not created:
-            return patch_item_in_basket(
+            return patch_item_quantity(
                 session=session, reservation_id=reservation_id, quantity=obj.quantity + quantity
             )
     except Exception as exc:
@@ -150,7 +198,7 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> dict:
                 'seller': {
                     'id': item.reservation.seller.id,
                     'name': item.reservation.seller.name,
-                    'image': item.reservation.seller.image,
+                    'image': None,
                 },
                 'other_sellers': get_available_sellers(good=item.reservation.good)
             }

@@ -22,11 +22,11 @@ from services.sellers import get_choices_sellers_by_good
 
 
 class SellerForm(forms.Form):
-    sellers = forms.ChoiceField(
+    seller = forms.ChoiceField(
         widget=Select(
             attrs={
                 'class': 'basket-item__seller',
-                'url': reverse_lazy('basket_patch_item')
+                'url': reverse_lazy('basket_patch_item_seller')
             }
         )
     )
@@ -37,7 +37,7 @@ class SellerForm(forms.Form):
         widget=forms.NumberInput(
             attrs={
                 'class': 'basket-item__quantity',
-                'url': reverse_lazy('basket_patch_item')
+                'url': reverse_lazy('basket_patch_item_quantity')
             }
         )
     )
@@ -45,7 +45,7 @@ class SellerForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         good_id = self.initial['good_id']
-        self.fields['sellers'].choices = get_choices_sellers_by_good(good=good_id)
+        self.fields['seller'].choices = get_choices_sellers_by_good(good=good_id)
         self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
         pass
 

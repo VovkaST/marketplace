@@ -31,7 +31,7 @@
                                     <tr class="basket-item-row" prefix="{{ item.form.prefix }}">
                                         <td>{{ item.name }}</td>
                                         <td class="text-right">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></td>
-                                        <td>{{ item.form.sellers }}</td>
+                                        <td>{{ item.form.seller }}</td>
                                         <td>
                                             {{ item.form.quantity }}
                                             <div class="note note-red">{% trans 'Available to order' %}: {{ item.available }}</div>

@@ -977,6 +977,15 @@ function setBasketFullness(quantity, total_sum) {
 }
 
 
+function setSeller($row, data) {
+    let formPrefix = $row.attr('prefix');
+    $row.find('.basket-item__price').text(data.price);
+    $(`[name="${formPrefix}-reservation_id"]`).val(data.reservation_id)
+    recalculateBasketRow($row, data);
+    recalculateBasketTotalSum();
+}
+
+
 function responseBasketAdd(response) {
     if (response.success) {
         setBasketFullness(response.goods_quantity, response.total_sum);
@@ -988,9 +997,22 @@ function responseBasketAdd(response) {
 }
 
 
-function responseBasketChangeItem(response) {
+function responseBasketChangeItemQuantity(response) {
     if (response.success) {
         let $row = response.elem.closest('.basket-item-row');
+        setBasketFullness(response.goods_quantity, response.total_sum);
+        recalculateBasketRow($row, response.changed_item);
+        recalculateBasketTotalSum();
+    } else
+        alert(`Ошибка: ${response.error.message}`);
+    return response.success;
+}
+
+
+function responseBasketChangeItemSeller(response) {
+    if (response.success) {
+        let $row = response.elem.closest('.basket-item-row');
+        setSeller($row, response.changed_item)
         setBasketFullness(response.goods_quantity, response.total_sum);
         recalculateBasketRow($row, response.changed_item);
         recalculateBasketTotalSum();
@@ -1011,6 +1033,12 @@ function responseBasketDelete(response) {
 }
 
 
+function extractFormIdx(attrValue) {
+    let idRegex = new RegExp(`${PREFIX}-(\\d+)`)
+    return idRegex.exec(attrValue)[1]
+}
+
+
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
 
@@ -1024,13 +1052,26 @@ $(function() {
         $(this).closest('form').submit();
     });
 
+    function collectItemData($item) {
+        let idx = extractFormIdx($item.attr('id')),
+            url = $item.attr('url'),
+            formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
+        return {
+            url: url,
+            formset_data: formset_data,
+        }
+    }
+
     $('.basket-item__quantity').change(function(){
         let $$ = $(this),
-            idRegex = new RegExp(`id_${PREFIX}-(\\d+)-`),
-            idx = idRegex.exec($$.attr('id'))[1],
-            url = $$.attr('url'),
-            formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
-        ajax(url, formset_data, responseBasketChangeItem, $$);
+            data = collectItemData($$)
+        ajax(data.url, data.formset_data, responseBasketChangeItemQuantity, $$);
+    });
+
+    $('.basket-item__seller').change(function() {
+        let $$ = $(this),
+            data = collectItemData($$)
+        ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
     });
 
     $('.basket-delete').submit(function(){
