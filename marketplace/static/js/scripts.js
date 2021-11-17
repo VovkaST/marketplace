@@ -895,18 +895,6 @@ Categories().init();
 /* Функции работы с данными сайта */
 const PREFIX = 'basket_item'
 const CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
-// let locale = $('select[name="language"] option[selected]')[0].value;
-let locale = 'RU';
-let IntlSettings = {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    useGrouping: false,
-};
-
-
-function toFloat(number) {
-    return parseFloat(number.replace(',', '.'));
-}
 
 
 function setBasketRowTotalPrice($row, item) {
@@ -916,24 +904,6 @@ function setBasketRowTotalPrice($row, item) {
 
 function setBasketTotalSum(totalSum) {
     $('.basket__total-sum').text(totalSum);
-}
-
-
-function ajaxSendJson(form, success_handler=undefined) {
-    $.ajax({
-        url: form.attr('action'),
-        type: form.attr('method'),
-        dataType: 'json',
-        data: form.serialize(),
-        headers:{
-            "X-CSRFToken": CSRF_TOKEN,
-        },
-        success: function(response){
-            if (!success_handler) return;
-            response.form = form;
-            success_handler(response);
-        },
-    });
 }
 
 
@@ -1010,7 +980,6 @@ function basketSetSeller($row, data) {
 function responseBasketAdd(response) {
     if (response.success) {
         setBasketFullness(response.goods_quantity, response.total_sum);
-        // response.form.find('input[name="quantity"]').val('');
         alert('Товар успешно добавлен в корзину!');
     } else
         alert(`Ошибка: ${response.error.message}`);
