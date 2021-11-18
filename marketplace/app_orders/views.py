@@ -18,11 +18,14 @@ from services.utils import update_instance_from_form
 
 
 class OrderMixin(ContextMixin):
+    """Миксин работы с Заказами и добавления данных по его этапам."""
+
     template_name = 'app_orders/order_create.html'
     step_name = None
     step = 1
 
     def get_order(self, user, related=False):
+        """Возвращает экземпляр незавершенного Заказа текущего пользователя"""
         return Orders.objects.incomplete_order(user=user, related=related)
 
     def get_context_data(self, **kwargs):
@@ -43,6 +46,8 @@ class OrderMixin(ContextMixin):
 
 
 class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
+    """Первый этап оформления Заказа (Персональные данные)"""
+
     success_url = reverse_lazy('order_create_step_2')
     page_title = _('Order: personal data')
     step_name = _('Personal data')
@@ -86,6 +91,8 @@ class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
 
 
 class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+    """Второй этап оформления Заказа (Способ доставки)"""
+
     success_url = reverse_lazy('order_create_step_3')
     form_class = OrderStep2Form
     page_title = _('Order: delivery')
@@ -113,6 +120,8 @@ class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
 
 
 class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+    """Третий этап оформления Заказа (Способ оплаты)"""
+
     success_url = reverse_lazy('order_create_confirmation')
     form_class = OrderStep3Form
     page_title = _('Order: payment')
@@ -127,6 +136,9 @@ class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
 
 
 class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+    """Четвертый этап оформления Заказа (Проверка
+    и подтверждение данных)"""
+
     # success_url = reverse_lazy('order_create_confirmation')
     form_class = OrderConfirmationForm
     page_title = _('Order: confirmation')

@@ -3,7 +3,11 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.utils.text import slugify as django_slugify
 
 
-def slugify(text):
+def slugify(text: str) -> str:
+    """Преобразует text в slug в соответствии с требованиями
+    к этому типу данных. В случае, когда текст имеет кириллицу,
+    осуществляет его транслитерацию.
+    """
     return transliterate.slugify(text) or django_slugify(text)
 
 
