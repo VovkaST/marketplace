@@ -2537,3 +2537,14 @@ button.link {
 .wrap-content {
   margin: 0 auto;
 }
+
+
+.note {
+    font-size: 0.8em;
+}
+.note-gray {
+    color: #8d8d8d;
+}
+.note-red {
+    color: #ffa457;
+}

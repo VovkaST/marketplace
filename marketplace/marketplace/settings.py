@@ -9,13 +9,22 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
 import os
+from decimal import Decimal
 from pathlib import Path
+
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(str, "teamdiploma.ru"),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR.parent, ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -25,7 +34,7 @@ SECRET_KEY = "django-insecure-$8w6i(@kgxy*c-ajx9v$bc-ety&tfl!w@i5a$4xk_55_4^rj$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['teamdiploma.ru']
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -41,6 +50,9 @@ INSTALLED_APPS = [
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
+    "app_basket.apps.AppBasketConfig",
+    "catalog.apps.CatalogConfig",
+    "django_filters",
     "app_orders.apps.AppOrdersConfig",
 ]
 
@@ -52,6 +64,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
+    "app_basket.middleware.session_user_data.SessionDataCollector",
 ]
 
 ROOT_URLCONF = "marketplace.urls"
@@ -134,3 +148,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
+
+DECIMAL_SUM_TEMPLATE = Decimal('0.01')
+
+SESSION_SAVE_EVERY_REQUEST = True
