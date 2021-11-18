@@ -15,3 +15,20 @@ def get_username_or_session_key(request: WSGIRequest) -> str:
     :return: Username or session key.
     """
     return request.user.username if request.user.is_authenticated else request.session.session_key
+
+
+def update_instance_from_form(form, instance, fields: list):
+    """Обновляет значения полей экземпляра instance,
+    перечисленных в fields, значениями clean_data
+    формы form.
+
+    :param form: Экземпляр заполненной формы.
+    :param instance: Экземпляр модели данных для обновления.
+    :param fields: Список полей, которые нужно обновить.
+    :return: Измененный экземпляр модели данных.
+    """
+    fields_changed = [field for field in form.changed_data if field in fields]
+    if fields_changed:
+        list(map(lambda field: setattr(instance, field, form.cleaned_data[field]), fields_changed))
+        instance.save(force_update=True, update_fields=fields_changed)
+    return instance

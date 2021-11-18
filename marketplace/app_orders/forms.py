@@ -11,7 +11,7 @@ from services.auth import is_user_exists
 
 class OrderStep1AuthorizedForm(forms.ModelForm):
     patronymic = forms.CharField(max_length=150, required=False)
-    phone = forms.CharField(max_length=30)
+    phone_number = forms.CharField(max_length=30)
 
     class Meta:
         model = User

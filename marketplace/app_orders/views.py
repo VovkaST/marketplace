@@ -14,6 +14,7 @@ from app_orders.forms import (
 from app_orders.models import Orders
 from main.views import PageInfoMixin
 from services.auth import registration
+from services.utils import update_instance_from_form
 
 
 class OrderMixin(ContextMixin):
@@ -51,7 +52,7 @@ class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
         initial = super().get_initial()
         if self.request.user.is_authenticated:
             initial.update({
-                'phone': obj.profile.phone_number,
+                'phone_number': obj.profile.phone_number,
                 'patronymic': obj.profile.patronymic,
             })
         return initial
@@ -69,12 +70,16 @@ class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
             return OrderStep1AuthorizedForm
         return OrderStep1NotAuthorizedForm
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-
     def form_valid(self, form):
         if not self.request.user.is_authenticated:
             registration(request=self.request, registration_form=form)
+        if form.changed_data:
+            user_fields = ['first_name', 'last_name', 'email']
+            profile_fields = ['patronymic', 'phone']
+
+            update_instance_from_form(form=form, instance=form.instance, fields=user_fields)
+            update_instance_from_form(form=form, instance=form.instance.profile, fields=profile_fields)
+
         if not Orders.objects.incomplete_order(user=self.request.user):
             Orders.objects.create(user=self.request.user)
         return super().form_valid(form)
