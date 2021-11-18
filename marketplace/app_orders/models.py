@@ -54,6 +54,7 @@ class Orders(models.Model):
         blank=True, null=True
     )
     payment_state = models.BooleanField(_('Payment state'), default=False)
+    bank_account = models.CharField(_('Bank account for payment'), max_length=20, blank=True, null=True)
     city = models.CharField(_('City'), max_length=255, blank=True)
     address = models.CharField(_('Address'), max_length=1000, blank=True)
     comment = models.CharField(_('Comment'), max_length=255, blank=True)

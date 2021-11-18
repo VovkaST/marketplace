@@ -51,6 +51,14 @@ class OrderStep2Form(forms.Form):
 
 class OrderStep3Form(forms.Form):
     payment = forms.ModelChoiceField(queryset=PaymentMethods.objects.all())
+    bank_account = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(
+            attrs={
+                'maxlength': 20,
+            }),
+        max_length=20
+    )
 
 
 class OrderConfirmationForm(forms.Form):

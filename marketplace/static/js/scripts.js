@@ -984,6 +984,34 @@ function responseBasketDelete(response) {
 }
 
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomSign($input, value) {
+    let number = getRandomInt(0, 9);
+    if (!value.length) {
+        $input.val(number);
+    } else {
+        $input.val(value + number);
+    }
+}
+
+function generateNumberString($input, stringLength, interval=300) {
+    let generator = setInterval(randomSign, 1, $input, $input.val());
+    let executor = setInterval(function () {
+        clearInterval(generator);
+        let value = $input.val();
+        if (value.length <= stringLength)
+            generator = setInterval(randomSign, 1, $input, value);
+        else
+            clearInterval(executor);
+    }, interval);
+}
+
+
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
 
@@ -1006,5 +1034,18 @@ $(function() {
     $('.basket-delete').submit(function(){
         ajaxSendJson($(this), responseBasketDelete);
         return false;
+    });
+
+    $('#id_payment').change(function () {
+        let $$ = $(this),
+            $accountRow = $('.id_bank_account_row'),
+            $accountInput = $('#id_bank_account');
+        if ($$.val() == 2) {
+            $accountRow.removeClass('hidden');
+            $accountInput.attr('type', 'text');
+            generateNumberString($accountInput, 20);
+        } else {
+            $accountRow.addClass('hidden');
+        }
     });
 });

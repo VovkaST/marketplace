@@ -2548,3 +2548,7 @@ button.link {
 .note-red {
     color: #ffa457;
 }
+
+.hidden {
+    display: none;
+}

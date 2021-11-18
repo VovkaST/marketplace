@@ -58,8 +58,10 @@
                                 <table>
                                     <tbody>
                                         {% for field in form %}
-                                            <tr>
-                                                <td><label for="{{ field.id_for_label }}" class="">{{ field.label}}:</label></td>
+                                            <tr class="{{ field.id_for_label }}_row {% if field.is_hidden %}hidden{% endif %}">
+                                                <td>
+                                                    <label for="{{ field.id_for_label }}">{{ field.label}}:</label>
+                                                </td>
                                                 <td>
                                                     {{ field }}
                                                     <div>
