@@ -893,54 +893,71 @@ Categories().init();
 
 
 /* Функции работы с данными сайта */
-let CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
-// let locale = $('select[name="language"] option[selected]')[0].value;
-let locale = 'RU';
-let IntlSettings = {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    useGrouping: false,
-};
+const PREFIX = 'basket_item'
+const CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
 
 
-function toFloat(number) {
-    return parseFloat(number.replace(',', '.'));
+function setBasketRowTotalPrice($row, item) {
+    $row.find('.basket-item__sum').text(item.total_price);
 }
 
 
-function recalculateBasketRow($row) {
-    let price = toFloat($row.find('.basket-item__price').text());
-    let quantity = Number($row.find('.basket-item__quantity').val());
-    $row.find('.basket-item__sum').text(
-        new Intl.NumberFormat( locale, IntlSettings ).format(quantity * price)
-    );
+function setBasketTotalSum(totalSum) {
+    $('.basket__total-sum').text(totalSum);
 }
 
 
-function recalculateBasketTotalSum() {
-    let total_sum = 0;
-    $('.basket-item__sum').each(function(){
-        total_sum += toFloat(this.textContent);
-    });
-    $('.basket__total-sum').text(new Intl.NumberFormat( locale, IntlSettings ).format(total_sum));
-}
-
-
-function ajaxSendJson(form, success_handler=undefined) {
+function ajax(url, data, success, element, async=true) {
+    let isSuccess = true,
+        jqXHRResponse = null
     $.ajax({
-        url: form.attr('action'),
-        type: form.attr('method'),
+        async: async,
+        url: url,
+        type: 'post',
         dataType: 'json',
-        data: form.serialize(),
+        data: data,
         headers:{
             "X-CSRFToken": CSRF_TOKEN,
         },
-        success: function(response){
-            if (!success_handler) return;
-            response.form = form;
-            success_handler(response);
+        success: function(response, status, jqXHR) {
+            jqXHRResponse = response
+            response.elem = element;
+            if (!success) return;
+            success(response)
+            isSuccess = jqXHRResponse.success;
         },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert(`AJAX-request error: ${textStatus}`);
+            isSuccess = false;
+        }
     });
+    return {
+        isSuccess: isSuccess,
+        jqXHRResponse: jqXHRResponse,
+    };
+}
+
+
+function getFormsetData(selector) {
+    let data = {},
+        nameRegex = new RegExp(`${PREFIX}-\\d+-(\\w+)$`)
+    $(selector).each(function() {
+        let el = $(this),
+            name = nameRegex.exec(el.attr('name'))[1];
+        data[name] = el.val()
+    });
+    return data
+}
+
+
+function collectItemData($item) {
+    let idx = extractFormIdx($item.attr('id')),
+        url = $item.attr('url'),
+        formset_data = getFormsetData(`[name^="${PREFIX}-${idx}"]`)
+    return {
+        url: url,
+        formset_data: formset_data,
+    }
 }
 
 
@@ -950,10 +967,19 @@ function setBasketFullness(quantity, total_sum) {
 }
 
 
+function basketSetSeller($row, data) {
+    let formPrefix = $row.attr('prefix');
+    $row.find('.basket-item__price').text(data.price);
+    $row.find('.basket-item__available').text(data.available)
+    $(`[name="${formPrefix}-reservation_id"]`).val(data.reservation_id)
+    setBasketRowTotalPrice($row, data);
+    setBasketTotalSum();
+}
+
+
 function responseBasketAdd(response) {
     if (response.success) {
         setBasketFullness(response.goods_quantity, response.total_sum);
-        // response.form.find('input[name="quantity"]').val('');
         alert('Товар успешно добавлен в корзину!');
     } else
         alert(`Ошибка: ${response.error.message}`);
@@ -961,50 +987,72 @@ function responseBasketAdd(response) {
 }
 
 
-function responseBasketChangeItem(response) {
+function responseBasketChangeItemQuantity(response) {
     if (response.success) {
-        let $row = response.form.closest('.basket-item-row');
+        let $row = response.elem.closest('.basket-item-row');
         setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketRow($row);
-        recalculateBasketTotalSum();
+        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketTotalSum();
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;
 }
 
 
-function responseBasketDelete(response) {
+function responseBasketChangeItemSeller(response) {
     if (response.success) {
-        response.form.closest('tr').remove();
+        let $row = response.elem.closest('.basket-item-row');
+        basketSetSeller($row, response.changed_item)
         setBasketFullness(response.goods_quantity, response.total_sum);
-        recalculateBasketTotalSum();
+        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketTotalSum();
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;
+}
+
+
+function basketDeleteItem($row) {
+    let delButton = $row.find('.delete-row'),
+        data = collectItemData(delButton),
+        result = ajax(data.url, data.formset_data, null, delButton, false);
+    setBasketFullness(result.jqXHRResponse.goods_quantity, result.jqXHRResponse.total_sum);
+    setBasketTotalSum(result.jqXHRResponse.total_sum);
+    if (!result.jqXHRResponse.success)
+        alert(`Error: ${result.jqXHRResponse.error.message}`)
+    return result.jqXHRResponse.success;
+}
+
+
+function extractFormIdx(attrValue) {
+    let idRegex = new RegExp(`${PREFIX}-(\\d+)`)
+    return idRegex.exec(attrValue)[1]
 }
 
 
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
 
-    $('.basket-form__add').submit(function(){
-        ajaxSendJson($(this), responseBasketAdd);
+    $('.basket-form__add').submit(function() {
+        let $form = $(this);
+        ajax($form.attr('action'), $form.serialize(), responseBasketAdd);
         return false;
     });
 
-    $('.submitter').click(function(event){
+    $('.submitter').click(function(event) {
         event.preventDefault();
         $(this).closest('form').submit();
     });
 
-    $('.basket-item__quantity').change(function(){
-        let $this = $(this);
-        if (!$this.val()) $this.val(1);
-        ajaxSendJson($this.closest('form'), responseBasketChangeItem);
+    $('.basket-item__quantity').change(function() {
+        let $$ = $(this),
+            data = collectItemData($$)
+        ajax(data.url, data.formset_data, responseBasketChangeItemQuantity, $$);
     });
 
-    $('.basket-delete').submit(function(){
-        ajaxSendJson($(this), responseBasketDelete);
-        return false;
+    $('.basket-item__seller').change(function() {
+        let $$ = $(this),
+            data = collectItemData($$)
+        ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
     });
 });
