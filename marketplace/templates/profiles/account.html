@@ -45,45 +45,59 @@
                     </div>
                     <div class="Account-group">
                         <div class="Account-column Account-column_full">
-                            <div class="Order Order_anons account_section">
+                            {% for order in orders %}
+                            <div class="Order Order_anons">
                                 <div class="Order-personal">
                                     <div class="row">
-                                        <div class="row-block"><a class="Order-title" href="oneorder.html">{% trans
-                                            'Order' %}&#32;<span class="Order-numberOrder">№200</span>&#32;от&#32;<span
-                                                    class="Order-dateOrder">21.07.2020</span></a>
-                                            <div class="Account-editLink"><a href="historyorder.html">{% trans 'Orders
-                                                history' %}</a>
-                                            </div>
+                                        <div class="row-block">
+                                            <a class="Order-title" href="{# url order detail #}">
+                                                {% trans 'Order' %}&#32;
+                                                <span class="Order-numberOrder">№{{ order.pk }}</span>
+                                                &#32;{% trans 'From' %}&#32;
+                                                <span class="Order-dateOrder">{{ order.date_time }}</span>
+                                            </a>
                                         </div>
                                         <div class="row-block">
                                             <div class="Order-info Order-info_delivery">
                                                 <div class="Order-infoType">{% trans 'Delivery type' %}:
                                                 </div>
-                                                <div class="Order-infoContent">Обычная доставка
+                                                <div class="Order-infoContent">{{ order.delivery.name }}
                                                 </div>
                                             </div>
                                             <div class="Order-info Order-info_pay">
                                                 <div class="Order-infoType">{% trans 'Payment' %}:
                                                 </div>
-                                                <div class="Order-infoContent">Онлайн картой
+                                                <div class="Order-infoContent">{{ order.payment.name }}
                                                 </div>
                                             </div>
                                             <div class="Order-info">
                                                 <div class="Order-infoType">{% trans 'Total price' %}:
                                                 </div>
-                                                <div class="Order-infoContent">200.99$
+                                                <div class="Order-infoContent">
+                                                    <span class="Order-price">{{ order.total_sum }}</span>
                                                 </div>
                                             </div>
                                             <div class="Order-info Order-info_status">
                                                 <div class="Order-infoType">{% trans 'Status' %}:
                                                 </div>
-                                                <div class="Order-infoContent">{% trans 'Not paid' %}
+                                                <div class="Order-infoContent">
+                                                    {{ order.payment_state }}
                                                 </div>
                                             </div>
+                                            {% if order.payment_errors %}
+                                            <div class="Order-info Order-info_error">
+                                                <div class="Order-infoType">{% trans 'Not paid' %}:
+                                                </div>
+                                                <div class="Order-infoContent">
+                                                    {{ order.payment_errors }}
+                                                </div>
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="Account-group">
@@ -93,10 +107,10 @@
                                 </h2>
                             </header>
                             <div class="Cards Cards_account">
-                                {% for product in viewed_products %}
+                                {% for product in view_history %}
                                 <div class="Card">
                                     <a class="Card-picture" href="{# url product detail #}">
-                                        {% if product.good_images %}
+                                        {% if product.good_images.first %}
                                         <img src="{{ product.good_images.first.image.url }}"
                                              alt="{{ product.name }} image"/>
                                         {% else %}
@@ -135,7 +149,7 @@
                                 {% endfor %}
                             </div>
                             <div class="Account-editLink Account-editLink_view">
-                                <a href="{# url history view #}">{% trans 'Full list' %}</a>
+                                <a href="{% url 'historyview' %}">{% trans 'Full list' %}</a>
                             </div>
                         </div>
                     </div>
