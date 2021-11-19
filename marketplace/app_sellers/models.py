@@ -5,6 +5,18 @@ from services.querysets import SoftDeleter
 from services.utils import slugify
 
 
+class SellerQuerySet(models.QuerySet):
+    def by_good(self, good, only_available=True):
+        filters = dict()
+        if isinstance(good, Goods):
+            filters.update({'balance_owner__good': good})
+        elif isinstance(good, int):
+            filters.update({'balance_owner__good_id': good})
+        if only_available:
+            filters.update({'balance_owner__quantity__gt': 0})
+        return self.filter(**filters)
+
+
 class Sellers(models.Model):
     slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_("Seller name"), max_length=254)
@@ -15,6 +27,8 @@ class Sellers(models.Model):
         _("Image (avatar)"), upload_to="files/sellers/", blank=True
     )
     description = models.CharField(_("Description"), max_length=1000)
+
+    objects = SellerQuerySet.as_manager()
 
     def clean(self):
         self.slug = slugify(self.name)
