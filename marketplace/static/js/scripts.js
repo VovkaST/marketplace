@@ -1004,7 +1004,7 @@ function generateNumberString($input, stringLength, interval=300) {
     let executor = setInterval(function () {
         clearInterval(generator);
         let value = $input.val();
-        if (value.length <= stringLength)
+        if (value.length < stringLength)
             generator = setInterval(randomSign, 1, $input, value);
         else
             clearInterval(executor);
