@@ -10,12 +10,15 @@ from services.auth import is_user_exists
 
 
 class OrderStep1AuthorizedForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
     patronymic = forms.CharField(max_length=150, required=False)
+    email = forms.EmailField(max_length=254)
     phone_number = forms.CharField(max_length=30)
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["first_name", "last_name", "patronymic", "email", "phone_number"]
 
     def is_valid(self):
         super().is_valid()

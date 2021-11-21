@@ -23,10 +23,33 @@ class OrderMixin(ContextMixin):
     template_name = 'app_orders/order_create.html'
     step_name = None
     step = 1
+    step_fields = list()
 
     def get_order(self, user, related=False):
         """Возвращает экземпляр незавершенного Заказа текущего пользователя"""
         return Orders.objects.incomplete_order(user=user, related=related)
+
+    def get_initial(self):
+        """Получает данные полей незавершенного Заказа пользователя
+        в соответствии с указанными в self.step_fields и использует
+        их в качестве инициализирующих форму."""
+        initial = super().get_initial()
+        order = self.get_order(user=self.request.user)
+        if order:
+            for field in self.step_fields:
+                initial.update({field: getattr(order, field)})
+        return initial
+
+    def form_valid(self, form):
+        """Получает экземпляр оформляемого Заказа, заполняет
+        (обновляет) поля, указанные в self.step_fields,
+        и сохраняет объект в БД."""
+        order = self.get_order(user=self.request.user)
+        if order and self.step_fields:
+            for field in self.step_fields:
+                setattr(order, field, form.cleaned_data.get(field))
+            order.save(update_fields=self.step_fields)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -57,8 +80,8 @@ class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
         initial = super().get_initial()
         if self.request.user.is_authenticated:
             initial.update({
-                'phone_number': obj.profile.phone_number,
                 'patronymic': obj.profile.patronymic,
+                'phone_number': obj.profile.phone_number,
             })
         return initial
 
@@ -98,25 +121,7 @@ class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
     page_title = _('Order: delivery')
     step_name = _('Delivery method')
     step = 2
-
-    def get_initial(self):
-        initial = super().get_initial()
-        order = self.get_order(user=self.request.user)
-        if order:
-            initial.update({
-                'delivery': order.delivery,
-                'city': order.city,
-                'address': order.address,
-            })
-        return initial
-
-    def form_valid(self, form):
-        order = self.get_order(user=self.request.user)
-        order.delivery = form.cleaned_data.get('delivery')
-        order.city = form.cleaned_data.get('city')
-        order.address = form.cleaned_data.get('address')
-        order.save(update_fields=['delivery', 'city', 'address'])
-        return super().form_valid(form)
+    step_fields = ['delivery', 'city', 'address']
 
 
 class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
@@ -127,12 +132,7 @@ class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
     page_title = _('Order: payment')
     step_name = _('Payment method')
     step = 3
-
-    def form_valid(self, form):
-        order = self.get_order(user=self.request.user)
-        order.payment = form.cleaned_data.get('payment')
-        order.save(update_fields=['payment'])
-        return super().form_valid(form)
+    step_fields = ['payment', 'bank_account']
 
 
 class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
@@ -144,20 +144,22 @@ class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, gener
     page_title = _('Order: confirmation')
     step_name = _('Completion')
     step = 4
+    step_fields = ['comment']
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         order = self.get_order(user=self.request.user, related=True)
         data.update({
             'order_data': {
-                'Date, time': order.date_time.strftime('%d %B %Y, %H:%M'),
-                'Receiver': f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
-                'Phone': order.user.profile.phone_number_formatted,
-                'Total sum': order.total_sum,
-                'City': order.city,
-                'Address': order.address,
-                'Delivery method': order.delivery.name,
-                'Payment method': order.payment.name,
+                _('Date, time'): order.date_time.strftime('%d %B %Y, %H:%M'),
+                _('Receiver'): f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
+                _('Phone'): order.user.profile.phone_number_formatted,
+                _('Total sum'): order.total_sum,
+                _('City'): order.city,
+                _('Address'): order.address,
+                _('Delivery method'): order.delivery.name,
+                _('Payment method'): order.payment.name,
+                _('Bank account'): order.bank_account,
             }
         })
         return data
