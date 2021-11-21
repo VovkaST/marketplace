@@ -25,12 +25,8 @@ class BasketQuerySet(models.QuerySet):
             filters = {'session': session_id}
         return self.filter(**filters)
 
-# class GoodsQuerySet(SoftDeleter):
-# class GoodsQuerySet(models.QuerySet):
-#     def annotate_with_reviews_count(self):
-#         return self.annotate(
-#             reviews_count=Count('good_balance'),
-#         )
+    def delete_user_basket(self, user_id: int):
+        return self.filter(user_id=user_id).delete()
 
 
 class OrdersQuerySet(SoftDeleter):
@@ -38,7 +34,7 @@ class OrdersQuerySet(SoftDeleter):
         return self.filter(user=user)
 
     def incomplete_order(self, user, related=False):
-        queryset = self.user_order(user=user).filter(payment_state=False)
+        queryset = self.user_order(user=user).filter(confirmed=False)
         if related:
             queryset.select_related('delivery', 'payment', 'user')
         return queryset.first()

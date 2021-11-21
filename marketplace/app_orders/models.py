@@ -58,6 +58,7 @@ class Orders(models.Model):
     city = models.CharField(_('City'), max_length=255, blank=True)
     address = models.CharField(_('Address'), max_length=1000, blank=True)
     comment = models.CharField(_('Comment'), max_length=255, blank=True)
+    confirmed = models.BooleanField(_('Confirmation status'), default=False)
     deleted = models.BooleanField(_("Deletion mark"), default=False)
 
     objects = OrdersQuerySet.as_manager()

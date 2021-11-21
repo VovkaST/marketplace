@@ -1,9 +1,14 @@
+from decimal import Decimal
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import generic
 from django.views.generic.base import ContextMixin
 
+from app_basket.models import Basket
 from app_orders.forms import (
     OrderConfirmationForm,
     OrderStep1AuthorizedForm,
@@ -11,7 +16,7 @@ from app_orders.forms import (
     OrderStep2Form,
     OrderStep3Form,
 )
-from app_orders.models import Orders
+from app_orders.models import Orders, OrderItems
 from main.views import PageInfoMixin
 from services.auth import registration
 from services.utils import update_instance_from_form
@@ -26,7 +31,7 @@ class OrderMixin(ContextMixin):
     step = 1
     step_fields = list()
 
-    def get_order(self, user, related=False):
+    def get_order(self, user, related=False) -> Orders:
         """Возвращает экземпляр незавершенного Заказа текущего пользователя"""
         return Orders.objects.incomplete_order(user=user, related=related)
 
@@ -142,7 +147,7 @@ class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, gener
     """Четвертый этап оформления Заказа (Проверка
     и подтверждение данных)"""
 
-    # success_url = reverse_lazy('order_create_confirmation')
+    success_url = reverse_lazy('basket')
     form_class = OrderConfirmationForm
     page_title = _('Order: confirmation')
     step_name = _('Completion')
@@ -166,6 +171,26 @@ class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, gener
             },
         })
         return data
+
+    def form_valid(self, form):
+        order = self.get_order(user=self.request.user)
+        order.comment = form.cleaned_data['comment']
+        order.total_sum = self.request.basket_total_sum
+        order.confirmed = True
+        with transaction.atomic():
+            order.save(force_update=True, update_fields=['comment', 'total_sum', 'confirmed'])
+            for basket_item in Basket.objects.user_basket(user_id=self.request.user.id):
+                data = {
+                    'order': order,
+                    'seller': basket_item.reservation.seller,
+                    'good': basket_item.reservation.good,
+                    'quantity': basket_item.quantity,
+                    'price': basket_item.reservation.price,
+                    'total_price': Decimal(basket_item.quantity) * basket_item.reservation.price,
+                }
+                OrderItems.objects.create(**data)
+            Basket.objects.delete_user_basket(user_id=self.request.user.id)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 steps_links = (
