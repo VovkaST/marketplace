@@ -21,6 +21,7 @@ class OrderMixin(ContextMixin):
     """Миксин работы с Заказами и добавления данных по его этапам."""
 
     template_name = 'app_orders/order_create.html'
+    form_template_name = 'app_orders/order_form.html'
     step_name = None
     step = 1
     step_fields = list()
@@ -64,6 +65,7 @@ class OrderMixin(ContextMixin):
         context.update({
             'step_name': self.step_name,
             'order_steps': order_steps,
+            'form_template': self.form_template_name
         })
         return context
 
@@ -127,6 +129,7 @@ class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
 class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
     """Третий этап оформления Заказа (Способ оплаты)"""
 
+    form_template_name = 'app_orders/payment_step.html'
     success_url = reverse_lazy('order_create_confirmation')
     form_class = OrderStep3Form
     page_title = _('Order: payment')
@@ -154,13 +157,13 @@ class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, gener
                 _('Date, time'): order.date_time.strftime('%d %B %Y, %H:%M'),
                 _('Receiver'): f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
                 _('Phone'): order.user.profile.phone_number_formatted,
-                _('Total sum'): order.total_sum,
+                _('Total sum'): self.request.basket_total_sum,
                 _('City'): order.city,
                 _('Address'): order.address,
                 _('Delivery method'): order.delivery.name,
                 _('Payment method'): order.payment.name,
                 _('Bank account'): order.bank_account,
-            }
+            },
         })
         return data
 
