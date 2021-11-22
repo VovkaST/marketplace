@@ -1,7 +1,8 @@
-from decimal import Decimal
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
+from django.contrib.auth.mixins import (
+    AccessMixin,
+    LoginRequiredMixin,
+)
+from django.core.exceptions import BadRequest
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -16,13 +17,47 @@ from app_orders.forms import (
     OrderStep2Form,
     OrderStep3Form,
 )
-from app_orders.models import Orders, OrderItems
+from app_orders.models import Orders
 from main.views import PageInfoMixin
 from services.auth import registration
+from services.basket import (
+    complete_order,
+    get_order_summary,
+)
 from services.utils import update_instance_from_form
 
 
-class OrderMixin(ContextMixin):
+class OrderBaseMixin:
+    prefetch_related_objects = False
+
+    def get_order(self, user) -> Orders:
+        """Возвращает экземпляр незавершенного Заказа текущего
+        пользователя (атрибут self.order). В случае отсутствия
+        вычисляет его."""
+        if not getattr(self, 'order', None):
+            self.order = Orders.objects.incomplete_order(user=user, related=self.prefetch_related_objects)
+        return self.order
+
+
+class OrderRequiredMixin(OrderBaseMixin, AccessMixin):
+    """Миксин обязательности наличия инициализированного Заказа"""
+
+    def dispatch(self, request, *args, **kwargs):
+        self.get_order(user=self.request.user)
+        if not self.order:
+            raise BadRequest(_('Order is not initialized'))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class BasketRequiredMixin(AccessMixin):
+    """Миксин обязательности наличия товаров в Корзине"""
+    def dispatch(self, request, *args, **kwargs):
+        if not Basket.objects.user_basket(session_id=request.session.session_key):
+            raise BadRequest(_('Basket is empty'))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OrderMixin(OrderBaseMixin, ContextMixin):
     """Миксин работы с Заказами и добавления данных по его этапам."""
 
     template_name = 'app_orders/order_create.html'
@@ -30,10 +65,6 @@ class OrderMixin(ContextMixin):
     step_name = None
     step = 1
     step_fields = list()
-
-    def get_order(self, user, related=False) -> Orders:
-        """Возвращает экземпляр незавершенного Заказа текущего пользователя"""
-        return Orders.objects.incomplete_order(user=user, related=related)
 
     def get_initial(self):
         """Получает данные полей незавершенного Заказа пользователя
@@ -75,7 +106,7 @@ class OrderMixin(ContextMixin):
         return context
 
 
-class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
+class OrderCreateStep1View(OrderMixin, BasketRequiredMixin, PageInfoMixin, generic.FormView):
     """Первый этап оформления Заказа (Персональные данные)"""
 
     success_url = reverse_lazy('order_create_step_2')
@@ -120,7 +151,9 @@ class OrderCreateStep1View(OrderMixin, PageInfoMixin, generic.FormView):
         return super().form_valid(form)
 
 
-class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin,
+                           OrderRequiredMixin, BasketRequiredMixin,
+                           generic.FormView):
     """Второй этап оформления Заказа (Способ доставки)"""
 
     success_url = reverse_lazy('order_create_step_3')
@@ -131,7 +164,9 @@ class OrderCreateStep2View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
     step_fields = ['delivery', 'city', 'address']
 
 
-class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin,
+                           OrderRequiredMixin, BasketRequiredMixin,
+                           generic.FormView):
     """Третий этап оформления Заказа (Способ оплаты)"""
 
     form_template_name = 'app_orders/payment_step.html'
@@ -143,7 +178,9 @@ class OrderCreateStep3View(OrderMixin, PageInfoMixin, LoginRequiredMixin, generi
     step_fields = ['payment', 'bank_account']
 
 
-class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
+class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin,
+                            OrderRequiredMixin, BasketRequiredMixin,
+                            generic.FormView):
     """Четвертый этап оформления Заказа (Проверка
     и подтверждение данных)"""
 
@@ -156,40 +193,19 @@ class OrderConfirmationView(OrderMixin, PageInfoMixin, LoginRequiredMixin, gener
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        order = self.get_order(user=self.request.user, related=True)
+        summary = get_order_summary(user=self.request.user)
+        summary.update({
+            _('Total sum'): self.request.basket_total_sum,
+        })
         data.update({
-            'order_data': {
-                _('Date, time'): order.date_time.strftime('%d %B %Y, %H:%M'),
-                _('Receiver'): f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
-                _('Phone'): order.user.profile.phone_number_formatted,
-                _('Total sum'): self.request.basket_total_sum,
-                _('City'): order.city,
-                _('Address'): order.address,
-                _('Delivery method'): order.delivery.name,
-                _('Payment method'): order.payment.name,
-                _('Bank account'): order.bank_account,
-            },
+            'order_data': summary,
         })
         return data
 
     def form_valid(self, form):
-        order = self.get_order(user=self.request.user)
-        order.comment = form.cleaned_data['comment']
-        order.total_sum = self.request.basket_total_sum
-        order.confirmed = True
-        with transaction.atomic():
-            order.save(force_update=True, update_fields=['comment', 'total_sum', 'confirmed'])
-            for basket_item in Basket.objects.user_basket(user_id=self.request.user.id):
-                data = {
-                    'order': order,
-                    'seller': basket_item.reservation.seller,
-                    'good': basket_item.reservation.good,
-                    'quantity': basket_item.quantity,
-                    'price': basket_item.reservation.price,
-                    'total_price': Decimal(basket_item.quantity) * basket_item.reservation.price,
-                }
-                OrderItems.objects.create(**data)
-            Basket.objects.delete_user_basket(user_id=self.request.user.id)
+        self.order.comment = form.cleaned_data['comment']
+        complete_order(user=self.request.user, order=self.order)
+        self.order.save(force_update=True, update_fields=['comment', 'total_sum', 'confirmed'])
         return HttpResponseRedirect(self.get_success_url())
 
 

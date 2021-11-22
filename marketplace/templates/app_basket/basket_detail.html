@@ -57,7 +57,7 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <a href="" class="btn btn_round btn_success">{% trans 'Order' %}</a>
+                    <a href="{% url 'order_create' %}" class="btn btn_round btn_success">{% trans 'Order' %}</a>
                 {% endcache %}
             {% else %}
                 <p>{% trans 'Your basket is empty!' %}</p>
