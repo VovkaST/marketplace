@@ -1,26 +1,22 @@
 import django_filters
-from app_sellers.models import Balances, Goods
-from django.db.models import Count
+from app_sellers.models import Balances, Goods, Sellers
+from django.db.models.functions import Coalesce
 from django.views.generic import ListView
-from django_filters.widgets import LinkWidget, RangeWidget
+from django_filters.widgets import BooleanWidget, LinkWidget, RangeWidget
+
+# fmt: off
+from django.db.models import (Case, Count, Exists, Min, OuterRef, Sum, Value,  # isort:skip
+                              When)  # isort:skip
 
 
 class CatalogFilter(django_filters.FilterSet):
-    sales = django_filters.RangeFilter(widget=RangeWidget())
+    min_price = django_filters.RangeFilter(widget=RangeWidget())
     name = django_filters.CharFilter(lookup_expr="icontains")
-
-    reviews_count = django_filters.RangeFilter(widget=RangeWidget())
-
-    # manufacturer = django_filters.ModelChoiceFilter(queryset=Manufacturer.objects.all())
-    # activity = django_filters.BooleanFilter(widget=BooleanWidget())
+    on_balance = django_filters.BooleanFilter(widget=BooleanWidget())
+    on_sale = django_filters.BooleanFilter(widget=BooleanWidget())
 
     o = django_filters.OrderingFilter(
-        fields=(
-            # ('reviews_count', 'reviews_count'),
-            "reviews_count",
-            "sales",
-            "name",
-        ),
+        fields=("reviews_count", "sales", "min_price"),
         # field_labels={
         #     'reviews_count': 'Qty of reviews',
         # },
@@ -53,10 +49,24 @@ class FilteredListView(ListView):
 
 
 class CatalogView(FilteredListView):
-    # model = Goods
-    # queryset = Goods.objects.annotate_with_reviews_count()
-    queryset = Goods.objects.annotate(reviews_count=Count("good_balance"))
+
+    # модель Balances вместо других моделей используется для отладки, пока нет моделей GoodsInStocks и Reviews
+
+    # здесь должно быть  stocks_subquery = GoodsInStocks.objects.filter(good=OuterRef('pk'))
+    stocks_subquery = Balances.objects.filter(good=OuterRef("pk"))
+
+    #               здесь должно быть reviews_count=Count("reviews_count")
+    queryset = Goods.objects.annotate(
+        reviews_count=Count("good_balance"),
+        min_price=Min("good_balance__price"),
+        on_sale=Exists(stocks_subquery),
+        sum_balance=Coalesce(Sum("good_balance__quantity"), Value(0)),
+    ).annotate(
+        on_balance=Case(When(sum_balance__gt=0, then=Value(True)), default=Value(False))
+    )
+
     template_name = "catalog/catalog.html"
+    context_object_name = "goods_list"
     filterset_class = CatalogFilter
     paginate_by = 3
 
