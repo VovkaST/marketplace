@@ -36,6 +36,7 @@ class GoodsDescriptionsValues(models.Model):
         "GoodsDescriptionsValues",
         blank=True,
         null=True,
+        default = None,
         verbose_name=_("Description item"),
         on_delete=models.CASCADE,
         related_name="description_feature",
