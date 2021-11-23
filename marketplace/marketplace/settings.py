@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "app_basket.apps.AppBasketConfig",
     "catalog.apps.CatalogConfig",
     "django_filters",
+    "django_extensions"
 ]
 
 MIDDLEWARE = [
