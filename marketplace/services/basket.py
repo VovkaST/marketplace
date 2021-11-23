@@ -1,6 +1,8 @@
 from decimal import Decimal
+from typing import List, Tuple
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import (
     DecimalField,
     F,
@@ -15,6 +17,9 @@ from app_sellers.models import (
     Balances,
     Goods,
     Sellers,
+from app_orders.models import (
+    OrderItems,
+    Orders,
 )
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
 from services.cache import basket_cache_clear
@@ -105,7 +110,7 @@ def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> 
     return obj_data, error
 
 
-def delete_item_from_basket(session: str, reservation_id: str):
+def delete_item_from_basket(session: str, reservation_id: str) -> dict:
     """Удаляет товар из пользовательской корзины.
 
     :param session: Строка идентификатора сессии.
@@ -268,3 +273,51 @@ def init_basket_formset(items):
     )
     [items[i].update({'form': form}) for i, form in enumerate(formset)]
     return formset
+
+def get_order_summary(user: User) -> dict:
+    """Собирает словарь сводных данных по Заказу.
+
+    :param user: экземпляр авторизованного пользователя.
+    """
+    order = Orders.objects.incomplete_order(user=user, related=True)
+    return {
+        _('Date, time'): order.date_time.strftime('%d %B %Y, %H:%M'),
+        _('Receiver'): f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
+        _('Phone'): order.user.profile.phone_number_formatted,
+        _('Total sum'): None,
+        _('City'): order.city,
+        _('Address'): order.address,
+        _('Delivery method'): order.delivery.name,
+        _('Payment method'): order.payment.name,
+        _('Bank account'): order.bank_account,
+    }
+
+
+def complete_order(user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
+    """Сохраняет позиции Заказа, подсчитывает общую сумму
+    заказа, помещает ее в экземпляр order. Возвращает измененный
+    order и созданные экземпляры OrderItems, помечает Заказ
+    как "Подтвержденный" (confirmed = True).
+
+    :param user: экземпляр авторизованного пользователя.
+    :param order: экземпляр Заказа.
+    """
+    items = list()
+    with transaction.atomic():
+        total_sum = 0
+        for basket_item in Basket.objects.user_basket(user_id=user.id):
+            total_price = Decimal(basket_item.quantity) * basket_item.reservation.price
+            data = {
+                'order': order,
+                'seller': basket_item.reservation.seller,
+                'good': basket_item.reservation.good,
+                'quantity': basket_item.quantity,
+                'price': basket_item.reservation.price,
+                'total_price': total_price,
+            }
+            total_sum += total_price
+            items.append(OrderItems.objects.create(**data))
+        order.total_sum = total_sum + order.delivery.price
+        order.confirmed = True
+        Basket.objects.delete_user_basket(user_id=user.id)
+    return order, items

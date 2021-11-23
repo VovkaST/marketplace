@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "catalog.apps.CatalogConfig",
     "django_filters",
     "django_extensions"
+    "app_orders.apps.AppOrdersConfig",
 ]
 
 MIDDLEWARE = [

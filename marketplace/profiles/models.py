@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -21,6 +23,11 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user}, {self.phone_number}, {self.patronymic}"
+
+    @property
+    def phone_number_formatted(self):
+        phone = re.findall(pattern=r'(\d{3})(\d{3})(\d{2})(\d{2})', string=self.phone_number)
+        return '+7 ({0}) {1}-{2}-{3}'.format(*phone[0]) if phone else self.phone_number
 
 
 class UserAddress(models.Model):

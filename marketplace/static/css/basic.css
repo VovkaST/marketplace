@@ -1342,6 +1342,7 @@ label.toggle {
   line-height: 1.2em;
 }
 .menu_vt .menu-item_ACTIVE a,
+.menu_vt .menu-item_ACTIVE .menu-text,
 .menu_vt .menu-item_trigger a {
   color: #0063d1;
   cursor: default;
@@ -2546,4 +2547,13 @@ button.link {
 }
 .note-red {
     color: #ffa457;
+}
+
+.hidden {
+    display: none;
+}
+#bank_account__number {
+    font-size: 1.5em;
+    color: #3670c7;
+    letter-spacing: .15em;
 }

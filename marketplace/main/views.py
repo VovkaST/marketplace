@@ -4,6 +4,8 @@ from services.main_page import get_banners, get_categories, get_top_goods
 
 
 class PageInfoMixin(ContextMixin):
+    """Миксин добавления названия страницы"""
+
     page_title = None
 
     def get_context_data(self, **kwargs):
