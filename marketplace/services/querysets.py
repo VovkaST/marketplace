@@ -1,7 +1,5 @@
 from django.db import models
 
-from app_orders.models import Orders
-
 
 class SoftDeleter(models.QuerySet):
     """QuerySet мягкого удаления объектов"""
@@ -58,7 +56,7 @@ class OrdersQuerySet(SoftDeleter):
         """
         return self.filter(user=user)
 
-    def incomplete_order(self, user, related=False) -> Orders:
+    def incomplete_order(self, user, related=False):
         """Фильтр получения экземпляра незавершенного
         Заказа пользователя user.
 
