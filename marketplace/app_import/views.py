@@ -15,4 +15,3 @@ class ImportView(generic.FormView):
         protocol = form.save()
         tasks.import_file.delay(protocol_id=protocol.id)
         return super().form_valid(form=form)
-

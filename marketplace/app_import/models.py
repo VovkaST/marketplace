@@ -3,13 +3,24 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from services.validators import FileValidator
+
 
 class ImportProtocol(models.Model):
-    filename = models.FileField(_('Data file path'), upload_to='files/import/')
+    filename = models.FileField(
+        _('Data file path'),
+        upload_to='files/import/',
+        validators=[FileValidator(allowed_extensions=['csv'])]
+    )
     is_imported = models.BooleanField(_('Import mark'), default=False)
     total_objects = models.IntegerField(_('Total objects quantity'), default=0)
     new_objects = models.IntegerField(_('New objects quantity'), default=0)
-    user = models.ForeignKey(User, verbose_name=_('Imported by'), on_delete=models.CASCADE, related_name='imported_by')
+    user = models.ForeignKey(
+        User,
+        verbose_name=_('Imported by'),
+        on_delete=models.CASCADE,
+        related_name='imported_by'
+    )
     created_at = models.DateTimeField(_('Creation date, time'), auto_now_add=True)
 
     class Meta:
