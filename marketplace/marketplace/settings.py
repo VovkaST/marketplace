@@ -18,7 +18,7 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(str, "teamdiploma.ru"),
+    ALLOWED_HOSTS=(str, "127.0.0.1"),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "main.apps.MainConfig",
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
@@ -65,7 +64,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
     "app_basket.middleware.session_user_data.SessionDataCollector",
 ]
 
@@ -150,6 +148,6 @@ LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
 
-DECIMAL_SUM_TEMPLATE = Decimal('0.01')
+DECIMAL_SUM_TEMPLATE = Decimal("0.01")
 
 SESSION_SAVE_EVERY_REQUEST = True

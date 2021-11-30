@@ -53,7 +53,7 @@
               <div class="Card-content">
                   название {{ good.name }} - продажи {{ good.sales }} - отзывы {{ good.reviews_count }}
                   -в наличии{{ good.on_balance }} - есть скидка {{ good.on_sale }}
-                <strong class="Card-title"><a href="product.html">{{ good.name }}</a>
+                <strong class="Card-title"><a href="{% url 'prod_detail' good.pk %}">{{ good.name }}</a>
                 </strong>
                 <div class="Card-description">
                   <div class="Card-cost"><span class="Card-price">{{ good.min_price }}</span>
@@ -96,6 +96,7 @@
   {% endif %}
 
   <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+</div>
 {% endif %}
 
 {% endblock %}

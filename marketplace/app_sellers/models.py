@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext as _
 from main.models import GoodCategory
@@ -9,11 +10,11 @@ class SellerQuerySet(models.QuerySet):
     def by_good(self, good, only_available=True):
         filters = dict()
         if isinstance(good, Goods):
-            filters.update({'balance_owner__good': good})
+            filters.update({"balance_owner__good": good})
         elif isinstance(good, int):
-            filters.update({'balance_owner__good_id': good})
+            filters.update({"balance_owner__good_id": good})
         if only_available:
-            filters.update({'balance_owner__quantity__gt': 0})
+            filters.update({"balance_owner__quantity__gt": 0})
         return self.filter(**filters)
 
 
@@ -50,7 +51,7 @@ class GoodsDescriptionsValues(models.Model):
         "GoodsDescriptionsValues",
         blank=True,
         null=True,
-        default = None,
+        default=None,
         verbose_name=_("Description item"),
         on_delete=models.CASCADE,
         related_name="description_feature",
@@ -87,6 +88,7 @@ class Goods(models.Model):
     )
 
     objects = SoftDeleter.as_manager()
+
     # objects = GoodsQuerySet.as_manager()
 
     class Meta:
@@ -108,7 +110,7 @@ class GoodsImage(models.Model):
     image = models.ImageField(upload_to="goods-images/", verbose_name=_("Image"))
 
     class Meta:
-        db_table = 'mp_goods_images'
+        db_table = "mp_goods_images"
         verbose_name = _("Goods image")
         verbose_name_plural = _("Goods images")
 
@@ -139,3 +141,21 @@ class Balances(models.Model):
 
     def __str__(self):
         return f"{self.quantity} ({self.price})"
+
+
+class Reviews(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="user_reviews",
+    )
+    good_review = models.ForeignKey(
+        Goods,
+        verbose_name=_("Good review"),
+        on_delete=models.CASCADE,
+        related_name="good_review",
+    )
+    comment = models.TextField(verbose_name=_("Comments"))
+    rating = models.IntegerField(verbose_name=_("Rating"))
+    crated_at = models.DateTimeField(auto_now=True, verbose_name=_("Crated at"))
