@@ -13,5 +13,9 @@ class ImportView(generic.FormView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         protocol = form.save()
-        tasks.import_file.delay(protocol_id=protocol.id, model_name=form.cleaned_data['target_model'])
+        tasks.import_file.delay(
+            protocol_id=protocol.id,
+            model_name=form.cleaned_data['target_model'],
+            update=form.cleaned_data['update_data'],
+        )
         return super().form_valid(form=form)
