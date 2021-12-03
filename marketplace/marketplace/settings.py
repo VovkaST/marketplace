@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
     "app_basket.apps.AppBasketConfig",
+    "app_import.apps.AppLoaderConfig",
     "catalog.apps.CatalogConfig",
     "django_filters",
     "django_extensions",
@@ -153,3 +154,12 @@ LOGOUT_REDIRECT_URL = "/"
 DECIMAL_SUM_TEMPLATE = Decimal('0.01')
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+
+# celery
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_CREATE_MISSING_QUEUES = True
