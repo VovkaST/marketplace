@@ -3,13 +3,14 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from marketplace.settings import IMPORT_UPLOAD_DIR
 from services.validators import FileValidator
 
 
 class ImportProtocol(models.Model):
     filename = models.FileField(
         _('Data file path'),
-        upload_to='files/import/',
+        upload_to=IMPORT_UPLOAD_DIR,
         validators=[FileValidator(allowed_extensions=['csv'])]
     )
     is_imported = models.BooleanField(_('Import mark'), default=False)
