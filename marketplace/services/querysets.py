@@ -25,6 +25,22 @@ class BasketQuerySet(models.QuerySet):
             filters = {'session': session_id}
         return self.filter(**filters)
 
+
+class SellerQuerySet(models.QuerySet):
+    def by_good(self, good, only_available=True):
+        filters = dict()
+        if isinstance(good, int):
+            filters.update({'balance_owner__good_id': good})
+        else:
+            filters.update({'balance_owner__good': good})
+        if only_available:
+            filters.update({'balance_owner__quantity__gt': 0})
+        return self.filter(**filters)
+
+    def get_by_natural_key(self, *, slug):
+        return self.filter(slug=slug).first()
+
+
 # class GoodsQuerySet(SoftDeleter):
 # class GoodsQuerySet(models.QuerySet):
 #     def annotate_with_reviews_count(self):

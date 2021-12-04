@@ -1,33 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext as _
 from main.models import GoodCategory
-from services.querysets import SoftDeleter
+from services.models import NaturalKeyModel
+from services.querysets import (
+    SellerQuerySet,
+    SoftDeleter,
+)
 from services.utils import slugify
-
-
-class NaturalKeyModel:
-    def set_values(self, data):
-        for field_name, value in data.items():
-            setattr(self, field_name, value)
-        return self
-
-    def natural_key(self):
-        raise NotImplementedError('Method is not implemented')
-
-
-class SellerQuerySet(models.QuerySet):
-    def by_good(self, good, only_available=True):
-        filters = dict()
-        if isinstance(good, Goods):
-            filters.update({'balance_owner__good': good})
-        elif isinstance(good, int):
-            filters.update({'balance_owner__good_id': good})
-        if only_available:
-            filters.update({'balance_owner__quantity__gt': 0})
-        return self.filter(**filters)
-
-    def get_by_natural_key(self, *, slug):
-        return self.filter(slug=slug).first()
 
 
 class Sellers(models.Model, NaturalKeyModel):
@@ -106,7 +85,6 @@ class Goods(models.Model):
     )
 
     objects = SoftDeleter.as_manager()
-    # objects = GoodsQuerySet.as_manager()
 
     class Meta:
         db_table = "mp_goods"
