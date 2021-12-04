@@ -35,12 +35,12 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
                 if not obj_in_db or (obj_in_db and update):
                     try:
                         obj.save()
+                        created += 1
                     except Exception as exc:
                         errors.append({
                             'error': exc.args[0],
                             'row_number': row_number,
                         })
-                    created += 1
                 total += 1
     protocol.is_imported = True
     protocol.total_objects = total
