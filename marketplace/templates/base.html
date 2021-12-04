@@ -106,9 +106,10 @@ p.error-browser
     </div>
     <div class="wrap">
         <div class="row Header-rowMain">
-            <div class="row-block Header-logo"><a class="logo" href="index.html"><img class="logo-image"
-                                                                                      src="{% static 'img/logo.png' %}"
-                                                                                      alt="logo.png"/></a>
+            <div class="row-block Header-logo">
+                <a class="logo" href="{% url 'main' %}">
+                    <img class="logo-image" src="{% static 'img/logo.png' %}" alt="logo.png"/>
+                </a>
             </div>
 
             {# if request.user.is_authenticated #}
@@ -116,20 +117,31 @@ p.error-browser
             <nav class="row-block row-block_right Header-menu">
                 <div class="menuModal" id="navigate">
                     <ul class="menu menu_main">
-                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Home" %}</a>
+                        <li class="menu-item">
+                            <a class="menu-link" href="#">{% trans "Home" %}</a>
                         </li>
-                        <li class="menu-item"><span class="menu-label menu-label_danger">New</span><a class="menu-link"
-                                                                                                      href="#">{% trans "Shop" %}</a>
+                        <li class="menu-item">
+                            <span class="menu-label menu-label_danger">New</span>
+                            <a class="menu-link" href="#">{% trans "Shop" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Blog" %}</a>
+                        <li class="menu-item">
+                            <a class="menu-link" href="#">{% trans "Blog" %}</a>
                         </li>
-                        <li class="menu-item"><span class="menu-label menu-label_success">Hot</span><a class="menu-link"
-                                                                                                       href="#">{% trans "Gallery" %}</a>
+                        <li class="menu-item">
+                            <span class="menu-label menu-label_success">Hot</span>
+                            <a class="menu-link" href="#">{% trans "Gallery" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Contacts" %}</a>
+                        <li class="menu-item">
+                            <a class="menu-link" href="#">{% trans "Contacts" %}</a>
                         </li>
-                        <li class="menu-item"><a class="menu-link" href="#">{% trans "Purchase" %}</a>
+                        <li class="menu-item">
+                            <a class="menu-link" href="#">{% trans "Purchase" %}</a>
                         </li>
+                        {% if request.user.is_superuser %}
+                            <li class="menu-item">
+                                <a class="menu-link" href="{% url 'import_data' %}">{% trans "Import data" %}</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>
