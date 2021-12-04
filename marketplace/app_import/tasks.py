@@ -47,7 +47,7 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
     protocol.new_objects = created
     protocol.save(force_update=True, update_fields=['is_imported', 'total_objects', 'new_objects'])
     return {
-        'success': bool(errors),
+        'success': not bool(errors),
         'errors': errors,
         'total': total,
         'created': created,
