@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import List
 
 from django.contrib.auth.models import User
 from django.db.models import (
@@ -251,7 +252,14 @@ def merge_baskets(old_session: str, new_session: str, user: User):
         basket_cache_clear(session_id=old_session, keys=['goods_quantity', 'total_sum', 'items'])
 
 
-def init_basket_formset(items):
+def init_basket_formset(items: List[dict]) -> BasketFormSet:
+    """Инициализирует формсет товаров в пользовательской корзине.
+    В словарь данных добавляет предварительно заполненную форму
+    из формсета.
+
+    :param items: Список словарей данных, содержащих сведения о
+    товарах в пользовательской корзине.
+    """
     initial = [
         {
             'reservation_id': item.get('reservation_id'),
@@ -266,5 +274,6 @@ def init_basket_formset(items):
         initial=initial,
         prefix='basket_item'
     )
-    [items[i].update({'form': form}) for i, form in enumerate(formset)]
+    if initial:
+        [items[i].update({'form': form}) for i, form in enumerate(formset)]
     return formset
