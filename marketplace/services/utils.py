@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import transliterate
 from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
@@ -18,6 +20,7 @@ def get_username_or_session_key(request: WSGIRequest) -> str:
     return request.user.username if request.user.is_authenticated else request.session.session_key
 
 
+@lru_cache(maxsize=None)
 def get_model_verbose_name(app_label: str, model_name: str) -> str:
     """Возвращает verbose_name модели.
 
