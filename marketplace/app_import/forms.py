@@ -1,13 +1,13 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 from app_import.models import ImportProtocol
+from services.utils import get_model_verbose_name
 
 
 MODELS_CHOICES = [
     ('', '', ),
-    ('sellers', _('Sellers'), ),
-    ('goods', _('Goods'), ),
+    ('sellers', get_model_verbose_name(app_label='app_sellers', model_name='Sellers'), ),
+    ('goods', get_model_verbose_name(app_label='app_sellers', model_name='Goods'), ),
 ]
 
 
