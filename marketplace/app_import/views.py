@@ -23,5 +23,6 @@ class ImportView(LoginRequiredMixin, generic.FormView):
             protocol_id=protocol.id,
             model_name=form.cleaned_data['target_model'],
             update=form.cleaned_data['update_data'],
+            delimiter=form.cleaned_data['delimiter'],
         )
         return super().form_valid(form=form)

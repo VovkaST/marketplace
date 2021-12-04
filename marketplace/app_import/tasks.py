@@ -12,7 +12,7 @@ APPS_MAP = {
 
 
 @celery_app.task
-def import_file(protocol_id: int, model_name: str, update: bool) -> dict:
+def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
     total, created, updated = 0, 0, 0
     success, error_msg = True, None
     protocol = ImportProtocol.objects.get(id=protocol_id)
@@ -20,7 +20,7 @@ def import_file(protocol_id: int, model_name: str, update: bool) -> dict:
 
     model = apps.get_model(app_label=app, model_name=class_name)
     with open(file=protocol.filename.path, encoding='utf-8', mode='r') as datafile:
-        headers = next(datafile).split(';')
+        headers = next(datafile).split(delimiter)
         with transaction.atomic():
             for row in datafile:
                 obj = model()

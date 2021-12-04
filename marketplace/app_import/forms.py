@@ -14,6 +14,7 @@ MODELS_CHOICES = [
 class ImportForm(forms.ModelForm):
     target_model = forms.ChoiceField(choices=MODELS_CHOICES)
     update_data = forms.BooleanField(required=False)
+    delimiter = forms.CharField(max_length=1, initial=';')
 
     class Meta:
         model = ImportProtocol
