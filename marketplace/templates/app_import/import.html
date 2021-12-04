@@ -2,9 +2,28 @@
 {% load i18n %}
 
 {% block content %}
-    <form action="{% url 'import_data' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <table>{{ form.as_table }}</table>
-        <button type="submit">{% trans 'Upload' %}</button>
-    </form>
+    <div class="Middle Middle_top">
+        <div class="Middle-top">
+            <div class="wrap">
+                <div class="Middle-header">
+                  <h1 class="Middle-title">{% trans 'Import data' %}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="Section">
+            <div class="wrap">
+                <form action="{% url 'import_data' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <table class="mt0">{{ form.as_table }}</table>
+                    <div class="Cart-total">
+                        <div class="Cart-block Cart-block_total">
+                        </div>
+                        <div class="Cart-block">
+                            <button type="submit" class="btn btn_primary btn_lg" href="#">{% trans 'Upload' %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock content %}

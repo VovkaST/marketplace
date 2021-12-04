@@ -2547,3 +2547,7 @@ button.link {
 .note-red {
     color: #ffa457;
 }
+
+.mt0 {
+    margin-top: 0;
+}

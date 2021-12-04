@@ -1,15 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 from django.views import generic
 
 from app_import.forms import ImportForm
 from app_import import tasks
+from main.views import PageInfoMixin
 
 
-class ImportView(LoginRequiredMixin, generic.FormView):
+class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
     template_name = 'app_import/import.html'
     form_class = ImportForm
     success_url = reverse_lazy('import_data')
+    page_title = _('Import data')
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_superuser:
