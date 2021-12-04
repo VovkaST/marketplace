@@ -14,7 +14,7 @@ APPS_MAP = {
 @celery_app.task
 def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
     total, created, updated = 0, 0, 0
-    success, error_msg = True, None
+    errors = list()
     protocol = ImportProtocol.objects.get(id=protocol_id)
     app, class_name = APPS_MAP[model_name]
 
@@ -22,9 +22,9 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
     with open(file=protocol.filename.path, encoding='utf-8', mode='r') as datafile:
         headers = next(datafile).split(delimiter)
         with transaction.atomic():
-            for row in datafile:
+            for row_number, row in enumerate(datafile, start=2):
                 obj = model()
-                data = dict(zip(headers, row.split(';')))
+                data = dict(zip(headers, row.split(delimiter)))
                 obj.set_values(data=data)
 
                 n_key = obj.natural_key()
@@ -36,15 +36,19 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
                     try:
                         obj.save()
                     except Exception as exc:
-                        success = False
-                        error_msg = exc.args[0]
+                        errors.append({
+                            'error': exc.args[0],
+                            'row_number': row_number,
+                        })
                     created += 1
                 total += 1
+    protocol.is_imported = True
+    protocol.total_objects = total
+    protocol.new_objects = created
+    protocol.save(force_update=True, update_fields=['is_imported', 'total_objects', 'new_objects'])
     return {
-        'success': success,
-        'error': {
-            'message': error_msg,
-        },
+        'success': bool(errors),
+        'errors': errors,
         'total': total,
         'created': created,
         'updated': updated,
