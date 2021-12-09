@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<form action="#" method="post">
+    {% csrf_token %}
+    {{ form.bank_account }}
+    <table>
+        <tbody>
+            <tr class="{{ form.payment.id_for_label }}_row {% if form.payment.is_hidden %}hidden{% endif %}">
+                <td>
+                    <label for="{{ form.payment.id_for_label }}">{{ form.payment.label}}:</label>
+                </td>
+                <td>
+                    {{ form.payment }}
+                    <div>
+                        <small id="{{ form.payment.id_for_label }}" class="text-muted">
+                            {{ form.payment.help_text }}
+                            {% if form.payment.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.payment.errors.as_text }}
+                                </div>
+                            {% endif %}
+                        </small>
+                    </div>
+                </td>
+            </tr>
+            <tr class="bank_account__row">
+                <td>{{ form.bank_account.label }}:</td>
+                <td>
+                    <div id="bank_account__number">{{ form.bank_account.value }}</div>
+                    <button id="bank_account__generate" type="button">{% trans 'Generate' %}</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">{% trans 'Next' %}</button>
+</form>

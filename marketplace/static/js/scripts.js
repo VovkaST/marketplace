@@ -1029,6 +1029,37 @@ function extractFormIdx(attrValue) {
     return idRegex.exec(attrValue)[1]
 }
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomSign($place, value) {
+    let number = getRandomInt(0, 9);
+    if (!value.length) {
+        $place.text(number);
+    } else {
+        $place.text(value + number);
+    }
+}
+
+function generateNumberString($place, $input, stringLength, interval=300) {
+    $input.val('');
+    $place.text('');
+    let generator = setInterval(randomSign, 1, $place, $place.text());
+    let executor = setInterval(function () {
+        clearInterval(generator);
+        let value = $place.text();
+        if (value.length < stringLength)
+            generator = setInterval(randomSign, 1, $place, value);
+        else {
+            clearInterval(executor);
+            $input.val($place.text());
+        }
+    }, interval);
+}
+
 
 $(function() {
     $('input[name="phone"]').mask('+7 (999) 999-99-99');
@@ -1054,5 +1085,23 @@ $(function() {
         let $$ = $(this),
             data = collectItemData($$)
         ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
+    });
+
+    $('#bank_account__generate').click(function() {
+        let $accountNumber = $('#bank_account__number'),
+            $accountNumberInput = $('#id_bank_account');
+        generateNumberString($accountNumber, $accountNumberInput,20);
+    });
+
+    $('#id_payment').change(function () {
+        let $$ = $(this),
+            $accountRow = $('.bank_account__row');
+        if ($$.val() == 2) {
+            $accountRow.removeClass('hidden');
+        } else {
+            $accountRow.addClass('hidden');
+            $('#id_bank_account').val('');
+            $('#bank_account__number').text('');
+        }
     });
 });

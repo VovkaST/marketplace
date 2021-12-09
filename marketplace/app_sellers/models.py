@@ -5,6 +5,16 @@ from services.querysets import SoftDeleter
 from services.utils import slugify
 
 
+class NaturalKeyModel:
+    def set_values(self, data):
+        for field_name, value in data.items():
+            setattr(self, field_name, value)
+        return self
+
+    def natural_key(self):
+        raise NotImplementedError('Method is not implemented')
+
+
 class SellerQuerySet(models.QuerySet):
     def by_good(self, good, only_available=True):
         filters = dict()
@@ -16,8 +26,11 @@ class SellerQuerySet(models.QuerySet):
             filters.update({'balance_owner__quantity__gt': 0})
         return self.filter(**filters)
 
+    def get_by_natural_key(self, *, slug):
+        return self.filter(slug=slug).first()
 
-class Sellers(models.Model):
+
+class Sellers(models.Model, NaturalKeyModel):
     slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_("Seller name"), max_length=254)
     address = models.CharField(_("Address"), max_length=254)
@@ -32,6 +45,13 @@ class Sellers(models.Model):
 
     def clean(self):
         self.slug = slugify(self.name)
+
+    def natural_key(self):
+        if not self.slug:
+            self.clean()
+        return {
+            'slug': self.slug,
+        }
 
     class Meta:
         db_table = "mp_sellers"
@@ -50,6 +70,7 @@ class GoodsDescriptionsValues(models.Model):
         "GoodsDescriptionsValues",
         blank=True,
         null=True,
+        default = None,
         verbose_name=_("Description item"),
         on_delete=models.CASCADE,
         related_name="description_feature",

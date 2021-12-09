@@ -68,10 +68,7 @@ class GoodCategory(models.Model):
 
     @property
     def photo_url(self):
-        try:
-            return self.image.url
-        except ValueError:
-            return self.image.storage.url('no-avatar.jpg')
+        return self.image.url if self.image else ''
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

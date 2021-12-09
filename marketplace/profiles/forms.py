@@ -13,8 +13,8 @@ class RegisterForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, help_text=_("Name"))
     last_name = forms.CharField(max_length=30, help_text=_("Last Name"))
     mail = forms.CharField(max_length=30, help_text=_("Mail"))
-    phone = forms.CharField(max_length=30, help_text=_("Phone"))
-    patronymic = forms.CharField(max_length=30, help_text=_("Patronymic"))
+    phone_number = forms.CharField(max_length=30, help_text=_("Phone number"))
+    patronymic = forms.CharField(max_length=30, help_text=_("Patronymic"), required=False)
     avatar = forms.ImageField(required=False, help_text=_("Avatar"))
 
     class Meta:
@@ -31,14 +31,14 @@ class ChangeInfoForm(forms.ModelForm):
         fields = ["first_name", "last_name", "email"]
 
     def clean_phone(self):
-        phone = re.sub(r'\D', '', self.cleaned_data['phone'])
+        phone = re.sub(r'\D', '', self.cleaned_data['phone_number'])
         if len(phone) != 11:
             raise ValidationError(_('Invalid phone format'), code='invalid')
         return phone[1:]
 
     def save(self, commit=True):
         super().save(commit=commit)
-        self.instance.profile.phone_number = self.cleaned_data['phone']
+        self.instance.profile.phone_number = self.cleaned_data['phone_number']
         self.instance.profile.avatar = self.cleaned_data['avatar']
         self.instance.profile.save()
         return self.instance

@@ -1,8 +1,7 @@
 import datetime
 
 from loguru import logger
-
-from marketplace.profiles.models import ViewHistory
+from profiles.models import ViewHistory
 
 
 def add_goods_to_view_history(user, goods):
@@ -61,7 +60,7 @@ def get_goods_in_view_history(user, start_date, end_date, limit=20):
     if end_date:
         views_queryset = views_queryset.filter(viewed_at__lte=end_date)
     if limit:
-        views_queryset = views_queryset[:limit]
+        views_queryset = views_queryset.order_by("-viewed_at")[:limit]
     viewed_goods = [view_history.goods for view_history in views_queryset]
     return viewed_goods
 
