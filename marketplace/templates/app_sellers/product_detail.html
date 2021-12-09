@@ -22,8 +22,8 @@
           <div class="ProductCard">
             <div class="ProductCard-look">
               <div class="ProductCard-photo">
-                <div class="ProductCard-sale">{{ detail_product.sales }}
-                </div><img src="assets/img/content/home/bigGoods.png" alt="bigGoods.png"/>
+                <div class="ProductCard-sale">{{ detail_product.sales }}%
+                </div><img src="{{ detail_product.good_images.first.image.url }}" alt="card.jpg"/>
               </div>
               <div class="ProductCard-picts"><a class="ProductCard-pict ProductCard-pict_ACTIVE" href="assets/img/content/home/bigGoods.png"><img src="assets/img/content/home/bigGoods.png" alt="bigGoods.png"/></a><a class="ProductCard-pict" href="assets/img/content/home/slider.png"><img src="assets/img/content/home/slider.png" alt="slider.png"/></a><a class="ProductCard-pict" href="assets/img/content/home/videoca.png"><img src="assets/img/content/home/videoca.png" alt="videoca.png"/></a>
               </div>
@@ -34,7 +34,7 @@
                 </h2>
                 <div class="ProductCard-info">
                   <div class="ProductCard-cost">
-                    <div class="ProductCard-price">{{ balance.good_descriptions.value }}
+                    <div class="ProductCard-price">{{ balance.seller.price }}{{ balance.price }}{{ balance.price.first }}
                     </div>
                     <div class="ProductCard-priceOld">
                     </div>
@@ -44,14 +44,6 @@
                 </div>
               </div>
               <div class="ProductCard-text">
-                <ul>
-                  <li>{{ detail_product.descriptions}}
-                  </li>
-                  <li>tempor incididunt ut labore et dolore magna aliqua. Lorem
-                  </li>
-                  <li>ipsum dolor sit ameabore et dolore magna aliqua. Lorem ipsum
-                  </li>
-                </ul>
               </div>
               <div class="ProductCard-cart">
                 <div class="ProductCard-cartElement ProductCard-cartElement_amount">
@@ -79,26 +71,9 @@
             </div>
             <div class="Tabs-wrap">
               <div class="Tabs-block" id="description">
-                <h2>Megano Store Hystory
+                <h2>{% trans "Description" %}
                 </h2>
-                <p>Lorem ipsum dolor sit amet, consectetuer&#32;
-                  <strong>adipiscing
-                  </strong>&#32;elit doli. Aenean commodo ligula eget dolor. Aenean massa.&#32;<a href="#">Cumtipsu</a>&#32;sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem.
-                </p><img class="pict pict_right" src="assets/img/content/home/bigGoods.png" alt="bigGoods.png"/>
-                <ul>
-                  <li>Lorem ipsum dolor sit amet, consectetuer
-                  </li>
-                  <li>adipiscing elit doli.&#32;<em>Aenean</em>&#32;commodo ligula
-                  </li>
-                  <li>eget dolor. Aenean massa. Cumtipsu sociis
-                  </li>
-                  <li>natoque penatibus et magnis dis parturient
-                  </li>
-                  <li>montesti, nascetur ridiculus mus. Donec
-                  </li>
-                  <li>quam felis, ultricies nec, pellentesque eutu
-                  </li>
-                </ul>
+                <p>{{ detail_product.description.first }}</p>
                 <div class="clearfix">
                 </div>
                 <div class="table">
@@ -110,82 +85,36 @@
                       </th>
                     </tr>
                     <tr>
-                      <td>ываыв
+                      <td>{{detail_product.description.first}}
                       </td>
-                      <td>llslssl
+                      <td>{{detail_product.description.first}}
                       </td>
                     </tr>
                   </table>
                 </div>
               </div>
-              <div class="Tabs-block" id="sellers">
+            {% for seller_id, name, price in seller %}
+                <li>
                 <div class="Categories Categories_product">
                   <div class="Categories-row">
                     <div class="Categories-block Categories-block_info">
                       <div class="Categories-info">
-                        <strong>Очень дешево
+                      <strong> {{ name }}
                         </strong>
                       </div>
                     </div>
                     <div class="Categories-splitProps">
                     </div>
                     <div class="Categories-block Categories-price">
-                      <strong>€&#32;40.58
-                      </strong>
-                    </div>
-                    <div class="Categories-block Categories-button"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Купить</span></a>
-                    </div>
-                  </div>
-                  <div class="Categories-row">
-                    <div class="Categories-block Categories-block_info">
-                      <div class="Categories-info">
-                        <strong>pleer.ru
-                        </strong>
-                      </div>
-                    </div>
-                    <div class="Categories-splitProps">
-                    </div>
-                    <div class="Categories-block Categories-price">
-                      <strong>€&#32;69.04
-                      </strong>
-                    </div>
-                    <div class="Categories-block Categories-button"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Купить</span></a>
-                    </div>
-                  </div>
-                  <div class="Categories-row">
-                    <div class="Categories-block Categories-block_info">
-                      <div class="Categories-info">
-                        <strong>citilink.ru
-                        </strong>
-                      </div>
-                    </div>
-                    <div class="Categories-splitProps">
-                    </div>
-                    <div class="Categories-block Categories-price">
-                      <strong>€&#32;112.69
-                      </strong>
-                    </div>
-                    <div class="Categories-block Categories-button"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Купить</span></a>
-                    </div>
-                  </div>
-                  <div class="Categories-row">
-                    <div class="Categories-block Categories-block_info">
-                      <div class="Categories-info">
-                        <strong>М.Видео
-                        </strong>
-                      </div>
-                    </div>
-                    <div class="Categories-splitProps">
-                    </div>
-                    <div class="Categories-block Categories-price">
-                      <strong>€&#32;197.32
+                      <strong>€&#32; {{ price }}
                       </strong>
                     </div>
                     <div class="Categories-block Categories-button"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Купить</span></a>
                     </div>
                   </div>
                 </div>
-              </div>
+                </li>
+                {% endfor %}
               <div class="Tabs-block" id="addit">
                 <div class="Product-props">
                   <div class="Product-prop">

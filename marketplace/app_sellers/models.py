@@ -159,3 +159,10 @@ class Reviews(models.Model):
     comment = models.TextField(verbose_name=_("Comments"))
     rating = models.IntegerField(verbose_name=_("Rating"))
     crated_at = models.DateTimeField(auto_now=True, verbose_name=_("Crated at"))
+
+    class Meta:
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
+
+    def __str__(self):
+        return f"{self.comment}, {self.rating}, {self.comment}"
