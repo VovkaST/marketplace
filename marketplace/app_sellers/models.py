@@ -9,7 +9,7 @@ from services.querysets import (
 from services.utils import slugify
 
 
-class Sellers(models.Model, NaturalKeyModel):
+class Sellers(NaturalKeyModel, models.Model):
     slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_("Seller name"), max_length=254)
     address = models.CharField(_("Address"), max_length=254)
@@ -43,8 +43,9 @@ class Sellers(models.Model, NaturalKeyModel):
         return self.name
 
 
-class GoodsDescriptionsValues(models.Model):
+class GoodsDescriptionsValues(NaturalKeyModel, models.Model):
     value = models.CharField(_("Description value"), max_length=254)
+
     feature = models.ForeignKey(
         "GoodsDescriptionsValues",
         blank=True,
@@ -54,15 +55,20 @@ class GoodsDescriptionsValues(models.Model):
         related_name="description_feature",
     )
 
-    class Meta:
-        db_table = "mp_goods_descriptions_values"
-        verbose_name = _("Description value")
-        verbose_name_plural = _("Description values")
+    def natural_key(self):
+        return {
+            'id': self.id,
+        }
 
     def __str__(self):
         if self.feature:
             return f"{self.feature.value}: {self.value}"
         return self.value
+
+    class Meta:
+        db_table = "mp_goods_descriptions_values"
+        verbose_name = _("Description value")
+        verbose_name_plural = _("Description values")
 
 
 class Goods(models.Model):
