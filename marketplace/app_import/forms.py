@@ -8,6 +8,7 @@ MODELS_CHOICES = [
     ('', '', ),
     ('sellers', get_model_verbose_name(app_label='app_sellers', model_name='Sellers'), ),
     ('goods', get_model_verbose_name(app_label='app_sellers', model_name='Goods'), ),
+    ('goods_descriptions', get_model_verbose_name(app_label='app_sellers', model_name='GoodsDescriptionsValues'), ),
 ]
 
 

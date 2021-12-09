@@ -8,6 +8,7 @@ from marketplace import celery_app
 APPS_MAP = {
     'sellers': ('app_sellers', 'Sellers'),
     'goods': ('app_sellers', 'Goods'),
+    'goods_descriptions': ('app_sellers', 'GoodsDescriptionsValues'),
 }
 
 
