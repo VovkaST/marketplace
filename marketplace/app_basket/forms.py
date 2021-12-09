@@ -29,10 +29,10 @@ class SellerForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        good_id = self.initial['good_id']
-        self.fields['seller'].choices = get_choices_sellers_by_good(good=good_id)
-        self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
-        pass
+        good_id = self.initial.get('good_id')
+        if good_id:
+            self.fields['seller'].choices = get_choices_sellers_by_good(good=good_id)
+            self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
 
 
 class BasketBaseFormSet(forms.BaseFormSet):

@@ -110,6 +110,49 @@ def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> 
         error = exc.args[0],
     return obj_data, error
 
+def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> tuple:
+    """Изменяет продавца товара в пользовательской корзине.
+
+    :param session: Строка идентификатора сессии.
+    :param reservation_id: Идентификатор баланса продавца.
+    :param seller: ...
+    :return: Данные измененного объекта и сообщение об ошибке.
+    """
+    obj_data, error = None, None
+
+    searchable = {
+        'reservation_id': reservation_id,
+        'session': session,
+    }
+    try:
+        obj = Basket.objects.filter(**searchable).select_related('reservation', 'reservation__seller').first()
+        if not obj:
+            raise Exception(_('Item not found in basket.'))
+        obj_balance = Balances.objects\
+            .filter(seller_id=seller, good=obj.reservation.good)\
+            .select_related('seller')\
+            .first()
+        if not obj_balance:
+            raise Exception(_('Seller not found.'))
+        obj.reservation = obj_balance
+        obj.save(force_update=True, update_fields=['reservation'])
+        obj_data = {
+            'reservation_id': obj_balance.id,
+            'good_id': obj.reservation.good_id,
+            'available': obj.reservation.quantity,
+            'quantity': obj.quantity,
+            'price': obj.reservation.price,
+            'total_price': (Decimal(obj.quantity) * obj.reservation.price).quantize(DECIMAL_SUM_TEMPLATE),
+            'seller': {
+                'id': obj.reservation.seller.id,
+                'name': obj.reservation.seller.name,
+                'image': None,
+            },
+        }
+    except Exception as exc:
+        error = exc.args[0],
+    return obj_data, error
+
 
 def delete_item_from_basket(session: str, reservation_id: str) -> dict:
     """Удаляет товар из пользовательской корзины.
@@ -257,7 +300,14 @@ def merge_baskets(old_session: str, new_session: str, user: User):
         basket_cache_clear(session_id=old_session, keys=['goods_quantity', 'total_sum', 'items'])
 
 
-def init_basket_formset(items):
+def init_basket_formset(items: List[dict]) -> BasketFormSet:
+    """Инициализирует формсет товаров в пользовательской корзине.
+    В словарь данных добавляет предварительно заполненную форму
+    из формсета.
+
+    :param items: Список словарей данных, содержащих сведения о
+    товарах в пользовательской корзине.
+    """
     initial = [
         {
             'reservation_id': item.get('reservation_id'),
