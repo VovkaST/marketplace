@@ -7,6 +7,8 @@ from app_import.forms import ImportForm
 from app_import import tasks
 from main.views import PageInfoMixin
 
+from marketplace import celery_app
+
 
 class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
     template_name = 'app_import/import.html'
@@ -22,10 +24,11 @@ class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         protocol = form.save()
-        tasks.import_file.delay(
-            protocol_id=protocol.id,
-            model_name=form.cleaned_data['target_model'],
-            update=form.cleaned_data['update_data'],
-            delimiter=form.cleaned_data['delimiter'],
-        )
+        task_kwargs = {
+            'protocol_id': protocol.id,
+            'model_name': form.cleaned_data['target_model'],
+            'update': form.cleaned_data['update_data'],
+            'delimiter': form.cleaned_data['delimiter'],
+        }
+        tasks.import_file.delay(**task_kwargs)
         return super().form_valid(form=form)

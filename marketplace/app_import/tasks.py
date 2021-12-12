@@ -1,9 +1,10 @@
+import json
+
 from django.apps import apps
 from django.db import transaction
 
 from app_import.models import ImportProtocol
 from marketplace import celery_app
-
 
 APPS_MAP = {
     'sellers': ('app_sellers', 'Sellers'),
@@ -12,8 +13,14 @@ APPS_MAP = {
 }
 
 
-@celery_app.task
-def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
+class ImportFileTask(celery_app.Task):
+    def on_success(self, retval, task_id, args, kwargs):
+        protocol_id = kwargs['protocol_id']
+        ImportProtocol.objects.filter(id=protocol_id).update(is_imported=True, result=json.dumps(retval))
+
+
+@celery_app.task(bind=True, base=ImportFileTask)
+def import_file(self, protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
     total, created, updated = 0, 0, 0
     errors = list()
     protocol = ImportProtocol.objects.get(id=protocol_id)
@@ -43,10 +50,10 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
                             'row_number': row_number,
                         })
                 total += 1
-    protocol.is_imported = True
     protocol.total_objects = total
     protocol.new_objects = created
-    protocol.save(force_update=True, update_fields=['is_imported', 'total_objects', 'new_objects'])
+    protocol.task_id = self.request.id
+    protocol.save(force_update=True, update_fields=['is_imported', 'total_objects', 'new_objects', 'task_id'])
     return {
         'success': not bool(errors),
         'errors': errors,

@@ -13,6 +13,8 @@ class ImportProtocol(models.Model):
         upload_to=IMPORT_UPLOAD_DIR,
         validators=[FileValidator(allowed_extensions=['csv'])]
     )
+    task_id = models.CharField(_('Celery task id'), max_length=36)
+    result = models.CharField(_('Task execution result'), max_length=2000)
     is_imported = models.BooleanField(_('Import mark'), default=False)
     total_objects = models.IntegerField(_('Total objects quantity'), default=0)
     new_objects = models.IntegerField(_('New objects quantity'), default=0)
