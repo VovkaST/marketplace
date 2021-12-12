@@ -1,13 +1,15 @@
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views import generic
 
 from app_import.forms import ImportForm
 from app_import import tasks
+from app_import.models import ImportProtocol
 from main.views import PageInfoMixin
-
-from marketplace import celery_app
 
 
 class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
@@ -20,6 +22,21 @@ class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
         if not request.user.is_superuser:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        protocols = ImportProtocol.objects.filter(~Q(task_id=''), user=self.request.user).order_by('-created_at')
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'import_tasks': [
+                {
+                    'uuid': protocol.task_id,
+                    'result': json.loads(protocol.result or '""'),
+                    'date': protocol.created_at,
+                }
+                for protocol in protocols
+            ],
+        })
+        return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user
