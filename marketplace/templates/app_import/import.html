@@ -23,6 +23,37 @@
                         </div>
                     </div>
                 </form>
+
+                <div class="tasks">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>{% trans 'Date, time' %}</td>
+                                <td>{% trans 'Success' %}</td>
+                                <td>{% trans 'Total objects' %}</td>
+                                <td>{% trans 'Created' %}</td>
+                                <td>{% trans 'Updated' %}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in import_tasks %}
+                                <tr>
+                                    <td>
+                                        {{ task.date|date:"Y-m-d H:i:s" }}
+                                        {% if not task.result %}
+                                            <div class="task__in-progress">{% trans 'In progress' %}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ task.result.success }}</td>
+                                    <td>{{ task.result.total }}</td>
+                                    <td>{{ task.result.created }}</td>
+                                    <td>{{ task.result.updated }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
