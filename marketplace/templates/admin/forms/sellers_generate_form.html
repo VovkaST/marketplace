@@ -12,27 +12,21 @@
 {% block coltype %}colM{% endblock %}
 
 {% block content %}
-<div id="content-main">
-    <h2>{% translate 'Clear all cache' %}</h2>
 
-    <form method="post" action="{% url 'admin:clear_all_cache' %}" id="ClearCacheForm">
-        {% csrf_token %}
-        <p>{% translate 'This button clears all cache in whole web app' %}</p>
-        <div class="submit-row">
-            <input type="submit" class="button" name="clearcache" value="{% translate 'Clear all cache' %}">
-        </div>
-    </form>
-</div>
-
+<form action="{% url 'admin:generate_sellers' %}" method="post" name="sellers_generate" id="SellersGenerateForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% trans 'Generate' %}</button>
+</form>
 {% block javascript %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   $(document).ready(function () {
-      $('#ClearCacheForm').submit(function () {
+      $('#SellersGenerateForm').submit(function () {
           $.ajax({
               data: $(this).serialize(),
               type: $(this).attr('method'),
-              url: "{% url 'admin:clear_all_cache' %}",
+              url: "{% url 'admin:generate_sellers' %}",
               dataType: "json",
               success: function (response) {
                 var obj = jQuery.parseJSON(response);

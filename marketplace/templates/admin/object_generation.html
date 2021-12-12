@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h2>
+        {% trans 'Sellers' %}
+    </h2>
+    <p>
+        {% trans 'You can use this button to generate sellers by themselves' %}
+    </p>
+    <div class="submit-row">
+        <a href="{% url 'admin:generate_sellers' %}" class="button">{% trans 'Generate sellers' %}</a>
+    </div>
+
+     <h2>
+        {% trans 'Goods' %}
+    </h2>
+    <p>
+        {% trans 'You can use this button to generate goods by themselves' %}
+    </p>
+    <div class="submit-row">
+        <a href="{% url 'admin:generate_goods' %}" class="button">{% trans 'Generate goods' %}</a>
+    </div>
+
+    <h2>
+        {% trans 'Balances' %}
+    </h2>
+    <p>
+        {% trans 'You can use this button to generate sellers, goods and balances for them' %}
+    </p>
+    <div class="submit-row">
+        <a href="{% url 'admin:generate_balances' %}" class="button">{% trans 'Generate balances' %}</a>
+    </div>
+</div>
+{% endblock %}

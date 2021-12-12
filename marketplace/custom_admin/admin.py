@@ -1,5 +1,14 @@
-from custom_admin.views import ClearAllCacheView, SettingsView
-from django.apps import apps
+# fmt: off
+from custom_admin.views import (  # isort:skip
+    ClearAllCacheView,  # isort:skip
+    GenerateBalancesView,  # isort:skip
+    GenerateGoodsView,  # isort:skip
+    GenerateSellersView,  # isort:skip
+    ObjectGenerationView,  # isort:skip
+    SettingsView,  # isort:skip
+)  # isort:skip
+# fmt: on
+
 from django.contrib import admin
 from django.urls import include
 from loguru import logger
@@ -32,6 +41,31 @@ class MyAdminSite(admin.AdminSite):
                         ),
                     ]
                 ),
-            )
+            ),
+            path(
+                "object-generation/",
+                include(
+                    [
+                        path(
+                            "", ObjectGenerationView.as_view(), name="object_generation"
+                        ),
+                        path(
+                            "generate_balances/",
+                            GenerateBalancesView.as_view(),
+                            name="generate_balances",
+                        ),
+                        path(
+                            "generate_goods/",
+                            GenerateGoodsView.as_view(),
+                            name="generate_goods",
+                        ),
+                        path(
+                            "generate_sellers/",
+                            GenerateSellersView.as_view(),
+                            name="generate_sellers",
+                        ),
+                    ]
+                ),
+            ),
         ] + urlpatterns
         return urlpatterns
