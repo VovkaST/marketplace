@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views import generic
@@ -49,3 +50,9 @@ class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
         }
         tasks.import_file.delay(**task_kwargs)
         return super().form_valid(form=form)
+
+
+class TaskCheckView(LoginRequiredMixin, generic.View):
+    def post(self):
+        response = dict()
+        return JsonResponse(response)

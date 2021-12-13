@@ -24,8 +24,8 @@
                     </div>
                 </form>
 
-                <div class="tasks">
-                    <table>
+                <div id="tasks" check_url="{% url 'task_check' %}">
+                    <table >
                         <thead>
                             <tr>
                                 <td>{% trans 'Date, time' %}</td>
@@ -37,7 +37,7 @@
                         </thead>
                         <tbody>
                             {% for task in import_tasks %}
-                                <tr class="task__row" uuid="{{ task.uuid }}">
+                                <tr class="task__row {% if not task.result %}in_progress{% endif %}" uuid="{{ task.uuid }}">
                                     <td>
                                         {{ task.date|date:"Y-m-d H:i:s" }}
                                         {% if not task.result %}
@@ -58,3 +58,28 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block scripts %}
+    <script>
+        function check_state(check_url, uuid) {
+            ajax(check_url, {uuid: uuid}, responseBasketChangeItemSeller);
+        }
+        let check_url = $('#tasks').attr('check_url');
+
+        $('.task__row.in_progress').each(function() {
+            let el = $(this);
+            let checker = setInterval(check_state, 1000, check_url, el.attr('uuid'));
+        //    let executor = setInterval(function () {
+        //        clearInterval(generator);
+        //        let value = $place.text();
+        //        if (value.length < stringLength)
+        //            generator = setInterval(randomSign, 1, $place, value);
+        //        else {
+        //            clearInterval(executor);
+        //            $input.val($place.text());
+        //        }
+        //    }, interval);
+
+        });
+    </script>
+{% endblock %}
