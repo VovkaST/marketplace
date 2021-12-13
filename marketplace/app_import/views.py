@@ -12,6 +12,8 @@ from app_import import tasks
 from app_import.models import ImportProtocol
 from main.views import PageInfoMixin
 
+from marketplace import celery_app
+
 
 class ImportView(PageInfoMixin, LoginRequiredMixin, generic.FormView):
     template_name = 'app_import/import.html'
