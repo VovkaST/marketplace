@@ -143,6 +143,18 @@ class Balances(models.Model):
         return f"{self.quantity} ({self.price})"
 
 
+class RatingStar(models.Model):
+    value = models.SmallIntegerField(verbose_name=_("value"), default=0)
+
+    class Meta:
+        verbose_name_plural = _("RatingStars")
+        verbose_name = _("RatingStar")
+        ordering = ["-value"]
+
+    def __str__(self):
+        return f"{self.value}"
+
+
 class Reviews(models.Model):
     user = models.ForeignKey(
         User,
@@ -157,7 +169,12 @@ class Reviews(models.Model):
         related_name="good_review",
     )
     comment = models.TextField(verbose_name=_("Comments"))
-    rating = models.IntegerField(verbose_name=_("Rating"))
+    star = models.ForeignKey(
+        RatingStar,
+        verbose_name=_("star"),
+        on_delete=models.CASCADE,
+        related_name="star",
+    )
     crated_at = models.DateTimeField(auto_now=True, verbose_name=_("Crated at"))
 
     class Meta:
@@ -165,4 +182,4 @@ class Reviews(models.Model):
         verbose_name_plural = _("Reviews")
 
     def __str__(self):
-        return f"{self.comment}, {self.rating}, {self.comment}"
+        return f"{self.user}, {self.comment}, {self.comment}, {self.star}"

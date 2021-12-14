@@ -137,7 +137,7 @@
               </div>
               <div class="Tabs-block" id="reviews">
                 <header class="Section-header">
-                  <h3 class="Section-title">2 Reviews
+                  <h3 class="Section-title">Количество отзывов: {{ detail_product.good_review.count }}
                   </h3>
                 </header>
                 <div class="Comments">
@@ -146,37 +146,28 @@
                       <div class="Comment-avatar">
                       </div>
                     </div>
+                      {% for comments in detail_product.good_review.all %}
                     <div class="Comment-column">
                       <header class="Comment-header">
                         <div>
-                          <strong class="Comment-title">Alexandra Brownie
-                          </strong><span class="Comment-date">December 25&#32;&#32;/&#32;&#32;2017&#32;&#32;/&#32;&#32;22:50</span>
+                          <strong class="Comment-title">{{ comments.user_reviews }} {{ comments.star }}
+                          </strong><span class="Comment-date">{{ comments.crated_at }}</span>
                         </div>
                       </header>
-                      <div class="Comment-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justotuio, rhoncus ut loret, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus element semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae.
+                      <div class="Comment-content">{{ comments.comment }}
                       </div>
                     </div>
                   </div>
                 </div>
+                  {% endfor %}
                 <header class="Section-header Section-header_product">
                   <h3 class="Section-title">Add Review
                   </h3>
                 </header>
                 <div class="Tabs-addComment">
-                  <form class="form" action="#" method="post">
-                    <div class="form-group">
-                      <textarea class="form-textarea" name="review" id="review" placeholder="Review"></textarea>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="row-block">
-                          <input class="form-input" id="name" name="name" type="text" placeholder="Name"/>
-                        </div>
-                        <div class="row-block">
-                          <input class="form-input" id="email" name="email" type="text" placeholder="Email"/>
-                        </div>
-                      </div>
-                    </div>
+                  <form class="form" action="{% url 'add_review' detail_product.pk %}" method="post" id="formReview">
+                        {% csrf_token %}
+                        {{ review_form.as_p }}
                     <div class="form-group">
                       <button class="btn btn_muted" type="submit">Submit Review
                       </button>
