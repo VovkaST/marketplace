@@ -6,12 +6,22 @@
 {{ media }}
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    › {% trans 'Settings' %}
+</div>
+{% endblock %}
+
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
 {% block content %}
+<h1>
+    {% trans 'Settings' %}
+</h1>
 <div id="content-main">
     <h2>{% translate 'Clear all cache' %}</h2>
 

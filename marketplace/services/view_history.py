@@ -65,7 +65,7 @@ def get_goods_in_view_history(user, start_date, end_date, limit=20):
     return viewed_goods
 
 
-def get_goods_quantity_in_view_history(user, start_date, end_date):
+def get_goods_quantity_in_view_history(user, start_date, end_date, limit):
     """
     :user: UserObject
     :start_date: datetime
@@ -78,4 +78,7 @@ def get_goods_quantity_in_view_history(user, start_date, end_date):
         views_queryset = views_queryset.filter(viewed_at__gte=start_date)
     if end_date:
         views_queryset = views_queryset.filter(viewed_at__lte=end_date)
+    if limit:
+        if views_queryset.count() > limit:
+            views_queryset = views_queryset[:limit]
     return views_queryset.count()

@@ -6,41 +6,62 @@
 {{ media }}
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    › {% trans 'Object generation' %}
+</div>
+{% endblock %}
+
+
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
 {% block content %}
+<h1>
+    Object generation
+</h1>
 <div id="content-main">
-    <h2>
-        {% trans 'Sellers' %}
-    </h2>
-    <p>
-        {% trans 'You can use this button to generate sellers by themselves' %}
-    </p>
-    <div class="submit-row">
-        <a href="{% url 'admin:generate_sellers' %}" class="button">{% trans 'Generate sellers' %}</a>
+    <div class="module">
+        <h2>
+            {% trans 'Orders' %}
+        </h2>
+        <p class="description">
+            {% trans 'You can use this button to generate orders with some goods' %}
+        </p>
+        <a href="{% url 'admin:generate_orders' %}" class="addlink">{% trans 'Generate orders' %}</a>
     </div>
 
-     <h2>
-        {% trans 'Goods' %}
-    </h2>
-    <p>
-        {% trans 'You can use this button to generate goods by themselves' %}
-    </p>
-    <div class="submit-row">
-        <a href="{% url 'admin:generate_goods' %}" class="button">{% trans 'Generate goods' %}</a>
+    <div class="module">
+        <h2>
+            {% trans 'Sellers' %}
+        </h2>
+        <p class="description">
+            {% trans 'You can use this button to generate sellers by themselves' %}
+        </p>
+        <a href="{% url 'admin:generate_sellers' %}" class="addlink">{% trans 'Generate sellers' %}</a>
     </div>
 
-    <h2>
-        {% trans 'Balances' %}
-    </h2>
-    <p>
-        {% trans 'You can use this button to generate sellers, goods and balances for them' %}
-    </p>
-    <div class="submit-row">
-        <a href="{% url 'admin:generate_balances' %}" class="button">{% trans 'Generate balances' %}</a>
+    <div class="module">
+        <h2>
+            {% trans 'Goods' %}
+        </h2>
+        <p class="description">
+            {% trans 'You can use this button to generate goods by themselves' %}
+        </p>
+        <a href="{% url 'admin:generate_goods' %}" class="addlink">{% trans 'Generate goods' %}</a>
+    </div>
+
+    <div class="module">
+        <h2>
+            {% trans 'Balances' %}
+        </h2>
+        <p class="description">
+            {% trans 'You can use this button to generate sellers, goods and balances for them' %}
+        </p>
+        <a href="{% url 'admin:generate_balances' %}" class="addlink">{% trans 'Generate balances' %}</a>
     </div>
 </div>
 {% endblock %}

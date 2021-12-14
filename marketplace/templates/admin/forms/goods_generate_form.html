@@ -6,17 +6,33 @@
 {{ media }}
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    ›
+    <a href="{% url 'admin:object_generation' %}">{% trans 'Object generation' %}</a>
+    › {% trans 'Goods generation' %}
+</div>
+{% endblock %}
+
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
 {% block content %}
-
+<h1>
+    {% trans 'Goods generation' %}
+</h1>
 <form action="{% url 'admin:generate_goods' %}" method="post" name="goods_generate" id="GoodsGenerateForm">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{% trans 'Generate' %}</button>
+    <div class="form-row">
+        {{ form.quantity.label }}
+        {{ form.quantity }}
+    </div>
+    <div class="submit-row">
+        <button type="submit" class="button">{% trans 'Generate' %}</button>
+    </div>
 </form>
 {% block javascript %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -5,7 +5,7 @@ from custom_admin.views import (  # isort:skip
     GenerateGoodsView,  # isort:skip
     GenerateSellersView,  # isort:skip
     ObjectGenerationView,  # isort:skip
-    SettingsView,  # isort:skip
+    SettingsView, GenerateOrdersView,  # isort:skip
 )  # isort:skip
 # fmt: on
 
@@ -50,19 +50,24 @@ class MyAdminSite(admin.AdminSite):
                             "", ObjectGenerationView.as_view(), name="object_generation"
                         ),
                         path(
-                            "generate_balances/",
+                            "generate-balances/",
                             GenerateBalancesView.as_view(),
                             name="generate_balances",
                         ),
                         path(
-                            "generate_goods/",
+                            "generate-goods/",
                             GenerateGoodsView.as_view(),
                             name="generate_goods",
                         ),
                         path(
-                            "generate_sellers/",
+                            "generate-sellers/",
                             GenerateSellersView.as_view(),
                             name="generate_sellers",
+                        ),
+                        path(
+                            "generate-orders/",
+                            GenerateOrdersView.as_view(),
+                            name="generate_orders",
                         ),
                     ]
                 ),

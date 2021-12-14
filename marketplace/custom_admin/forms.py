@@ -36,3 +36,9 @@ class GenerateSellersForm(forms.Form):
     quantity = forms.IntegerField(
         max_value=100, min_value=1, label=_("Quantity of different sellers")
     )
+
+
+class OrdersGenerateForm(forms.Form):
+    quantity = forms.IntegerField(
+        max_value=50, min_value=1, label=_("Quantity of different orders")
+    )

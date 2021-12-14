@@ -34,8 +34,8 @@
                         </div>
                         <div class="Account-column">
                             <div class="Account-name">
-                                <div class="account-column__row">{{ account.last_name }} {{ account.first_name }} {{
-                                    account.profile.patronymic }}
+                                <div class="account-column__row">{{ account.last_name }} {{ account.first_name }}
+                                    {{ account.profile.patronymic }}
                                 </div>
                                 <div class="account-column__row">{{ account.profile.phone_number }}</div>
                                 <div class="account-column__row">{{ account.email }}</div>
@@ -45,6 +45,11 @@
                     </div>
                     <div class="Account-group">
                         <div class="Account-column Account-column_full">
+                             <header class="Section-header">
+                                <h2 class="Section-title">{% trans 'Orders' %}
+                                </h2>
+                            </header>
+                            {% if orders %}
                             {% for order in orders %}
                             <div class="Order Order_anons">
                                 <div class="Order-personal">
@@ -98,6 +103,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="Account-group">

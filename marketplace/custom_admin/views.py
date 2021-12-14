@@ -1,5 +1,6 @@
 import json
 
+from app_orders.factories import OrderItemsFactory
 from app_sellers.factories import BalancesFactory, GoodsFactory, SellersFactory
 from custom_admin.utlis import clear_cache
 from django.conf import settings
@@ -13,7 +14,7 @@ from custom_admin.forms import (  # isort:skip
     ClearCacheForm,  # isort:skip
     GenerateBalancesForm,  # isort:skip
     GenerateGoodsForm,  # isort:skip
-    GenerateSellersForm,  # isort:skip
+    GenerateSellersForm, OrdersGenerateForm,  # isort:skip
 )  # isort:skip
 # fmt: on
 
@@ -102,4 +103,19 @@ class GenerateSellersView(FormView):
         sellers = SellersFactory.create_batch(size=form.cleaned_data["quantity"])
         logger.info(f"Created sellers: {sellers}")
         response = {"message": "Sellers successfully created!"}
+        return JsonResponse(data=json.dumps(response), status=200, safe=False)
+
+
+class GenerateOrdersView(FormView):
+    template_name = "admin/forms/orders_generate_form.html"
+    form_class = OrdersGenerateForm
+
+    def form_valid(self, form):
+        orders = []
+        for order in range(form.cleaned_data["quantity"]):
+            orders.append(
+                OrderItemsFactory.create_batch(size=4, order__user=self.request.user)
+            )
+        response = {"message": "Orders successfully created!"}
+        logger.info(f"Created orders: {orders}")
         return JsonResponse(data=json.dumps(response), status=200, safe=False)
