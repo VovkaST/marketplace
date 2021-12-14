@@ -1055,4 +1055,45 @@ $(function() {
             data = collectItemData($$)
         ajax(data.url, data.formset_data, responseBasketChangeItemSeller, $$);
     });
+
+    let $tasks_in_progress = $('.task__row.in_progress'),
+        checker = undefined;
+
+    function responseCheckTasks(response) {
+        if (response.success) {
+            let active = 0;
+            response.tasks.forEach(function (task, i) {
+                if (task.success) {
+                    let task_row = $(`.task__row.in_progress[uuid="${task.uuid}"]`),
+                        success = task.success.toString();
+                    task_row.find('.success').text(
+                        success.charAt(0).toUpperCase() + success.slice(1)
+                    );
+                    task_row.find('.total').text(task.total);
+                    task_row.find('.created').text(task.created);
+                    task_row.find('.updated').text(task.updated);
+                    task_row.find('.task__in-progress').remove();
+                    task_row.removeClass('in_progress');
+                } else active += 1;
+            });
+            if (active)
+                checker = setInterval(checkTasks, 3000);
+        } else
+            alert(`Ошибка: ${response.error.message}`);
+        return response.success;
+    }
+
+    function checkTasks() {
+        let uuids = [],
+            check_url = $('#tasks').attr('check_url');
+        $tasks_in_progress.each(function() {
+            uuids.push($(this).attr('uuid'));
+        });
+        ajax(check_url, {uuid: uuids}, responseCheckTasks);
+        clearInterval(checker);
+    }
+
+    if ($tasks_in_progress.length) {
+        checker = setInterval(checkTasks, 3000);
+    }
 });
