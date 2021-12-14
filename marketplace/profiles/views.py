@@ -10,8 +10,8 @@ from profiles.forms import ChangeInfoForm, RegisterForm
 from profiles.models import Profile
 from services.auth import registration
 from services.basket import merge_baskets
-from services.view_history import (get_goods_in_view_history,
-                                   get_goods_quantity_in_view_history)
+from services.orders import get_user_orders
+from services.view_history import get_goods_in_view_history
 
 # fmt: on
 
@@ -26,9 +26,7 @@ class AccountView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AccountView, self).get_context_data(**kwargs)
-        context["orders"] = get_goods_quantity_in_view_history(
-            user=self.request.user, start_date=None, end_date=None, limit=3
-        )
+        context["orders"] = get_user_orders(user=self.request.user, limit=3)
         start_date = datetime.datetime.now() - datetime.timedelta(days=30)
         context["view_history"] = get_goods_in_view_history(
             user=self.request.user,
@@ -102,7 +100,5 @@ class OrdersHistoryView(ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        queryset = get_goods_quantity_in_view_history(
-            user=self.request.user, start_date=None, end_date=None, limit=None
-        )
+        queryset = get_user_orders(user=self.request.user, limit=None)
         return queryset
