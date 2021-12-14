@@ -1,4 +1,7 @@
+from typing import List
+
 from django.db import models
+from django.db.models import Q
 
 
 class SoftDeleter(models.QuerySet):
@@ -39,6 +42,15 @@ class SellerQuerySet(models.QuerySet):
 
     def get_by_natural_key(self, *, slug):
         return self.filter(slug=slug).first()
+
+
+class ImportProtocolQuerySet(models.QuerySet):
+    def active_tasks(self, user):
+        return self.filter(~Q(task_id=''), user=user)
+
+    def tasks_results(self, user, tasks: List[str]):
+        values = ['task_id', 'is_imported', 'total_objects', 'new_objects', 'updated_objects']
+        return self.active_tasks(user=user).filter(task_id__in=tasks).values(*values)
 
 
 # class GoodsQuerySet(SoftDeleter):

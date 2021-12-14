@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from marketplace.settings import IMPORT_UPLOAD_DIR
+from services.querysets import ImportProtocolQuerySet
 from services.validators import FileValidator
 
 
@@ -18,6 +19,7 @@ class ImportProtocol(models.Model):
     is_imported = models.BooleanField(_('Import mark'), default=False)
     total_objects = models.IntegerField(_('Total objects quantity'), default=0)
     new_objects = models.IntegerField(_('New objects quantity'), default=0)
+    updated_objects = models.IntegerField(_('Updated objects quantity'), default=0)
     user = models.ForeignKey(
         User,
         verbose_name=_('Imported by'),
@@ -25,6 +27,8 @@ class ImportProtocol(models.Model):
         related_name='imported_by'
     )
     created_at = models.DateTimeField(_('Creation date, time'), auto_now_add=True)
+
+    objects = ImportProtocolQuerySet.as_manager()
 
     class Meta:
         db_table = 'mp_import_protocol'

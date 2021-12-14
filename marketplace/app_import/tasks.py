@@ -52,8 +52,9 @@ def import_file(self, protocol_id: int, model_name: str, update: bool, delimiter
                 total += 1
     protocol.total_objects = total
     protocol.new_objects = created
+    protocol.updated_objects = updated
     protocol.task_id = self.request.id
-    protocol.save(force_update=True, update_fields=['is_imported', 'total_objects', 'new_objects', 'task_id'])
+    protocol.save(force_update=True, update_fields=['total_objects', 'new_objects', 'updated_objects', 'task_id'])
     return {
         'success': not bool(errors),
         'errors': errors,

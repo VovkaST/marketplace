@@ -44,10 +44,10 @@
                                             <div class="task__in-progress">{% trans 'In progress' %}</div>
                                         {% endif %}
                                     </td>
-                                    <td>{{ task.result.success }}</td>
-                                    <td>{{ task.result.total }}</td>
-                                    <td>{{ task.result.created }}</td>
-                                    <td>{{ task.result.updated }}</td>
+                                    <td class="success">{{ task.result.success }}</td>
+                                    <td class="total">{{ task.result.total }}</td>
+                                    <td class="created">{{ task.result.created }}</td>
+                                    <td class="updated">{{ task.result.updated }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -61,25 +61,43 @@
 
 {% block scripts %}
     <script>
-        function check_state(check_url, uuid) {
-            ajax(check_url, {uuid: uuid}, responseBasketChangeItemSeller);
-        }
-        let check_url = $('#tasks').attr('check_url');
 
-        $('.task__row.in_progress').each(function() {
-            let el = $(this);
-            let checker = setInterval(check_state, 1000, check_url, el.attr('uuid'));
-        //    let executor = setInterval(function () {
-        //        clearInterval(generator);
-        //        let value = $place.text();
-        //        if (value.length < stringLength)
-        //            generator = setInterval(randomSign, 1, $place, value);
-        //        else {
-        //            clearInterval(executor);
-        //            $input.val($place.text());
-        //        }
-        //    }, interval);
+        $(function() {
+            let $tasks_in_progress = $('.task__row.in_progress'),
+                check_url = $('#tasks').attr('check_url'),
+                checker = undefined;
 
+            function checkTasks() {
+                let uuids = [];
+                $tasks_in_progress.each(function() {
+                    uuids.push($(this).attr('uuid'));
+                });
+                ajax(check_url, {uuid: uuids}, responseCheckTasks);
+            }
+
+            function responseCheckTasks(response) {
+                if (response.success) {
+                    let active = 0;
+                    response.tasks.forEach(function (task, i) {
+                        if (task.success) {
+                            let task_row = $(`.task__row.in_progress[uuid="${task.uuid}"]`);
+                            task_row.find('.success').text(task.success);
+                            task_row.find('.total').text(task.total);
+                            task_row.find('.created').text(task.created);
+                            task_row.find('.updated').text(task.updated);
+                            task_row.find('.task__in-progress').remove();
+                            task_row.removeClass('in_progress');
+                        } else active += 1;
+                    });
+                    if (!active) clearInterval(checker);
+                } else
+                    alert(`Ошибка: ${response.error.message}`);
+                return response.success;
+            }
+
+            if ($tasks_in_progress.length) {
+                checker = setInterval(checkTasks, 3000);
+            }
         });
     </script>
 {% endblock %}
