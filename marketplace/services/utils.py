@@ -1,4 +1,7 @@
+from functools import lru_cache
+
 import transliterate
+from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
 from django.utils.text import slugify as django_slugify
 
@@ -36,3 +39,14 @@ def update_instance_from_form(form, instance, fields: list):
         list(map(lambda field: setattr(instance, field, form.cleaned_data[field]), fields_changed))
         instance.save(force_update=True, update_fields=fields_changed)
     return instance
+
+
+@lru_cache(maxsize=None)
+def get_model_verbose_name(app_label: str, model_name: str) -> str:
+    """Возвращает verbose_name модели.
+
+    :param app_label: Имя приложения.
+    :param model_name: Имя модели.
+    """
+    model = apps.get_model(app_label=app_label, model_name=model_name)
+    return model._meta.verbose_name

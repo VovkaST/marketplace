@@ -1,7 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext as _
 from main.models import GoodCategory
-from services.querysets import SoftDeleter
+from services.models import NaturalKeyModel
+from services.querysets import (
+    SellerQuerySet,
+    SoftDeleter,
+)
 from services.utils import slugify
 
 
@@ -30,7 +34,7 @@ class SellerQuerySet(models.QuerySet):
         return self.filter(slug=slug).first()
 
 
-class Sellers(models.Model, NaturalKeyModel):
+class Sellers(NaturalKeyModel, models.Model):
     slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_("Seller name"), max_length=254)
     address = models.CharField(_("Address"), max_length=254)
@@ -64,8 +68,9 @@ class Sellers(models.Model, NaturalKeyModel):
         return self.name
 
 
-class GoodsDescriptionsValues(models.Model):
+class GoodsDescriptionsValues(NaturalKeyModel, models.Model):
     value = models.CharField(_("Description value"), max_length=254)
+
     feature = models.ForeignKey(
         "GoodsDescriptionsValues",
         blank=True,
@@ -76,15 +81,20 @@ class GoodsDescriptionsValues(models.Model):
         related_name="description_feature",
     )
 
-    class Meta:
-        db_table = "mp_goods_descriptions_values"
-        verbose_name = _("Description value")
-        verbose_name_plural = _("Description values")
+    def natural_key(self):
+        return {
+            'id': self.id,
+        }
 
     def __str__(self):
         if self.feature:
             return f"{self.feature.value}: {self.value}"
         return self.value
+
+    class Meta:
+        db_table = "mp_goods_descriptions_values"
+        verbose_name = _("Description value")
+        verbose_name_plural = _("Description values")
 
 
 class Goods(models.Model):
@@ -107,7 +117,6 @@ class Goods(models.Model):
     )
 
     objects = SoftDeleter.as_manager()
-    # objects = GoodsQuerySet.as_manager()
 
     class Meta:
         db_table = "mp_goods"

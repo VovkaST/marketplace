@@ -2552,8 +2552,19 @@ button.link {
 .hidden {
     display: none;
 }
+
 #bank_account__number {
     font-size: 1.5em;
     color: #3670c7;
     letter-spacing: .15em;
+
+.mt0 {
+    margin-top: 0;
+}
+
+.task__in-progress {
+    padding-left: 2em;
+    font-size: 0.8em;
+    line-height: 0.9em;
+    color: #32a901;
 }
