@@ -23,7 +23,7 @@
             {% include 'profiles/navigation.html' %}
             <div class="Section-content">
                 <div class="Orders">
-
+                    {% if orders %}
                     {% for order in orders %}
                     <div class="Order Order_anons">
                         <div class="Order-personal">
@@ -90,6 +90,7 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>

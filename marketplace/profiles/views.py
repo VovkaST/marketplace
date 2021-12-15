@@ -1,3 +1,4 @@
+# fmt: off
 import datetime
 
 from app_orders.models import Orders
@@ -13,6 +14,8 @@ from services.basket import merge_baskets
 from services.orders import get_user_orders
 from services.view_history import get_goods_in_view_history
 
+# fmt: on
+
 
 class AccountView(LoginRequiredMixin, generic.DetailView):
     model = Profile
@@ -24,7 +27,7 @@ class AccountView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AccountView, self).get_context_data(**kwargs)
-        context["orders"] = get_user_orders(self.request.user)
+        context["orders"] = get_user_orders(user=self.request.user, limit=3)
         start_date = datetime.datetime.now() - datetime.timedelta(days=30)
         context["view_history"] = get_goods_in_view_history(
             user=self.request.user,
@@ -97,3 +100,7 @@ class OrdersHistoryView(ListView):
     template_name = "profiles/historyorder.html"
     model = Orders
     context_object_name = "orders"
+
+    def get_queryset(self):
+        queryset = get_user_orders(user=self.request.user, limit=None)
+        return queryset

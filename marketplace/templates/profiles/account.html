@@ -45,6 +45,11 @@
                     </div>
                     <div class="Account-group">
                         <div class="Account-column Account-column_full">
+                             <header class="Section-header">
+                                <h2 class="Section-title">{% trans 'Orders' %}
+                                </h2>
+                            </header>
+                            {% if orders %}
                             {% for order in orders %}
                             <div class="Order Order_anons">
                                 <div class="Order-personal">
@@ -95,6 +100,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="Account-group">

@@ -50,7 +50,7 @@ def get_goods_in_view_history(user, start_date, end_date, limit=20):
     :user: UserObject
     :start_date: datetime
     :end_date: datetime
-    :end_date: int
+    :limit: int
     Function to used to get goods from user view history
     :return: list[GooodsObject(1), GoodsObject(2), ...]
     """

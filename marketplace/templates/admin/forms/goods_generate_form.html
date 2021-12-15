@@ -9,7 +9,9 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    › {% trans 'Settings' %}
+    ›
+    <a href="{% url 'admin:object_generation' %}">{% trans 'Object generation' %}</a>
+    › {% trans 'Goods generation' %}
 </div>
 {% endblock %}
 
@@ -20,29 +22,27 @@
 
 {% block content %}
 <h1>
-    {% trans 'Settings' %}
+    {% trans 'Goods generation' %}
 </h1>
-<div id="content-main">
-    <h2>{% translate 'Clear all cache' %}</h2>
-
-    <form method="post" action="{% url 'admin:clear_all_cache' %}" id="ClearCacheForm">
-        {% csrf_token %}
-        <p>{% translate 'This button clears all cache in whole web app' %}</p>
-        <div class="submit-row">
-            <input type="submit" class="button" name="clearcache" value="{% translate 'Clear all cache' %}">
-        </div>
-    </form>
-</div>
-
+<form action="{% url 'admin:generate_goods' %}" method="post" name="goods_generate" id="GoodsGenerateForm">
+    {% csrf_token %}
+    <div class="form-row">
+        {{ form.quantity.label }}
+        {{ form.quantity }}
+    </div>
+    <div class="submit-row">
+        <button type="submit" class="button">{% trans 'Generate' %}</button>
+    </div>
+</form>
 {% block javascript %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   $(document).ready(function () {
-      $('#ClearCacheForm').submit(function () {
+      $('#GoodsGenerateForm').submit(function () {
           $.ajax({
               data: $(this).serialize(),
               type: $(this).attr('method'),
-              url: "{% url 'admin:clear_all_cache' %}",
+              url: "{% url 'admin:generate_goods' %}",
               dataType: "json",
               success: function (response) {
                 var obj = jQuery.parseJSON(response);
