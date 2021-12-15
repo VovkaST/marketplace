@@ -1092,16 +1092,4 @@ $(function() {
             $accountNumberInput = $('#id_bank_account');
         generateNumberString($accountNumber, $accountNumberInput,20);
     });
-
-    $('#id_payment').change(function () {
-        let $$ = $(this),
-            $accountRow = $('.bank_account__row');
-        if ($$.val() == 2) {
-            $accountRow.removeClass('hidden');
-        } else {
-            $accountRow.addClass('hidden');
-            $('#id_bank_account').val('');
-            $('#bank_account__number').text('');
-        }
-    });
 });

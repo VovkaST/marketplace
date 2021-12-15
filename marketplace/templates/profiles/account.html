@@ -34,8 +34,8 @@
                         </div>
                         <div class="Account-column">
                             <div class="Account-name">
-                                <div class="account-column__row">{{ account.last_name }} {{ account.first_name }} {{
-                                    account.profile.patronymic }}
+                                <div class="account-column__row">{{ account.last_name }} {{ account.first_name }}
+                                    {{ account.profile.patronymic }}
                                 </div>
                                 <div class="account-column__row">{{ account.profile.phone_number }}</div>
                                 <div class="account-column__row">{{ account.email }}</div>
@@ -80,19 +80,16 @@
                                             <div class="Order-info Order-info_status">
                                                 <div class="Order-infoType">{% trans 'Status' %}:
                                                 </div>
+                                                {% ifequal order.payment_state False %}
+                                                <a class="Order-infoContent" href="{% url 'order_payment' order.pk %}">
+                                                    {% trans 'Not paid' %}
+                                                </a>
+                                                {% else %}
                                                 <div class="Order-infoContent">
-                                                    {{ order.payment_state }}
+                                                    {% trans 'Paid' %}
                                                 </div>
+                                                {% endifequal %}
                                             </div>
-                                            {% if order.payment_errors %}
-                                            <div class="Order-info Order-info_error">
-                                                <div class="Order-infoType">{% trans 'Not paid' %}:
-                                                </div>
-                                                <div class="Order-infoContent">
-                                                    {{ order.payment_errors }}
-                                                </div>
-                                            </div>
-                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

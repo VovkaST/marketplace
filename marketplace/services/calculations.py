@@ -1,4 +1,4 @@
-from marketplace.app_sellers.models import Balances
+from app_sellers.models import Balances
 
 
 def get_final_price(price=None):

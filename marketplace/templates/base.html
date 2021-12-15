@@ -176,9 +176,14 @@ p.error-browser
                         {% if category.sub_category.all %}
                         <div class="CategoriesButton-link">-->
                             <a href="#">
-                                <div class="CategoriesButton-icon"><img
-                                        src="{{ category.image_url }}"
-                                        alt="1.svg"/>
+                                <div class="CategoriesButton-icon">
+                                    {% if category.image %}
+                                    <img src="{{ category.image_url }}"
+                                          alt="{{ category.name }} {% trans 'icon' %}"/>
+                                    {% else %}
+                                    <img src="{% static 'img/icons/departments/1.svg' %}"
+                                          alt="{{ category.name }} {% trans 'icon' %}"/>
+                                    {% endif %}
                                 </div>
 
                                 <span class="CategoriesButton-text">{{ category.name }}</span></a><a class="CategoriesButton-arrow" href="#"></a>
@@ -199,9 +204,14 @@ p.error-browser
                         {% else %}
                         <div class="CategoriesButton-link">-->
                             <a href="#">
-                                <div class="CategoriesButton-icon"><img
-                                        src="{{ category.image.url }}"
-                                        alt="1.svg"/>
+                                 <div class="CategoriesButton-icon">
+                                    {% if category.image %}
+                                    <img src="{{ category.image_url }}"
+                                          alt="{{ category.name }} {% trans 'icon' %}"/>
+                                    {% else %}
+                                    <img src="{% static 'img/icons/departments/1.svg' %}"
+                                          alt="{{ category.name }} {% trans 'icon' %}"/>
+                                    {% endif %}
                                 </div>
 
                                 <span class="CategoriesButton-text">{{ category.name }}</span></a>
