@@ -1,16 +1,16 @@
 import datetime
 
-import factory
+from app_orders.models import Orders
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic import ListView
-from profiles.factories import OrdersFactory
 from profiles.forms import ChangeInfoForm, RegisterForm
-from profiles.models import Profile, ViewHistory
+from profiles.models import Profile
 from services.auth import registration
 from services.basket import merge_baskets
+from services.orders import get_user_orders
 from services.view_history import get_goods_in_view_history
 
 
@@ -24,7 +24,7 @@ class AccountView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AccountView, self).get_context_data(**kwargs)
-        context["orders"] = OrdersFactory.build_batch(size=3)
+        context["orders"] = get_user_orders(self.request.user)
         start_date = datetime.datetime.now() - datetime.timedelta(days=30)
         context["view_history"] = get_goods_in_view_history(
             user=self.request.user,
@@ -95,10 +95,5 @@ class ViewsHistoryView(ListView):
 
 class OrdersHistoryView(ListView):
     template_name = "profiles/historyorder.html"
+    model = Orders
     context_object_name = "orders"
-
-    def get_queryset(self):
-        queryset = OrdersFactory.build_batch(size=10)
-        for order in queryset:
-            pass
-        return queryset

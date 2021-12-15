@@ -275,6 +275,7 @@ def init_basket_formset(items):
     [items[i].update({'form': form}) for i, form in enumerate(formset)]
     return formset
 
+
 def get_order_summary(user: User) -> dict:
     """Собирает словарь сводных данных по Заказу.
 

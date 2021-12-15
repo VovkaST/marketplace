@@ -1,36 +1,63 @@
+{% extends 'base.html' %}
 {% load i18n %}
 
-<form action="#" method="post">
-    {% csrf_token %}
-    {{ form.bank_account }}
-    <table>
-        <tbody>
-            <tr class="{{ form.payment.id_for_label }}_row {% if form.payment.is_hidden %}hidden{% endif %}">
-                <td>
-                    <label for="{{ form.payment.id_for_label }}">{{ form.payment.label}}:</label>
-                </td>
-                <td>
-                    {{ form.payment }}
-                    <div>
-                        <small id="{{ form.payment.id_for_label }}" class="text-muted">
-                            {{ form.payment.help_text }}
-                            {% if form.payment.errors %}
-                                <div class="alert alert-danger" role="alert">
-                                    {{ form.payment.errors.as_text }}
-                                </div>
-                            {% endif %}
-                        </small>
-                    </div>
-                </td>
-            </tr>
-            <tr class="bank_account__row">
-                <td>{{ form.bank_account.label }}:</td>
-                <td>
-                    <div id="bank_account__number">{{ form.bank_account.value }}</div>
-                    <button id="bank_account__generate" type="button">{% trans 'Generate' %}</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <button type="submit">{% trans 'Next' %}</button>
-</form>
+{% block content %}
+<div class="Middle Middle_top">
+    <div class="Middle-top">
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">{% trans 'Payment' %}
+                </h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
+                    </li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Payment' %}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <form action="#" method="post" class="form Payment">
+        {% csrf_token %}
+        <div class="Payment-card">
+            <div class="form-group">
+                <label for="{{ form.payment.id_for_label }}" class="form-label">{{ form.payment.label}}</label>
+                {{ form.payment }}
+                <div>
+                    <small id="{{ form.payment.id_for_label }}" class="text-muted">
+                        {{ form.payment.help_text }}
+                        {% if form.payment.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.payment.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.bank_account.id_for_label }}" class="form-label">{{ form.bank_account.label }}</label>
+                <div id="bank_account__number" class="form-input Payment-bill">
+                    {{ form.bank_account }}
+                </div>
+                <div>
+                    <small id="{{ form.bank_account.id_for_label }}" class="text-muted">
+                        {{ form.bank_account.help_text }}
+                        {% if form.bank_account.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.bank_account.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="form-group">
+                <button id="bank_account__generate" class="btn btn_success Payment-generate" type="button">
+                    {% trans 'Generate random account' %}
+                </button>
+            </div>
+        </div>
+        <div class="Payment-pay">
+            <button type="submit" class="btn btn_primary">{% trans 'Pay' %}</button>
+        </div>
+    </form>
+    {% endblock %}
