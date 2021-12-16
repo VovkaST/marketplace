@@ -322,7 +322,8 @@ def init_basket_formset(items: List[dict]) -> BasketFormSet:
         initial=initial,
         prefix='basket_item'
     )
-    [items[i].update({'form': form}) for i, form in enumerate(formset)]
+    if initial:
+        [items[i].update({'form': form}) for i, form in enumerate(formset)]
     return formset
 
 

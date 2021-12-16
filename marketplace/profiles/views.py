@@ -76,6 +76,8 @@ class ClientLoginView(LoginView):
 
 class RegistrationView(generic.FormView):
     form_class = RegisterForm
+    template_name = "profiles/base_registration.html"
+    success_url = reverse_lazy("index")
 
     def form_valid(self, form):
         registration(request=self.request, registration_form=self.get_form())
