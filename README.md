@@ -76,3 +76,26 @@ max-complexity = 18
 select = B,C,E,F,W,T4,B9
 
 ```
+
+#### Selenium
+Chrome browser and chrome driver (ver. 96.0.4664.110) must be installed.
+Newest version of chrome driver you can get at:
+https://chromedriver.chromium.org/downloads
+```bash
+pip install selenium
+```
+
+If you want test locally on server with default settings, write in .env file:
+```dotenv
+HOST_URL='http://127.0.0.1:8000'
+```
+
+#### Celery
+```shell
+pip install celery
+```
+Default settings to use on local machine in .env:
+```dotenv
+CELERY_BROKER_URL='celery://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND='celery://127.0.0.1:6379/1'
+```
