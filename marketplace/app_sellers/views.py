@@ -1,3 +1,5 @@
+from app_basket.forms import SellerForm
+from app_basket.views import BasketAddItemView
 from app_sellers.models import Balances, Goods, GoodsImage, Reviews, Sellers
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -21,7 +23,9 @@ class GoodDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         obj = self.get_object()
         context["seller"] = get_choices_sellers_by_good(obj.id)
-        context["balance"] = Balances.objects.filter(good=obj.id)
+        context["balances"] = Balances.objects.filter(good=obj.id).values(
+            "seller__name", "quantity", "price"
+        )
         context["review_form"] = ReviewForm()
         return context
 

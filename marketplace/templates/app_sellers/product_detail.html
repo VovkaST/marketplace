@@ -55,7 +55,15 @@
                     </button>
                   </div>
                 </div>
-                <div class="ProductCard-cartElement"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Add To Cart</span></a>
+                <div class="ProductCard-cartElement">
+                    <a class="Card-btn submitter" href="#">
+                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                            {% csrf_token %}
+                            <input type="hidden" name="data-id" value="{{ detail_product.id }}">
+                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                            <span class="Card-btn submitter">Купить</span>
+                    </form>
+                    </a>
                 </div>
               </div>
               <div class="ProductCard-footer">
@@ -85,59 +93,55 @@
                       </th>
                     </tr>
                     <tr>
-                      <td>{{detail_product.description.first}}
+                        {% for descriptions in detail_product.description.all %}
+                      <td> {{ descriptions.value }}
                       </td>
-                      <td>{{detail_product.description.first}}
+                      <td>{{descriptions.description_feature.all}}
                       </td>
                     </tr>
+                      {% endfor %}
                   </table>
                 </div>
               </div>
-            {% for seller_id, name, price in seller %}
+            {% for bal in balances %}
                 <li>
                 <div class="Categories Categories_product">
                   <div class="Categories-row">
                     <div class="Categories-block Categories-block_info">
                       <div class="Categories-info">
-                      <strong> {{ name }}
+                      <strong> {{ bal.seller__name }}
                         </strong>
                       </div>
                     </div>
                     <div class="Categories-splitProps">
                     </div>
                     <div class="Categories-block Categories-price">
-                      <strong>€&#32; {{ price }}
+                      <strong>€&#32; {{ bal.price }}
                       </strong>
                     </div>
-                    <div class="Categories-block Categories-button"><a class="btn btn_primary" href="#"><img class="btn-icon" src="assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/><span class="btn-content">Купить</span></a>
+                    <div class="Categories-block Categories-button">
+                        <div class="Amount Amount_product">
+                            <button class="Amount-remove" type="button">
+                            </button>
+                                <input class="basket-form__add" name="amount" type="text" value="1"/>
+                                <button class="Amount-add" type="button">
+                            </button>
+                            <a class="btn btn_primary" href="#">
+                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                {% csrf_token %}
+                                <input type="hidden" name="data-id" value="{{ balances.good_balance.id }}">
+                                <span class="Card-btn submitter">Купить</span>
+                            </form>
+                        </a>
+                            </div>
                     </div>
                   </div>
                 </div>
                 </li>
                 {% endfor %}
-              <div class="Tabs-block" id="addit">
-                <div class="Product-props">
-                  <div class="Product-prop">
-                    <strong>Lorem
-                    </strong><span> Pfizer</span>
-                  </div>
-                  <div class="Product-prop">
-                    <strong>ipsum
-                    </strong><span> Lorem ipsum dolor sit</span>
-                  </div>
-                  <div class="Product-prop">
-                    <strong>dolor sit
-                    </strong><span> 5 ans</span>
-                  </div>
-                  <div class="Product-prop">
-                    <strong>psum dolo
-                    </strong><span> 2–3 jours</span>
-                  </div>
-                </div>
-              </div>
               <div class="Tabs-block" id="reviews">
                 <header class="Section-header">
-                  <h3 class="Section-title">Количество отзывов: {{ detail_product.good_review.count }}
+                  <h3 class="Section-title">Количество отзывов: {{ detail_product.good_review.count }} {{ bal.good.id }}
                   </h3>
                 </header>
                 <div class="Comments">
@@ -150,7 +154,7 @@
                     <div class="Comment-column">
                       <header class="Comment-header">
                         <div>
-                          <strong class="Comment-title">{{ comments.user_reviews }} {{ comments.star }}
+                          <strong class="Comment-title">Имя: {{ comments.user }} оценка: {{ comments.star }}
                           </strong><span class="Comment-date">{{ comments.crated_at }}</span>
                         </div>
                       </header>
