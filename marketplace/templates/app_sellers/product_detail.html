@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block content %}
+  <div class="Middle Middle_top">
+    <div class="Middle-top">
+      <div class="wrap">
+        <div class="Middle-header">
+          <h1 class="Middle-title">Megano Product
+          </h1>
+          <ul class="breadcrumbs Middle-breadcrumbs">
+            <li class="breadcrumbs-item"><a href="index.html">home</a>
+            </li>
+            <li class="breadcrumbs-item breadcrumbs-item_current"><span>Product</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="Section">
+      <div class="wrap">
+        <div class="Product">
+          <div class="ProductCard">
+            <div class="ProductCard-look">
+              <div class="ProductCard-photo">
+                <div class="ProductCard-sale">{{ detail_product.sales }}%
+                </div><img src="{{ detail_product.good_images.first.image.url }}" alt="card.jpg"/>
+              </div>
+              <div class="ProductCard-picts"><a class="ProductCard-pict ProductCard-pict_ACTIVE" href="assets/img/content/home/bigGoods.png"><img src="assets/img/content/home/bigGoods.png" alt="bigGoods.png"/></a><a class="ProductCard-pict" href="assets/img/content/home/slider.png"><img src="assets/img/content/home/slider.png" alt="slider.png"/></a><a class="ProductCard-pict" href="assets/img/content/home/videoca.png"><img src="assets/img/content/home/videoca.png" alt="videoca.png"/></a>
+              </div>
+            </div>
+            <div class="ProductCard-desc">
+              <div class="ProductCard-header">
+                <h2 class="ProductCard-title">{{ detail_product.name }}
+                </h2>
+                <div class="ProductCard-info">
+                  <div class="ProductCard-cost">
+                    <div class="ProductCard-price">{{ balance.seller.price }}{{ balance.price }}{{ balance.price.first }}
+                    </div>
+                    <div class="ProductCard-priceOld">
+                    </div>
+                  </div>
+                  <div class="ProductCard-compare"><a class="btn btn_default" href="#"><img class="btn-icon" src="assets/img/icons/card/change.svg" alt="change.svg"/></a>
+                  </div>
+                </div>
+              </div>
+              <div class="ProductCard-text">
+              </div>
+              <div class="ProductCard-cart">
+                <div class="ProductCard-cartElement ProductCard-cartElement_amount">
+                  <div class="Amount Amount_product">
+                    <button class="Amount-remove" type="button">
+                    </button>
+                    <input class="Amount-input form-input" name="amount" type="text" value="1"/>
+                    <button class="Amount-add" type="button">
+                    </button>
+                  </div>
+                </div>
+                <div class="ProductCard-cartElement">
+                    <a class="Card-btn submitter" href="#">
+                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                            {% csrf_token %}
+                            <input type="hidden" name="data-id" value="{{ detail_product.id }}">
+                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                            <span class="Card-btn submitter">Купить</span>
+                    </form>
+                    </a>
+                </div>
+              </div>
+              <div class="ProductCard-footer">
+                <div class="ProductCard-tags">
+                  <strong class="ProductCard-tagsTitle">Tags:
+                  </strong><a href="#">Accesories</a>,<a href="#">Creative</a>,<a href="#">Design</a>,<a href="#">Gaming</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="Tabs Tabs_default">
+            <div class="Tabs-links"><a class="Tabs-link_ACTIVE Tabs-link" href="#description"><span>Описание</span></a><a class="Tabs-link" href="#sellers"><span>Продавцы</span></a><a class="Tabs-link" href="#addit"><span>AdditionaL Info</span></a><a class="Tabs-link" href="#reviews"><span>Reviews (3)</span></a>
+            </div>
+            <div class="Tabs-wrap">
+              <div class="Tabs-block" id="description">
+                <h2>{% trans "Description" %}
+                </h2>
+                <p>{{ detail_product.description.first }}</p>
+                <div class="clearfix">
+                </div>
+                <div class="table">
+                  <table>
+                    <tr>
+                      <th>Характеристика
+                      </th>
+                      <th>Значение
+                      </th>
+                    </tr>
+                    <tr>
+                        {% for descriptions in detail_product.description.all %}
+                      <td> {{ descriptions.value }}
+                      </td>
+                      <td>{{descriptions.description_feature.all}}
+                      </td>
+                    </tr>
+                      {% endfor %}
+                  </table>
+                </div>
+              </div>
+            {% for bal in balances %}
+                <li>
+                <div class="Categories Categories_product">
+                  <div class="Categories-row">
+                    <div class="Categories-block Categories-block_info">
+                      <div class="Categories-info">
+                      <strong> {{ bal.seller__name }}
+                        </strong>
+                      </div>
+                    </div>
+                    <div class="Categories-splitProps">
+                    </div>
+                    <div class="Categories-block Categories-price">
+                      <strong>€&#32; {{ bal.price }}
+                      </strong>
+                    </div>
+                    <div class="Categories-block Categories-button">
+                        <div class="Amount Amount_product">
+                            <button class="Amount-remove" type="button">
+                            </button>
+                                <input class="basket-form__add" name="amount" type="text" value="1"/>
+                                <button class="Amount-add" type="button">
+                            </button>
+                            <a class="btn btn_primary" href="#">
+                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                {% csrf_token %}
+                                <input type="hidden" name="data-id" value="{{ balances.good_balance.id }}">
+                                <span class="Card-btn submitter">Купить</span>
+                            </form>
+                        </a>
+                            </div>
+                    </div>
+                  </div>
+                </div>
+                </li>
+                {% endfor %}
+              <div class="Tabs-block" id="reviews">
+                <header class="Section-header">
+                  <h3 class="Section-title">Количество отзывов: {{ detail_product.good_review.count }} {{ bal.good.id }}
+                  </h3>
+                </header>
+                <div class="Comments">
+                  <div class="Comment">
+                    <div class="Comment-column Comment-column_pict">
+                      <div class="Comment-avatar">
+                      </div>
+                    </div>
+                      {% for comments in detail_product.good_review.all %}
+                    <div class="Comment-column">
+                      <header class="Comment-header">
+                        <div>
+                          <strong class="Comment-title">Имя: {{ comments.user }} оценка: {{ comments.star }}
+                          </strong><span class="Comment-date">{{ comments.crated_at }}</span>
+                        </div>
+                      </header>
+                      <div class="Comment-content">{{ comments.comment }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  {% endfor %}
+                <header class="Section-header Section-header_product">
+                  <h3 class="Section-title">Add Review
+                  </h3>
+                </header>
+                <div class="Tabs-addComment">
+                  <form class="form" action="{% url 'add_review' detail_product.pk %}" method="post" id="formReview">
+                        {% csrf_token %}
+                        {{ review_form.as_p }}
+                    <div class="form-group">
+                      <button class="btn btn_muted" type="submit">Submit Review
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

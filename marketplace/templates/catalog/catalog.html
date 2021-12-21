@@ -33,37 +33,38 @@
                     </div>
                 </div>
             </div>
-            <div class="Section-content">
-                <div class="Cards">
-                    {% for good in goods_list %}
-                        <div class="Card">
-                            <a class="Card-picture" href="#">
-                                <img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/>
-                            </a>
-                            <div class="Card-content">
-                                <strong class="Card-title">
-                                    <a href="product.html">{{ good.name }}</a>
-                                </strong>
-                                <div class="Card-description">
-                                    <div class="Card-cost">
-                                        <span class="Card-price">&#8381;{{ good.min_price|intcomma }}</span>
-                                    </div>
-                                    <div class="Card-category">Games / xbox</div>
-                                    <div class="Card-hover">
-                                        <a class="Card-btn" href="#">
-                                            <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
-                                        </a>
-                                        <a class="Card-btn" href="#">
-                                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
-                                        </a>
-                                        <a class="Card-btn" href="#">
-                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+          </div>
+        </div>
+      </div>
+</div>
+
+<!--<form action="" method="get">-->
+<!--    {{ filterset.form.as_p }}-->
+<!--    <input type="submit" />-->
+<!--</form>-->
+
+<div class="Section-content">
+<ul>
+     <div class="Cards">
+    {% for good in goods_list %}
+    <li>
+    <div class="Cards">
+            <div class="Card"><a class="Card-picture" href="#"><img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/></a>
+              <div class="Card-content">
+                  название {{ good.name }} - продажи {{ good.sales }} - отзывы {{ good.reviews_count }}
+                  -в наличии{{ good.on_balance }} - есть скидка {{ good.on_sale }}
+                <strong class="Card-title"><a href="{% url 'prod_detail' good.pk %}">{{ good.name }}</a>
+                </strong>
+                <div class="Card-description">
+                  <div class="Card-cost"><span class="Card-price">{{ good.min_price }}</span>
+                  </div>
+                  <div class="Card-category">Games / xbox
+                  </div>
+                  <div class="Card-hover">
+                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a>
+                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/></a>
+                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
+                  </div>
                 </div>
                 {% if is_paginated %}
                     <div class="Pagination">
@@ -108,4 +109,28 @@
         </div>
     </div>
 </div>
+
+{% load catalog_tags %}
+
+{% if is_paginated %}
+  {% if page_obj.has_previous %}
+    <a href="?{% param_replace page=1 %}">First</a>
+    {% if page_obj.previous_page_number != 1 %}
+      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+    {% endif %}
+  {% endif %}
+
+  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+
+  {% if page_obj.has_next %}
+    {% if page_obj.next_page_number != paginator.num_pages %}
+      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+    {% endif %}
+    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
+  {% endif %}
+
+  <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+</div>
+{% endif %}
+
 {% endblock %}

@@ -20,7 +20,7 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True),
-    ALLOWED_HOSTS=(str, "teamdiploma.ru"),
+    ALLOWED_HOSTS=(str, "127.0.0.1,teamdiploma.ru"),
     SECRET_KEY=(str, ""),
     HOST_URL=(str, "teamdiploma.ru")
 )
