@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_extensions",
     "app_orders.apps.AppOrdersConfig",
+    "selenium_tests",
 ]
 
 MIDDLEWARE = [
