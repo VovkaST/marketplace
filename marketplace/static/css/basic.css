@@ -2539,6 +2539,26 @@ button.link {
 }
 
 
+.language-form {
+  margin-right: 1em;
+}
+
+.select-language {
+  display: inline;
+  padding: 5px 5px;
+  min-height: unset;
+  min-width: unset;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.btn-select-language {
+  padding: 5px 10px;
+  min-height: unset;
+  min-width: unset;
+}
+
+
 .note {
     font-size: 0.8em;
 }
@@ -2554,9 +2574,10 @@ button.link {
 }
 
 #bank_account__number {
-    font-size: 1.5em;
-    color: #3670c7;
-    letter-spacing: .15em;
+  font-size: 1.5em;
+  color: #3670c7;
+  letter-spacing: .15em;
+}
 
 .mt0 {
     margin-top: 0;

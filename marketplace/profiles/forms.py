@@ -6,12 +6,13 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from .models import UserAddress
+from profiles.models import UserAddress
 
 
 class RegisterForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, help_text=_("Name"))
     last_name = forms.CharField(max_length=30, help_text=_("Last Name"))
+    patronymic = forms.CharField(max_length=30, help_text=_("Patronymic"), required=False)
     mail = forms.CharField(max_length=30, help_text=_("Mail"))
     phone_number = forms.CharField(max_length=30, help_text=_("Phone number"))
     patronymic = forms.CharField(
