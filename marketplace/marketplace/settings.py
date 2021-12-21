@@ -20,6 +20,7 @@ env = environ.Env(
     DEBUG=(bool, True),
     ALLOWED_HOSTS=(str, "teamdiploma.ru"),
     SECRET_KEY=(str, ""),
+    HOST_URL=(str, "teamdiploma.ru")
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
