@@ -18,8 +18,9 @@ class ClearCacheForm(forms.Form):
 
 class GenerateBalancesForm(forms.Form):
     single_choice = forms.ChoiceField(
-        choices=((1, "None"), (2, "Good"), (3, "Seller")),
+        choices=(("", ""), ("Good", "Good"), ("Seller", "Seller")),
         label=_("I want only one ... for balances"),
+        required=False
     )
     balances_quantity = forms.IntegerField(
         max_value=100, min_value=1, label=_("Quantity of different balances")

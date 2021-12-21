@@ -1,61 +1,18 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_modify %}
-
-{% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
-{{ media }}
-{% endblock %}
-
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    ›
-    <a href="{% url 'admin:object_generation' %}">{% trans 'Object generation' %}</a>
-    › {% trans 'Orders generation' %}
-</div>
-{% endblock %}
-
-{% block coltype %}colM{% endblock %}
+{% extends "admin/forms/generate_form_base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h1>
-    {% trans 'Sellers generation' %}
-</h1>
-<form action="{% url 'admin:generate_orders' %}" method="post" name="orders_generate" id="OrdersGenerateForm">
-    {% csrf_token %}
-    <div class="form-row">
-        {{ form.quantity.label }}
-        {{ form.quantity }}
-    </div>
-    <div class="submit-row">
-        <button type="submit" class="button">{% trans 'Generate' %}</button>
-    </div>
-</form>
-{% block javascript %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-  $(document).ready(function () {
-      $('#OrdersGenerateForm').submit(function () {
-          $.ajax({
-              data: $(this).serialize(),
-              type: $(this).attr('method'),
-              url: "{% url 'admin:generate_orders' %}",
-              dataType: "json",
-              success: function (response) {
-                var obj = jQuery.parseJSON(response);
-                alert(obj.message);
-              },
-              error: function (response) {
-                var obj = jQuery.parseJSON(response);
-                alert(obj.message);;
-              },
-          });
-          return false;
-      });
-    })
-</script>
-{% endblock javascript %}
+    <h1>
+        {% trans 'Orders generation' %}
+    </h1>
+    <form action="{% url 'admin:generate_orders' %}" method="post" id="generatingForm">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.quantity.label }}
+            {{ form.quantity }}
+        </div>
+        <div class="submit-row">
+            <button type="submit" class="button">{% trans 'Generate' %}</button>
+        </div>
+    </form>
 {% endblock %}

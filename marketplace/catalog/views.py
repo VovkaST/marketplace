@@ -1,25 +1,31 @@
 import django_filters
-from app_sellers.models import Balances, Goods, Sellers
+from app_sellers.models import Balances, Goods
 from django.db.models.functions import Coalesce
+from django.utils.translation import gettext as _
 from django.views.generic import ListView
 from django_filters.widgets import BooleanWidget, LinkWidget, RangeWidget
 
 # fmt: off
-from django.db.models import (Case, Count, Exists, Min, OuterRef, Sum, Value,  # isort:skip
-                              When)  # isort:skip
+from django.db.models import (
+    Case,
+    Count,
+    Exists,
+    Min,
+    OuterRef,
+    Sum,
+    Value,
+    When
+)  # isort:skip
 
 
 class CatalogFilter(django_filters.FilterSet):
-    min_price = django_filters.RangeFilter(widget=RangeWidget())
-    name = django_filters.CharFilter(lookup_expr="icontains")
-    on_balance = django_filters.BooleanFilter(widget=BooleanWidget())
-    on_sale = django_filters.BooleanFilter(widget=BooleanWidget())
+    min_price = django_filters.RangeFilter(widget=RangeWidget(), label=_('Price range'))
+    name = django_filters.CharFilter(lookup_expr="icontains", label=_('Name'))
+    on_balance = django_filters.BooleanFilter(widget=BooleanWidget(), label=_('On balance'))
+    on_sale = django_filters.BooleanFilter(widget=BooleanWidget(), label=_('On sale'))
 
     o = django_filters.OrderingFilter(
-        fields=("reviews_count", "sales", "min_price"),
-        # field_labels={
-        #     'reviews_count': 'Qty of reviews',
-        # },
+        fields=(_("reviews_count"), _("sales"), _("min_price")),
         widget=LinkWidget,
     )
 
@@ -68,7 +74,7 @@ class CatalogView(FilteredListView):
     template_name = "catalog/catalog.html"
     context_object_name = "goods_list"
     filterset_class = CatalogFilter
-    paginate_by = 3
+    paginate_by = 9
 
     def get_queryset(self):
         queryset = super().get_queryset()

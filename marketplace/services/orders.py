@@ -13,3 +13,8 @@ def get_user_orders(user, limit):
         if orders_queryset.count() > limit:
             orders_queryset = orders_queryset[:limit]
     return orders_queryset
+
+
+def is_incomplete_order(user) -> bool:
+    """Возвращает наличие у пользователя user незавершенного заказа."""
+    return bool(Orders.objects.incomplete_order(user=user))

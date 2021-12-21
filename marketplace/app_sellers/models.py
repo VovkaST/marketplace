@@ -9,31 +9,6 @@ from services.querysets import (
 from services.utils import slugify
 
 
-class NaturalKeyModel:
-    def set_values(self, data):
-        for field_name, value in data.items():
-            setattr(self, field_name, value)
-        return self
-
-    def natural_key(self):
-        raise NotImplementedError('Method is not implemented')
-
-
-class SellerQuerySet(models.QuerySet):
-    def by_good(self, good, only_available=True):
-        filters = dict()
-        if isinstance(good, Goods):
-            filters.update({'balance_owner__good': good})
-        elif isinstance(good, int):
-            filters.update({'balance_owner__good_id': good})
-        if only_available:
-            filters.update({'balance_owner__quantity__gt': 0})
-        return self.filter(**filters)
-
-    def get_by_natural_key(self, *, slug):
-        return self.filter(slug=slug).first()
-
-
 class Sellers(NaturalKeyModel, models.Model):
     slug = models.SlugField(blank=True, unique=True)
     name = models.CharField(_("Seller name"), max_length=254)
