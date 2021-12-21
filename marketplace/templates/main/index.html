@@ -165,17 +165,17 @@
                                     <div class="Card-category">{{ good.category.name }}</div>
                                     <div class="Card-hover">
                                         <a class="Card-btn" href="#">
-                                            <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
+                                            <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/>
                                         </a>
                                         <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
                                             {% csrf_token %}
                                             <input type="hidden" name="data-id" value="{{ good.balance_id }}">
                                             <a class="Card-btn submitter" href="#">
-                                                <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                                                <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
                                             </a>
                                         </form>
                                         <a class="Card-btn" href="compare.html">
-                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
+                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
                                         </a>
                                     </div>
                                 </div>
@@ -214,11 +214,11 @@
                                             <div class="Card-category">Games / xbox
                                             </div>
                                             <div class="Card-hover"><a class="Card-btn" href="#"><img
-                                                    src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a><a
+                                                    src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/></a><a
                                                     class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}"
-                                                                                   alt="cart.svg"/></a><a
+                                                                                   alt="{% static 'img/icons/card/cart.svg' %}"/></a><a
                                                     class="Card-btn" href="compare.html"><img
-                                                    src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
+                                                    src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/></a>
                                             </div>
                                         </div>
                                     </div>
@@ -241,11 +241,11 @@
                                             <div class="Card-category">Games / xbox
                                             </div>
                                             <div class="Card-hover"><a class="Card-btn" href="#"><img
-                                                    src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a><a
+                                                    src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/></a><a
                                                     class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}"
                                                                                    alt="cart.svg"/></a><a
                                                     class="Card-btn" href="compare.html"><img
-                                                    src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
+                                                    src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/></a>
                                             </div>
                                         </div>
                                     </div>
@@ -269,11 +269,11 @@
                                             <div class="Card-category">Digital / xbox
                                             </div>
                                             <div class="Card-hover"><a class="Card-btn" href="#"><img
-                                                    src="{% static 'img/icons/card/bookmark.svg" alt="bookmark.svg"/></a><a
+											src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/></a><a
                                                     class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}"
-                                                                                   alt="cart.svg"/></a><a
+                                                                                   alt="{% static 'img/icons/card/cart.svg' %}"/></a><a
                                                     class="Card-btn" href="compare.html"><img
-                                                    src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
+                                                    src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/></a>
                                             </div>
                                         </div>
                                     </div>
@@ -297,7 +297,7 @@
                                             <div class="Card-category">Games / xbox
                                             </div>
                                             <div class="Card-hover"><a class="Card-btn" href="#"><img
-                                                    src="{% static 'img/icons/card/bookmark.svg" alt="bookmark.svg"/></a><a
+											src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a><a
                                                     class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}"
                                                                                    alt="cart.svg"/></a><a
                                                     class="Card-btn" href="compare.html"><img
