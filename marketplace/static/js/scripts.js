@@ -999,6 +999,16 @@ function responseBasketChangeItemQuantity(response) {
 }
 
 
+function responseObjectsGeneration(response) {
+    if (response.success) {
+        alert(response.message)
+        window.location = response.redirect;
+    } else
+        alert(`Ошибка: ${response.error.message}`);
+    return response.success;
+}
+
+
 function responseBasketChangeItemSeller(response) {
     if (response.success) {
         let $row = response.elem.closest('.basket-item-row');
@@ -1070,6 +1080,12 @@ $(function() {
         return false;
     });
 
+    $('#generatingForm').submit(function() {
+        let $$ = $(this);
+        ajax($$.attr('url'), $$.serialize(), responseObjectsGeneration, $$);
+        return false;
+    });
+
     $('.submitter').click(function(event) {
         event.preventDefault();
         $(this).closest('form').submit();
@@ -1133,5 +1149,4 @@ $(function() {
     if ($tasks_in_progress.length) {
         checker = setInterval(checkTasks, 3000);
     }
->>>>>>> 34-35-razrabotka-stranitsy-provedeniya-importa
 });

@@ -13,6 +13,8 @@ import os
 from decimal import Decimal
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 import environ
 
 env = environ.Env(
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
 
     "main.apps.MainConfig",
     "profiles.apps.UsersConfig",
@@ -133,6 +136,11 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('ru', _('Russian')),
+)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

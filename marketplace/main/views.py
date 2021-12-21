@@ -1,4 +1,6 @@
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import ContextMixin, TemplateView
+
 from services.cache_settings import cache_settings
 from services.main_page import get_banners, get_categories, get_top_goods
 
@@ -58,3 +60,10 @@ class MarketMain(TemplateView, BannerMixin, CategoryMixin, TopGoodsMixin, CacheS
     """Представление главной страницы магазина"""
 
     template_name = "main/index.html"
+
+
+class ContactsMain(PageInfoMixin, TemplateView, CacheSettingsMixin):
+    """Представление страницы контактов магазина"""
+
+    template_name = "main/contacts.html"
+    page_title = _('Contacts')
