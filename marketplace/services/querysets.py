@@ -3,6 +3,8 @@ from typing import List
 from django.db import models
 from django.db.models import Q
 
+from loguru import logger
+
 
 class SoftDeleter(models.QuerySet):
     """QuerySet мягкого удаления объектов"""
@@ -67,6 +69,9 @@ class OrdersQuerySet(SoftDeleter):
         :param related: Флаг необходимости предварительной
         обработки связанных объектов ('delivery', 'payment', 'user').
         """
+        if user.is_anonymous:
+            return self.model.objects.none()
+
         queryset = self.user_order(user=user).filter(confirmed=False)
         if related:
             queryset.select_related('delivery', 'payment', 'user')
