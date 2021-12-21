@@ -54,8 +54,6 @@ class AuthTests(TestCase):
         mail.send_keys("test@test.test")
         phone = self.driver.find_element(by=By.NAME, value="phone_number")
         phone.send_keys("89888980008")
-        patronymic = self.driver.find_element(by=By.NAME, value="patronymic")
-        patronymic.send_keys("test-patronymic")
         buttons = self.driver.find_elements(by=By.TAG_NAME, value="button")
         buttons[-1].click()
         logout_link = self.driver.find_element(by=By.NAME, value="logout")

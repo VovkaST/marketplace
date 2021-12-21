@@ -51,6 +51,7 @@ class UpdateProfile(LoginRequiredMixin, generic.UpdateView):
             {
                 "phone": obj.profile.phone_number,
                 "avatar": obj.profile.avatar,
+                "patronymic": obj.profile.patronymic,
             }
         )
         return initial
