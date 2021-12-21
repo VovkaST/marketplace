@@ -13,3 +13,6 @@ isort==5.9.3
 django-filter==21.1
 django_extensions
 celery
+
+# test
+selenium==4.1.0

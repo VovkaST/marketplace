@@ -19,7 +19,8 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True),
     ALLOWED_HOSTS=(str, "teamdiploma.ru"),
-    SECRET_KEY=(str, ''),
+    SECRET_KEY=(str, ""),
+    HOST_URL=(str, "teamdiploma.ru")
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,7 +49,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "main.apps.MainConfig",
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_extensions",
     "app_orders.apps.AppOrdersConfig",
+    "selenium_tests",
 ]
 
 MIDDLEWARE = [
@@ -69,7 +70,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
     "app_basket.middleware.session_user_data.SessionDataCollector",
 ]
 
@@ -100,6 +100,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "TEST": {"NAME": os.path.join(BASE_DIR, "db_test.sqlite3")},
     }
 }
 
@@ -146,7 +147,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
 
 # Каталог загрузки файлов для импорта
-IMPORT_UPLOAD_DIR = 'files/import/'
+IMPORT_UPLOAD_DIR = "files/import/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -157,7 +158,7 @@ LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
 
-DECIMAL_SUM_TEMPLATE = Decimal('0.01')
+DECIMAL_SUM_TEMPLATE = Decimal("0.01")
 
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -165,7 +166,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 # celery
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
 CELERY_CREATE_MISSING_QUEUES = True

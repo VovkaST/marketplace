@@ -51,6 +51,7 @@ class UpdateProfile(LoginRequiredMixin, generic.UpdateView):
             {
                 "phone": obj.profile.phone_number,
                 "avatar": obj.profile.avatar,
+                "patronymic": obj.profile.patronymic,
             }
         )
         return initial
@@ -77,7 +78,7 @@ class ClientLoginView(LoginView):
 class RegistrationView(generic.FormView):
     form_class = RegisterForm
     template_name = "profiles/base_registration.html"
-    success_url = reverse_lazy("index")
+    success_url = reverse_lazy("main")
 
     def form_valid(self, form):
         registration(request=self.request, registration_form=self.get_form())
