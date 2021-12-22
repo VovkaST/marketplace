@@ -292,9 +292,10 @@ class OrderPaymentView(FormView):
     View для отдельной оплаты заказа, если этот шаг был пропущен при
     создании заказа.
     """
+
     form_class = OrderStep3Form
     template_name = "app_orders/payment_step.html"
-    success_url = 'orderhistory'
+    success_url = "ordershistory"
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)

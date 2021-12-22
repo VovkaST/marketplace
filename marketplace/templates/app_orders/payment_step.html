@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block content %}
 <div class="Middle Middle_top">
@@ -36,9 +36,7 @@
             </div>
             <div class="form-group">
                 <label for="{{ form.bank_account.id_for_label }}" class="form-label">{{ form.bank_account.label }}</label>
-                <div id="bank_account__number" class="form-input Payment-bill">
-                    {{ form.bank_account }}
-                </div>
+                {{ form.bank_account }}
                 <div>
                     <small id="{{ form.bank_account.id_for_label }}" class="text-muted">
                         {{ form.bank_account.help_text }}
@@ -60,4 +58,5 @@
             <button type="submit" class="btn btn_primary">{% trans 'Pay' %}</button>
         </div>
     </form>
-    {% endblock %}
+</div>
+{% endblock %}

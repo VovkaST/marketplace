@@ -28,7 +28,7 @@
               <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit">{% trans 'Update' %}</button>
+                <button type="submit" class="btn btn_success">{% trans 'Update' %}</button>
               </form>
             {% endif %}
           </div>

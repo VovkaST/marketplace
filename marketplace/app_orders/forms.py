@@ -56,7 +56,10 @@ class OrderStep3Form(forms.Form):
     bank_account = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={"style": "background-color: #f9fafc; border: none"}
+            attrs={
+                "style": "background-color: #f9fafc; border: none; margin: auto;",
+                "class": "form-input Payment-bill",
+            }
         ),
         max_length=20,
     )
