@@ -6,10 +6,10 @@
     <div class="Middle-top">
         <div class="wrap">
             <div class="Middle-header">
-                <h1 class="Middle-title">Catalog Megano</h1>
+                <h1 class="Middle-title">{% trans 'Catalog' %} Megano</h1>
                 <ul class="breadcrumbs Middle-breadcrumbs">
                     <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
-                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>Catalog</span></li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Catalog' %}</span></li>
                 </ul>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div class="Section-column">
                 <div class="Section-columnSection">
                     <header class="Section-header">
-                        <strong class="Section-title">Filter</strong>
+                        <strong class="Section-title">{% trans 'Filter' %}</strong>
                     </header>
                     <div class="Section-columnContent">
                         <form class="form" action="" method="get">
@@ -51,8 +51,8 @@
     <div class="Cards">
         <div class="Card"><a class="Card-picture" href="#"><img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/></a>
             <div class="Card-content">
-                  название {{ good.name }} - продажи {{ good.sales }} - отзывы {{ good.reviews_count }}
-                  -в наличии{{ good.on_balance }} - есть скидка {{ good.on_sale }}
+                  {% trans 'title' %} {{ good.name }} - {% trans 'sales' %} {{ good.sales }} - {% trans 'reviews' %} {{ good.reviews_count }}
+                  - {% trans 'on balance' %} {{ good.on_balance }} - {% trans 'sale' %} {{ good.on_sale }}
                 <strong class="Card-title">
 					<a href="{% url 'prod_detail' good.pk %}">{{ good.name }}</a>
                 </strong>
@@ -62,9 +62,17 @@
 					</div>
 					<div class="Card-category">Games / xbox</div>
 					<div class="Card-hover">
-						<a class="Card-btn" href="#"><img src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/></a>
-						<a class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/></a>
-						<a class="Card-btn" href="#"><img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/></a>
+						<a class="Card-btn" href="#">
+							<img src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/>
+						</a>
+
+						<a class="Card-btn" href="#">
+							<img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
+						</a>
+
+						<a class="Card-btn" href="#">
+							<img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+						</a>
 					</div>
                 </div>
 			</div>
@@ -80,7 +88,7 @@
 		<div class="Pagination-ins">
 			{% if page_obj.has_previous %}
 				<a class="Pagination-element Pagination-element_prev" href="?{% param_replace page=page_obj.previous_page_number %}">
-					<img src={% static "/img/icons/prevPagination.svg" %} alt="prevPagination"/>
+					<img src="{% static '/img/icons/prevPagination.svg' %}" alt="prevPagination"/>
 				</a>
 			{% endif %}
 			{% if page_obj.has_previous %}
@@ -108,7 +116,7 @@
 					</a>
 				{% endif %}
 				<a class="Pagination-element Pagination-element_prev" href="?{% param_replace page=page_obj.next_page_number %}">
-					<img src={% static "/img/icons/nextPagination.svg" %} alt="nextPagination"/>
+					<img src="{% static '/img/icons/nextPagination.svg' %}" alt="nextPagination"/>
 				</a>
 			{% endif %}
 		</div>
