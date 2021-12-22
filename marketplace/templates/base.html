@@ -107,11 +107,27 @@ p.error-browser
                     </form>
 
                     {% if request.user.is_authenticated %}
-                        <div class="row-block"><a class="ControlPanel-title" href="{% url 'account' %}" name="account">Account</a></div>
-                        <div class="row-block"><a class="ControlPanel-title" href="{% url 'logout' %}" name="logout">Logout</a></div>
+                        <div class="row-block">
+                            <a class="ControlPanel-title" href="{% url 'account' %}" name="account">
+                                {% trans 'Account' }
+                            </a>
+                        </div>
+                        <div class="row-block">
+                            <a class="ControlPanel-title" href="{% url 'logout' %}" name="logout">
+                                {% trans 'Logout' %}
+                            </a>
+                        </div>
                     {% else %}
-                        <div class="row-block"><a class="ControlPanel-title" href="{% url 'registration' %}" name="register">Register</a></div>
-                        <div class="row-block"><a class="ControlPanel-title" href="{% url 'login' %}" name="login">Login</a></div>
+                        <div class="row-block">
+                            <a class="ControlPanel-title" href="{% url 'registration' %}" name="register">
+                                {% trans 'Register' %}
+                            </a>
+                        </div>
+                        <div class="row-block">
+                            <a class="ControlPanel-title" href="{% url 'login' %}" name="login">
+                                {% trans 'Login' %}
+                            </a>
+                        </div>
                     {% endif %}
                     </div>
                 </nav>
@@ -145,7 +161,7 @@ p.error-browser
                             <a class="menu-link" href="{% url 'main' %}">{% trans "Home" %}</a>
                         </li>
                         <li class="menu-item">
-                            <span class="menu-label menu-label_danger">New</span>
+                            <span class="menu-label menu-label_danger">{% trans 'New' %}</span>
                             <a class="menu-link" href="#">{% trans "Shop" %}</a>
                         </li>
                         <li class="menu-item">
@@ -187,7 +203,7 @@ p.error-browser
                 </div>
             </div>
             <div class="row-block Header-trigger"><a class="menuTrigger" href="#navigate">
-                <div class="menuTrigger-content">Показать навигацию
+                <div class="menuTrigger-content">{% trans 'Show navigation' %}
                 </div>
                 <span></span><span></span><span></span></a>
             </div>
@@ -203,7 +219,7 @@ p.error-browser
                         <div class="CategoriesButton-icon"><img src="{% static 'img/icons/allDep.svg' %}"
                                                                 alt="allDep.svg"/>
                         </div>
-                        <span class="CategoriesButton-text">All Departments</span>
+                        <span class="CategoriesButton-text">{% trans 'All Departments' %}</span>
                         <div class="CategoriesButton-arrow">
                         </div>
                     </div>
@@ -271,7 +287,7 @@ p.error-browser
                         <input class="search-input" id="query" name="query" type="text"
                                placeholder="What are you looking for ..."/>
                         <button class="search-button" type="submit" name="search" id="search"><img
-                                src="{% static 'img/icons/search.svg' %}" alt="search.svg"/>Search
+                                src="{% static 'img/icons/search.svg' %}" alt="search.svg"/>{% trans 'Search' %}
                         </button>
                     </form>
                 </div>
@@ -318,45 +334,45 @@ p.error-browser
                 </ul>
             </div>
             <div class="row-block">
-                <strong class="Footer-title">Useful Links
+                <strong class="Footer-title">{% trans 'Useful Links' %}
                 </strong>
                 <ul class="menu menu_vt Footer-menu">
-                    <li class="menu-item"><a class="menu-link" href="#">Checkout</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Checkout' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">My Cart</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'My Cart' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Delivery</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Delivery' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Order Info</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Order Info' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Terms</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Terms' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Conditions</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Conditions' %}</a>
                     </li>
                 </ul>
             </div>
             <div class="row-block">
-                <strong class="Footer-title">My Account
+                <strong class="Footer-title">{% trans 'My Account' %}
                 </strong>
                 <ul class="menu menu_vt Footer-menu">
-                    <li class="menu-item"><a class="menu-link" href="#">Accessories</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Accessories' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Bags</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Bags' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Cameras</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Cameras' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Clothings</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Clothings' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Electronics</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Electronics' %}</a>
                     </li>
-                    <li class="menu-item"><a class="menu-link" href="#">Fashion</a>
+                    <li class="menu-item"><a class="menu-link" href="#">{% trans 'Fashion' %}</a>
                     </li>
                 </ul>
             </div>
             <div class="row-block">
-                <strong class="Footer-title">Contacts
+                <strong class="Footer-title">{% trans 'Contacts' %}
                 </strong>
-                <p>Phone: 8.800.200.600<br>Email: Support@ninzio.com<br>Skype: techno<br>Address: New York, north<br>Avenue
+                <p>{% trans 'Phone' %}: 8.800.200.600<br>Email: Support@ninzio.com<br>Skype: techno<br>Address: New York, north<br>Avenue
                     26/7<br>0057
                 </p>
             </div>
@@ -365,9 +381,10 @@ p.error-browser
     <div class="Footer-copy">
         <div class="wrap">
             <div class="row row_space">
-                <div class="row-block">© Copyright&#32;<a href="#">Megano Store.</a>&#32;All rights reserved.
+                <div class="row-block">© Copyright&#32;<a href="#">Megano {% trans 'Store' %}.</a>&#32;All rights reserved.
                 </div>
-                <div class="row-block"><span>Accepted Payments</span>
+                <div class="row-block">
+                    <span>{% trans 'Accepted Payments' %}</span>
                     <div class="Footer-payments">
                         <div><img src="{% static 'img/payments/visa.png' %}" alt="visa.png"/>
                         </div>

@@ -30,9 +30,9 @@
                             <div class="row">
                                 <div class="row-block">
                                     <a class="Order-title" href="{# url order detail #}">
-                                        Заказ&#32;
+                                        {% trans 'Order' %}&#32;
                                         <span class="Order-numberOrder">№{{ order.pk }}</span>
-                                        &#32;от&#32;
+                                        &#32;{% trans 'from' %}&#32;
                                         <span class="Order-dateOrder">{{ order.date_time }}</span>
                                     </a>
                                 </div>
