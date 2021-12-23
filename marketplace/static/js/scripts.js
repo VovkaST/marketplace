@@ -992,7 +992,7 @@ function responseBasketChangeItemQuantity(response) {
         let $row = response.elem.closest('.basket-item-row');
         setBasketFullness(response.goods_quantity, response.total_sum);
         setBasketRowTotalPrice($row, response.changed_item);
-        setBasketTotalSum();
+        setBasketTotalSum(response.total_sum);
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;
@@ -1015,7 +1015,7 @@ function responseBasketChangeItemSeller(response) {
         basketSetSeller($row, response.changed_item)
         setBasketFullness(response.goods_quantity, response.total_sum);
         setBasketRowTotalPrice($row, response.changed_item);
-        setBasketTotalSum();
+        setBasketTotalSum(response.total_sum);
     } else
         alert(`Ошибка: ${response.error.message}`);
     return response.success;

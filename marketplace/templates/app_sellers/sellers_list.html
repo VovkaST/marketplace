@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load cache i18n static %}
+
+{% block content %}
+    {% cache cache_settings.sellers_list_life_time sellers_list %}
+    <div class="Middle Middle_top">
+        <div class="Middle-top">
+            <div class="wrap">
+                <div class="Middle-header">
+                    <h1 class="Middle-title">{% trans 'Megano Sellers' %}</h1>
+                    <ul class="breadcrumbs Middle-breadcrumbs">
+                        <li class="breadcrumbs-item">
+                            <a href="{% url 'main' %}">{% trans 'home' %}</a>
+                        </li>
+                        <li class="breadcrumbs-item breadcrumbs-item_current">
+                            <span>{% trans 'Megano sellers' %}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="Section Section_column Section_columnWide">
+            <div class="wrap">
+                <div class="Section-content">
+                    <div class="sellers-list">
+                        {% for seller in sellers_list %}
+                            <a href="{% url 'seller_detail' seller.slug %}" class="sellers-list__link">
+                                <div class="sellers-list__item">
+                                    <div class="sellers-list__item__image">
+                                        <img src="{% static seller.image %}" alt="{{ seller.name }}">
+                                    </div>
+                                    <div class="seller-list__item__description">
+                                        <h3>{{ seller.name }}</h3>
+                                        <div class="seller-list__item__address">
+                                            {{ seller }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcache %}
+{% endblock content %}

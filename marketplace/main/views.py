@@ -27,7 +27,7 @@ class CacheSettingsMixin(ContextMixin):
         return context
 
 
-class BannerMixin(ContextMixin):
+class BannerMixin(CacheSettingsMixin, ContextMixin):
     """Выбор баннеров и занесение их в context"""
 
     def get_context_data(self, **kwargs):
@@ -37,7 +37,7 @@ class BannerMixin(ContextMixin):
         return context
 
 
-class CategoryMixin(ContextMixin):
+class CategoryMixin(CacheSettingsMixin, ContextMixin):
     """Получение всех категорий для вывода на главную страницу"""
 
     def get_context_data(self, **kwargs):
