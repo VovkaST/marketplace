@@ -11,9 +11,9 @@ def get_choices_sellers_by_good(good: Union[Goods, int]) -> List[Tuple]:
     :return: Список продавцов в виде множества.
     """
     sellers = Sellers.objects.by_good(good=good).values(
-        "id", "name", "balance_owner__price"
+        "id", "name"
     )
     return [
-        (seller["id"], seller["name"], seller["balance_owner__price"])
+        (seller["id"], seller["name"])
         for seller in sellers
     ]

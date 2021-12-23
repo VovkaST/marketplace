@@ -2589,3 +2589,25 @@ button.link {
     line-height: 0.9em;
     color: #32a901;
 }
+
+.sellers-list__link {
+    text-decoration: none;
+    color: inherit;
+}
+.sellers-list__item {
+    display: flex;
+    align-items: center;
+    margin: 0 0 30px;
+    border-bottom: 1px solid white;
+}
+.sellers-list__item:hover {
+  border-bottom: 1px solid #f1f1f1;
+}
+.sellers-list__item__image {
+    width: 160px;
+    margin-left: 50px;
+}
+.seller-list__item__address {
+    color: #d5d5d5;
+    font-size: 0.9em;
+}

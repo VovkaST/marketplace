@@ -1,32 +1,45 @@
-from app_basket.forms import SellerForm
-from app_basket.views import BasketAddItemView
-from app_sellers.models import Balances, Goods, GoodsImage, Reviews, Sellers
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 from django.views import View, generic
-from main.views import CacheSettingsMixin
+
+from app_sellers.models import Balances, Goods, Reviews, Sellers
+from app_sellers.forms import ReviewForm
+from main.views import CategoryMixin, PageInfoMixin
 from services.sellers import get_choices_sellers_by_good
 
-from .forms import ReviewForm
 
-
-class SellerDetailView(generic.DetailView, CacheSettingsMixin):
+class SellerDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
     model = Sellers
 
+    @property
+    def page_title(self):
+        obj = self.get_object()
+        return obj.name
 
-class GoodDetailView(generic.DetailView):
+
+class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
     model = Goods
     template_name = "app_sellers/product_detail.html"
     context_object_name = "detail_product"
 
+    @property
+    def page_title(self):
+        obj = self.get_object()
+        return obj.name
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         obj = self.get_object()
-        context["seller"] = get_choices_sellers_by_good(obj.id)
-        context["balances"] = Balances.objects.filter(good=obj.id).values(
-            "seller__name", "quantity", "price"
-        )
-        context["review_form"] = ReviewForm()
+        balances = Balances.objects.filter(good=obj.id)\
+            .values("id", "seller__name", "quantity", "price")\
+            .order_by('-price')
+        context.update({
+            'seller': get_choices_sellers_by_good(obj.id),
+            'balance': balances[0],
+            'other_balances': balances[1:],
+            'review_form': ReviewForm(),
+            'description': obj.description.all().values('feature__value', 'value')
+        })
         return context
 
 
@@ -46,3 +59,11 @@ class AddReviews(View):
             )
             return HttpResponseRedirect("/")
         return HttpResponseRedirect("/")
+
+
+class SellersListView(PageInfoMixin, CategoryMixin, generic.ListView):
+    """Список продавцов"""
+
+    page_title = _('Our sellers')
+    model = Sellers
+    context_object_name = 'sellers_list'
