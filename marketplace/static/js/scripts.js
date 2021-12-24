@@ -1065,9 +1065,22 @@ function generateNumberString($place, $input, stringLength, interval=300) {
             generator = setInterval(randomSign, 1, $place, value);
         else {
             clearInterval(executor);
-            $input.val($place.text());
+            $place.val = $place.text();
+            document.getElementById('id_bank_account').value = $place.val;
         }
     }, interval);
+}
+
+
+function makeid(length) {
+    var result           = '';
+    var characters       = '0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() *
+ charactersLength));
+   }
+   return result;
 }
 
 
@@ -1104,9 +1117,10 @@ $(function() {
     });
 
     $('#bank_account__generate').click(function() {
-        let $accountNumber = $('#bank_account__number'),
-            $accountNumberInput = $('#id_bank_account');
-        generateNumberString($accountNumber, $accountNumberInput,20);
+//        let $accountNumber = $('#bank_account__number'),
+//            $accountNumberInput = $('#id_bank_account');
+//        generateNumberString($accountNumberInput, $accountNumber,20);
+        document.getElementById('id_bank_account').value = makeid(20);
     });
     
     let $tasks_in_progress = $('.task__row.in_progress'),

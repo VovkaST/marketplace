@@ -22,17 +22,16 @@
 
             {% include 'profiles/navigation.html' %}
 
-            <div class="Section-content">
-                <div class="Profile">
-                    {% if request.user.is_authenticated %}
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit">{% trans 'Update' %}</button>
-                    </form>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="Section-content">
+          <div class="Profile">
+            {% if request.user.is_authenticated %}
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn_success">{% trans 'Update' %}</button>
+              </form>
+            {% endif %}
+          </div>
         </div>
     </div>
 </div>

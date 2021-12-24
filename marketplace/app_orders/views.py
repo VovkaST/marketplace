@@ -298,7 +298,7 @@ class OrderPaymentView(CategoryMixin, PageInfoMixin, FormView):
     page_title = _('Order payment')
     form_class = OrderStep3Form
     template_name = "app_orders/payment_step.html"
-    success_url = 'orderhistory'
+    success_url = "ordershistory"
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
