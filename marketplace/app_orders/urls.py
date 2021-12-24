@@ -4,6 +4,7 @@ from app_orders.views import (  # isort:skip
     OrderCreateStep1View,  # isort:skip
     OrderCreateStep2View,  # isort:skip
     OrderCreateStep3View,  # isort:skip
+    OrderDetailView,  # isort:skip
     OrderPaymentView,  # isort:skip
 )  # isort:skip
 from django.urls import include, path  # isort:skip
@@ -18,8 +19,6 @@ urlpatterns = [
         OrderConfirmationView.as_view(),
         name="order_create_confirmation",
     ),
-    path(
-        "<int:pk>/",
-        include([path("payment/", OrderPaymentView.as_view(), name="order_payment")]),
-    ),
+    path("<int:pk>/payment/", OrderPaymentView.as_view(), name="order_payment"),
+    path("<int:pk>/view/", OrderDetailView.as_view(), name="order_detail"),
 ]

@@ -5,8 +5,11 @@ from app_orders.models import Orders
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views import generic
 from django.views.generic import ListView
+
+from main.views import CategoryMixin, PageInfoMixin
 from profiles.forms import ChangeInfoForm, RegisterForm
 from profiles.models import Profile
 from services.auth import registration
@@ -17,7 +20,8 @@ from services.view_history import get_goods_in_view_history
 # fmt: on
 
 
-class AccountView(LoginRequiredMixin, generic.DetailView):
+class AccountView(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.DetailView):
+    page_title = _('Your profile')
     model = Profile
     template_name = "profiles/account.html"
     context_object_name = "account"
@@ -38,7 +42,8 @@ class AccountView(LoginRequiredMixin, generic.DetailView):
         return context
 
 
-class UpdateProfile(LoginRequiredMixin, generic.UpdateView):
+class UpdateProfile(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.UpdateView):
+    page_title = _('Your profile: edit')
     form_class = ChangeInfoForm
     template_name = "profiles/profile.html"
     context_object_name = "profile"
@@ -60,7 +65,8 @@ class UpdateProfile(LoginRequiredMixin, generic.UpdateView):
         return self.request.user
 
 
-class ClientLoginView(LoginView):
+class ClientLoginView(CategoryMixin, PageInfoMixin, LoginView):
+    page_title = _('Login')
     template_name = "profiles/base_login_form.html"
 
     def form_valid(self, form):
@@ -75,7 +81,8 @@ class ClientLoginView(LoginView):
         return response
 
 
-class RegistrationView(generic.FormView):
+class RegistrationView(CategoryMixin, PageInfoMixin, generic.FormView):
+    page_title = _('Registration')
     form_class = RegisterForm
     template_name = "profiles/base_registration.html"
     success_url = reverse_lazy("main")
@@ -85,7 +92,8 @@ class RegistrationView(generic.FormView):
         return super().form_valid(form=form)
 
 
-class ViewsHistoryView(ListView):
+class ViewsHistoryView(CategoryMixin, PageInfoMixin, ListView):
+    page_title = _('View history')
     template_name = "profiles/historyview.html"
     context_object_name = "viewed_products"
 
@@ -99,7 +107,8 @@ class ViewsHistoryView(ListView):
         return queryset
 
 
-class OrdersHistoryView(ListView):
+class OrdersHistoryView(CategoryMixin, PageInfoMixin, ListView):
+    page_title = _('Orders history')
     template_name = "profiles/historyorder.html"
     model = Orders
     context_object_name = "orders"

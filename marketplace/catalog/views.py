@@ -7,15 +7,15 @@ from django_filters.widgets import BooleanWidget, LinkWidget, RangeWidget
 
 # fmt: off
 from django.db.models import (
-    Case,
     Count,
     Exists,
     Min,
     OuterRef,
     Sum,
     Value,
-    When
 )  # isort:skip
+
+from main.views import CategoryMixin, PageInfoMixin
 
 
 class CatalogFilter(django_filters.FilterSet):
@@ -34,7 +34,8 @@ class CatalogFilter(django_filters.FilterSet):
         fields = ["name"]
 
 
-class FilteredListView(ListView):
+class FilteredListView(CategoryMixin, PageInfoMixin, ListView):
+    page_title = _('Catalog')
     filterset_class = None
 
     def get_queryset(self):
@@ -67,9 +68,7 @@ class CatalogView(FilteredListView):
         min_price=Min("good_balance__price"),
         on_sale=Exists(stocks_subquery),
         sum_balance=Coalesce(Sum("good_balance__quantity"), Value(0)),
-    ).annotate(
-        on_balance=Case(When(sum_balance__gt=0, then=Value(True)), default=Value(False))
-    )
+    ).filter(good_balance__isnull=False)
 
     template_name = "catalog/catalog.html"
     context_object_name = "goods_list"

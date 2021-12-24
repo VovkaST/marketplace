@@ -56,13 +56,13 @@ class TopGoodsMixin(ContextMixin):
         return context
 
 
-class MarketMain(TemplateView, BannerMixin, CategoryMixin, TopGoodsMixin, CacheSettingsMixin):
+class MarketMain(BannerMixin, CategoryMixin, TopGoodsMixin, TemplateView):
     """Представление главной страницы магазина"""
 
     template_name = "main/index.html"
 
 
-class ContactsMain(PageInfoMixin, TemplateView, CacheSettingsMixin):
+class ContactsMain(PageInfoMixin, CategoryMixin, TemplateView):
     """Представление страницы контактов магазина"""
 
     template_name = "main/contacts.html"
