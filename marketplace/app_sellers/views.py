@@ -6,6 +6,7 @@ from app_sellers.models import Balances, Goods, Reviews, Sellers
 from app_sellers.forms import ReviewForm
 from main.views import CategoryMixin, PageInfoMixin
 from services.sellers import get_choices_sellers_by_good
+from services.view_history import add_goods_to_view_history
 
 
 class SellerDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
@@ -32,7 +33,7 @@ class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
         obj = self.get_object()
         balances = Balances.objects.filter(good=obj.id)\
             .values("id", "seller__name", "quantity", "price")\
-            .order_by('-price')
+            .order_by('price')
         context.update({
             'seller': get_choices_sellers_by_good(obj.id),
             'balance': balances[0],
@@ -40,6 +41,8 @@ class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
             'review_form': ReviewForm(),
             'description': obj.description.all().values('feature__value', 'value')
         })
+        if self.request.user.is_authenticated:
+            add_goods_to_view_history(self.request.user, obj)
         return context
 
 

@@ -9,7 +9,7 @@
                 <h1 class="Middle-title">{% trans 'Account' %}
                 </h1>
                 <ul class="breadcrumbs Middle-breadcrumbs">
-                    <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">{% trans 'Home' %}</a>
                     </li>
                     <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Account' %}</span>
                     </li>
@@ -55,7 +55,7 @@
                                 <div class="Order-personal">
                                     <div class="row">
                                         <div class="row-block">
-                                            <a class="Order-title" href="{# url order detail #}">
+                                            <a class="Order-title" href="{% url 'order_detail' order.id %}">
                                                 {% trans 'Order' %}&#32;
                                                 <span class="Order-numberOrder">№{{ order.pk }}</span>
                                                 &#32;{% trans 'From' %}&#32;

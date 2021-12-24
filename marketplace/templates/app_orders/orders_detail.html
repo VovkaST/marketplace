@@ -10,7 +10,7 @@
                 </h1>
                 <ul class="breadcrumbs Middle-breadcrumbs">
                     <li class="breadcrumbs-item">
-                        <a href="index.html">{% trans 'Home' %}</a>
+                        <a href="{% url 'main' %}">{% trans 'Home' %}</a>
                     </li>
 
                     <li class="breadcrumbs-item">
@@ -115,87 +115,87 @@
                                         </div>
 
                                         <div class="Order-infoContent">
-                                            {{ order.payment_state }}
+                                            {% if order.payment_state %}{% trans 'Payed' %}{% else %}{% trans 'Not payed' %}{% endif %}
                                         </div>
                                     </div>
 
                                     {% ifequal order.payment_state False %}
-                                    <div class="Order-info Order-info_error">
-                                        <div class="Order-infoType">
-                                            {% trans 'Not payed' %}:
+                                        <div class="Order-info Order-info_error">
+                                            <div class="Order-infoType">
+                                                {% trans 'Not payed' %}:
+                                            </div>
+                                            <div class="Order-infoContent">
+                                                {% trans 'order has not been paid yet, because of payment server internal error' %}
+                                            </div>
                                         </div>
-                                        <div class="Order-infoContent">
-                                            {% trans 'order has not been paid yet, because of payment server internal error' %}
-                                        </div>
-                                    </div>
                                     {% endifequal %}
                                 </div>
                             </div>
                         </div>
 
                         <div class="Cart Cart_order">
-                            {% if order.items.all %}
-                            {% for order_item in order.items.all %}
-                            <div class="Cart-product">
-                                <div class="Cart-block Cart-block_row">
-                                    <div class="Cart-block Cart-block_pict">
-                                        <a class="Cart-pict" href="#">
-                                            <img class="Cart-img" src="assets/img/content/home/card.jpg" alt="card.jpg"/>
-                                        </a>
-                                    </div>
+                            {% for order_item in order_items %}
+                                <div class="Cart-product">
+                                    <div class="Cart-block Cart-block_row">
+                                        <div class="Cart-block Cart-block_pict">
+                                            <a class="Cart-pict" href="#">
+                                                <img class="Cart-img" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
+                                            </a>
+                                        </div>
 
-                                    <div class="Cart-block Cart-block_info">
-                                        <a class="Cart-title" href="#">
-                                            {{ order_item.good }}
-                                        </a>
-                                        <div class="Cart-desc">
-                                            {{ order_item.good.description }}
+                                        <div class="Cart-block Cart-block_info">
+                                            <a class="Cart-title" href="{% url 'prod_detail' order_item.id %}">
+                                                {{ order_item.good }}
+                                            </a>
+                                            <div class="Cart-desc">
+                                                {{ order_item.good.category.name }}
+                                            </div>
+                                        </div>
+
+                                        <div class="Cart-block Cart-block_price">
+                                            <div class="Cart-price">
+                                                &#8381;{{ order_item.total_price }}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="Cart-block Cart-block_price">
-                                        <div class="Cart-price">
-                                            {{ order_item.total_price }}
+                                    <div class="Cart-block Cart-block_row">
+                                        <div class="Cart-block Cart-block_seller">
+                                            <div>
+                                                {% trans 'Seller' %}:
+                                            </div>
+
+                                            <div>
+                                                {{ order_item.seller.name }}
+                                            </div>
+                                        </div>
+                                        <div class="Cart-block Cart-block_amount">
+                                            {{ order_item.quantity }} {% trans 'pcs' %}.
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="Cart-block Cart-block_row">
-                                    <div class="Cart-block Cart-block_seller">
-                                        <div>
-                                            {% trans 'Seller' %}:
-                                        </div>
-
-                                        <div>
-                                            {{ order_item.seller }}
-                                        </div>
-                                    </div>
-                                    <div class="Cart-block Cart-block_amount">
-                                        {{ order_item.quantity }} {% trans 'pcs' %}.
-                                    </div>
-                                </div>
-                            </div>
                             {% endfor %}
-                            {% endif %}
                             <div class="Cart-total">
                                 <div class="Cart-block Cart-block_total">
                                     <strong class="Cart-title">
                                         {% trans 'Final price' %}:
                                         <span class="Cart-price">
-                                            {{ order.total_sum }}
+                                            &#8381;{{ order.total_sum }}
                                         </span>
                                         {% if order.old_sum %}
                                         <span class="Cart-price_old">
-                                            {{ order.old_sum }}
+                                            &#8381;{{ order.old_sum }}
                                         </span>
                                         {% endif %}
                                     </strong>
                                 </div>
-                                <div class="Cart-block">
-                                    <a class="btn btn_primary btn_lg" href="#">
-                                        {% trans 'Pay' %}
-                                    </a>
-                                </div>
+                                {% ifequal order.payment_state False %}
+                                    <div class="Cart-block">
+                                        <a class="btn btn_primary btn_lg" href="#">
+                                            {% trans 'Pay' %}
+                                        </a>
+                                    </div>
+                                {% endifequal %}
                             </div>
                         </div>
                     </div>

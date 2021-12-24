@@ -72,14 +72,14 @@
                                 </div>
                             </div>
                             <div class="ProductCard-cartElement">
-                                <a class="btn btn_primary submitter" href="#">
-                                    <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                    <a class="btn btn_primary submitter" href="#">
                                         {% csrf_token %}
                                         <input type="hidden" name="data-id" value="{{ detail_product.id }}">
                                         <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
                                         <span class="submitter btn-content">Add To Cart</span>
-                                    </form>
-                                </a>
+                                    </a>
+                                </form>
                             </div>
                         </div>
                         <div class="ProductCard-footer">
@@ -146,14 +146,14 @@
                                             <strong>€&#32; {{ balance.price }}</strong>
                                         </div>
                                         <div class="Categories-block Categories-button">
-                                            <a class="btn btn_primary" href="#">
-                                                <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
-                                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                            <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                                <a class="btn btn_primary" href="#">
+                                                    <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
                                                     {% csrf_token %}
                                                     <input type="hidden" name="data-id" value="{{ balance.id }}">
                                                     <span class="submitter btn-content">{% trans 'Buy' %}</span>
-                                                </form>
-                                            </a>
+                                                </a>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
