@@ -1,18 +1,19 @@
 # fmt: off
 from app_basket.models import Basket  # isort:skip
-from app_orders.models import Orders  # isort:skip
+from app_orders.models import Orders, OrderItems  # isort:skip
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin  # isort:skip
 from django.core.exceptions import BadRequest  # isort:skip
 from django.http import HttpResponseRedirect  # isort:skip
 from django.shortcuts import redirect  # isort:skip
-from django.urls import reverse, reverse_lazy  # isort:skip
+from django.urls import reverse_lazy  # isort:skip
 from django.utils.translation import gettext_lazy as _  # isort:skip
 from django.views import generic  # isort:skip
 from django.views.generic import FormView  # isort:skip
 from django.views.generic.base import ContextMixin  # isort:skip
-from main.views import PageInfoMixin  # isort:skip
+from main.views import PageInfoMixin, CategoryMixin  # isort:skip
 from services.auth import registration  # isort:skip
 from services.basket import complete_order, get_order_summary  # isort:skip
+from services.cache import order_availability_cache_clear
 from services.financial import order_payment  # isort:skip
 from services.utils import update_instance_from_form  # isort:skip
 
@@ -59,7 +60,7 @@ class BasketRequiredMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderMixin(OrderBaseMixin, ContextMixin):
+class OrderMixin(CategoryMixin, OrderBaseMixin, ContextMixin):
     """Миксин работы с Заказами и добавления данных по его этапам."""
 
     template_name = "app_orders/order_create.html"
@@ -264,6 +265,7 @@ class OrderConfirmationView(
         self.order.save(
             force_update=True, update_fields=["comment", "total_sum", "confirmed"]
         )
+        order_availability_cache_clear(session_id=self.request.session.session_key)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -287,12 +289,13 @@ steps_links = (
 )
 
 
-class OrderPaymentView(FormView):
+class OrderPaymentView(CategoryMixin, PageInfoMixin, FormView):
     """
     View для отдельной оплаты заказа, если этот шаг был пропущен при
     создании заказа.
     """
 
+    page_title = _('Order payment')
     form_class = OrderStep3Form
     template_name = "app_orders/payment_step.html"
     success_url = "ordershistory"
@@ -310,3 +313,26 @@ class OrderPaymentView(FormView):
                 form.add_error("bank_account", response["message"])
         context["form"] = form
         return self.render_to_response(context)
+
+
+class OrderDetailView(CategoryMixin, PageInfoMixin, generic.DetailView):
+    """Представление детальной страницы заказа"""
+    model = Orders
+    context_object_name = 'order'
+
+    @property
+    def page_title(self):
+        return '{} № {} details'.format(_('Order'), self.get_object().id)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('delivery', 'payment', 'user__profile')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        items = OrderItems.objects.filter(order_id=self.object)\
+            .select_related('seller', 'good__category')
+        context.update({
+            'order_items': items,
+        })
+        return context

@@ -1,0 +1,26 @@
+{% extends 'admin/base.html' %}
+{% load i18n static %}
+
+{% block extrahead %}{{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">{% endblock %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        ›
+        <a href="{% url 'admin:object_generation' %}">{% trans 'Object generation' %}</a>
+        › {{ view.objects_name }} {% trans 'generation' %}
+    </div>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    {% include 'js_scripts.html' %}
+{% endblock footer %}

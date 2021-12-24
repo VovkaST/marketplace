@@ -1,101 +1,115 @@
 {% extends 'base.html' %}
-{% load i18n cache static %}
+{% load i18n cache static humanize catalog_tags %}
 
 {% block content %}
 <div class="Middle Middle_top">
     <div class="Middle-top">
-      <div class="wrap">
-        <div class="Middle-header">
-          <h1 class="Middle-title">Catalog Megano
-          </h1>
-          <ul class="breadcrumbs Middle-breadcrumbs">
-            <li class="breadcrumbs-item"><a href="index.html">home</a>
-            </li>
-            <li class="breadcrumbs-item breadcrumbs-item_current"><span>Catalog</span>
-            </li>
-          </ul>
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">{% trans 'Catalog' %} Megano</h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Catalog' %}</span></li>
+                </ul>
+            </div>
         </div>
-      </div>
     </div>
 
 
-<div class="Section Section_column Section_columnLeft">
-      <div class="wrap">
-        <div class="Section-column">
-          <div class="Section-columnSection">
-            <header class="Section-header">
-              <strong class="Section-title">Filter
-              </strong>
-            </header>
-            <div class="Section-columnContent">
-              <form class="form" action="" method="get">
-               {{ filterset.form.as_p }}
-               <input type="submit" />
-               </form>
-            </div>
-          </div>
-        </div>
-      </div>
-</div>
-
-<!--<form action="" method="get">-->
-<!--    {{ filterset.form.as_p }}-->
-<!--    <input type="submit" />-->
-<!--</form>-->
-
-<div class="Section-content">
-<ul>
-     <div class="Cards">
-    {% for good in goods_list %}
-    <li>
-    <div class="Cards">
-            <div class="Card"><a class="Card-picture" href="#"><img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/></a>
-              <div class="Card-content">
-                  название {{ good.name }} - продажи {{ good.sales }} - отзывы {{ good.reviews_count }}
-                  -в наличии{{ good.on_balance }} - есть скидка {{ good.on_sale }}
-                <strong class="Card-title"><a href="product.html">{{ good.name }}</a>
-                </strong>
-                <div class="Card-description">
-                  <div class="Card-cost"><span class="Card-price">{{ good.min_price }}</span>
-                  </div>
-                  <div class="Card-category">Games / xbox
-                  </div>
-                  <div class="Card-hover">
-                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a>
-                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/></a>
-                      <a class="Card-btn" href="#"><img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
-                  </div>
+    <div class="Section Section_column Section_columnLeft">
+        <div class="wrap">
+            <div class="Section-column">
+                <div class="Section-columnSection">
+                    <header class="Section-header">
+                        <strong class="Section-title">{% trans 'Filter' %}</strong>
+                    </header>
+                    <div class="Section-columnContent">
+                        <form class="form" action="" method="get">
+                            {{ filterset.form.as_p }}
+                            <div class="buttons">
+                                <button type="submit" class="btn btn_square btn_dark btn_narrow">{% trans 'Filter' %}</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-              </div>
-<!--              <div class="Card-sale">-60%-->
-              </div>
             </div>
-    </li>
-    {% endfor %}
-     </div>
-</ul>
+            <div class="Section-content">
+                <div class="Cards">
+                    {% for good in goods_list %}
+                        <div class="Card">
+                            <a class="Card-picture" href="#">
+                                <img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/>
+                            </a>
+                            <div class="Card-content">
+                                <strong class="Card-title">
+                                    <a href="{% url 'prod_detail' good.id %}">{{ good.name }}</a>
+                                </strong>
+                                <div class="Card-description">
+                                    <div class="Card-cost">
+                                        <span class="Card-price">&#8381;{{ good.min_price|intcomma }}</span>
+                                    </div>
+                                    <div class="Card-category">{{ good.category }}</div>
+                                    <div class="Card-hover">
+                                        <a class="Card-btn" href="#">
+                                            <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
+                                        </a>
+                                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="data-id" value="{{ good.balance_id }}">
+                                            <a class="Card-btn submitter" href="#">
+                                                <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                                            </a>
+                                        </form>
+                                        <a class="Card-btn" href="compare.html">
+                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if is_paginated %}
+                    <div class="Pagination">
+                        <div class="Pagination-ins">
+                            {% if page_obj.has_previous %}
+                                <a class="Pagination-element Pagination-element_prev" href="?{% param_replace page=page_obj.previous_page_number %}">
+                                    <img src={% static "/img/icons/prevPagination.svg" %} alt="prevPagination"/>
+                                </a>
+                            {% endif %}
+                            {% if page_obj.has_previous %}
+                                {% if page_obj.number >= 3 and page_obj.paginator.num_pages >= 3 %}
+                                    <a class="Pagination-element" href="?{% param_replace page=page_obj.number|add:-2 %}">
+                                        <span class="Pagination-text">{{ page_obj.number|add:-2 }}</span>
+                                    </a>
+                                {% endif %}
+                                <a class="Pagination-element" href="?{% param_replace page=page_obj.previous_page_number %}">
+                                    <span class="Pagination-text">{{ page_obj.previous_page_number }}</span>
+                                </a>
+                            {% endif %}
+                            <a class="Pagination-element Pagination-element_current" href="#">
+                                <span class="Pagination-text">{{ page_obj.number }}</span>
+                            </a>
+                            {% if page_obj.has_next %}
+                                <a class="Pagination-element" href="?{% param_replace page=page_obj.next_page_number %}">
+                                    <span class="Pagination-text">{{ page_obj.next_page_number }}</span>
+                                </a>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                {% if page_obj.number == 1 and page_obj.paginator.num_pages >= 3 %}
+                                    <a class="Pagination-element" href="?{% param_replace page=3 %}">
+                                        <span class="Pagination-text">3</span>
+                                    </a>
+                                {% endif %}
+                                <a class="Pagination-element Pagination-element_prev" href="?{% param_replace page=page_obj.next_page_number %}">
+                                    <img src={% static "/img/icons/nextPagination.svg" %} alt="nextPagination"/>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
-
-{% load catalog_tags %}
-
-{% if is_paginated %}
-  {% if page_obj.has_previous %}
-    <a href="?{% param_replace page=1 %}">First</a>
-    {% if page_obj.previous_page_number != 1 %}
-      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
-    {% endif %}
-  {% endif %}
-
-  Page {{ page_obj.number }} of {{ paginator.num_pages }}
-
-  {% if page_obj.has_next %}
-    {% if page_obj.next_page_number != paginator.num_pages %}
-      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
-    {% endif %}
-    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
-  {% endif %}
-
-  <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
-{% endif %}
-
 {% endblock %}

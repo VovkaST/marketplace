@@ -1,5 +1,4 @@
-import datetime
-
+from django.utils import timezone
 from loguru import logger
 from profiles.models import ViewHistory
 
@@ -8,14 +7,14 @@ def add_goods_to_view_history(user, goods):
     """
     Function to used to add goods to view history
     """
-    try:
-        view_history = ViewHistory.objects.get(user=user, goods=goods)
-        view_history.viewed_at = datetime.datetime.now()
-        view_history.save()
-    except ViewHistory.DoesNotExist:
-        ViewHistory.objects.create(
-            user=user, goods=goods, viewed_at=datetime.datetime.now()
-        )
+    filters = {
+        'user': user,
+        'goods': goods,
+    }
+    defaults = {
+        'viewed_at': timezone.now()
+    }
+    ViewHistory.objects.get_or_create(defaults=defaults, **filters)
 
 
 def delete_goods_from_view_history(user, goods):

@@ -47,10 +47,10 @@ class Stocks(models.Model):
     method = models.ForeignKey(
         StockMethod, verbose_name=_('Stock method'), on_delete=models.CASCADE, related_name='stock_method'
     )
-    amount = models.DecimalField(_('Stock amount'))
-    index_min = models.DecimalField(_('Min stock index'))
-    index_max = models.DecimalField(_('Max stock index'))
-    since = models.DateTimeField(default=timezone.now())
+    amount = models.DecimalField(_('Stock amount'), decimal_places=10, max_digits=18)
+    index_min = models.DecimalField(_('Min stock index'), decimal_places=10, max_digits=18)
+    index_max = models.DecimalField(_('Max stock index'), decimal_places=10, max_digits=18)
+    since = models.DateTimeField(default=timezone.now)
     until = models.DateTimeField()
     active = models.BooleanField(default=True)
 

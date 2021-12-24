@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block content %}
+<div class="Middle Middle_top">
+    <div class="Middle-top">
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">Megano {% trans 'Product' %}
+                </h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a>
+                    </li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Product' %}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="Section">
+        <div class="wrap">
+            <div class="Product">
+                <div class="ProductCard">
+                    <div class="ProductCard-look">
+                        <div class="ProductCard-photo">
+                            <div class="ProductCard-sale">
+                                {{ detail_product.sales }}%
+                            </div>
+                            <img src="{{ detail_product.good_images.first.image.url }}" alt="card.jpg"/>
+                        </div>
+
+                        <div class="ProductCard-picts">
+                            <a class="ProductCard-pict ProductCard-pict_ACTIVE" href={% static "/img/content/home/bigGoods.png" %}>
+                                <img src={% static "/img/content/home/bigGoods.png" %} alt="bigGoods.png"/>
+                            </a>
+
+                            <a class="ProductCard-pict" href={% static "/img/content/home/slider.png" %}>
+                                <img src={% static "/img/content/home/slider.png" %} alt="slider.png"/>
+                            </a>
+
+                            <a class="ProductCard-pict" href={% static "/img/content/home/videoca.png" %}>
+                                <img src={% static "/img/content/home/videoca.png" %} alt="videoca.png"/>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ProductCard-desc">
+                        <div class="ProductCard-header">
+                            <h2 class="ProductCard-title">
+                                {{ detail_product.name }}
+                            </h2>
+
+                            <div class="ProductCard-info">
+                                <div class="ProductCard-cost">
+                                    <div class="ProductCard-price">&#8381;{{ balance.price }}</div>
+                                    <div class="ProductCard-priceOld"></div>
+                                </div>
+
+                                <div class="ProductCard-compare">
+                                    <a class="btn btn_default" href="#">
+                                        <img class="btn-icon" src={% static "/img/icons/card/change.svg" %} alt="change.svg"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ProductCard-text"></div>
+                        <div class="ProductCard-cart">
+                            <div class="ProductCard-cartElement ProductCard-cartElement_amount">
+                                <div class="Amount Amount_product">
+                                    <button class="Amount-remove" type="button"></button>
+                                    <input class="Amount-input form-input" name="amount" type="text" value="1"/>
+                                    <button class="Amount-add" type="button"></button>
+                                </div>
+                            </div>
+                            <div class="ProductCard-cartElement">
+                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                    <a class="btn btn_primary submitter" href="#">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="data-id" value="{{ detail_product.id }}">
+                                        <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
+                                        <span class="submitter btn-content">Add To Cart</span>
+                                    </a>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="ProductCard-footer">
+                            <div class="ProductCard-tags">
+                                <strong class="ProductCard-tagsTitle">
+                                    {% trans 'Tags' %}:
+                                </strong>
+                                <a href="#">{% trans 'Accesories' %}</a>,
+                                <a href="#">{% trans 'Creative' %}</a>,
+                                <a href="#">{% trans 'Design' %}</a>,
+                                <a href="#">{% trans 'Gaming' %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="Tabs Tabs_default">
+                    <div class="Tabs-links">
+                        <a class="Tabs-link_ACTIVE Tabs-link" href="#description">
+                            <span>{% trans 'Description' %}</span>
+                        </a>
+                        <a class="Tabs-link" href="#sellers">
+                            <span>{% trans 'Sellers' %}</span>
+                        </a>
+                        <a class="Tabs-link" href="#addit">
+                            <span>{% trans 'Additional info' %}</span>
+                        </a>
+                        <a class="Tabs-link" href="#reviews">
+                            <span>{% trans 'Reviews' %} (3)</span>
+                        </a>
+                    </div>
+                    <div class="Tabs-wrap">
+                        <div class="Tabs-block" id="description">
+                            <h2>{% trans "Description" %}
+                            </h2>
+                            <p>{{ detail_product.description.first }}</p>
+                            <div class="clearfix">
+                            </div>
+                            <div class="table">
+                                <table>
+                                    <tr>
+                                        <th>{% trans 'Parameter' %}</th>
+                                        <th>{% trans 'Value' %}</th>
+                                    </tr>
+                                    {% for item in description %}
+                                        <tr>
+                                            <td>{{ item.feature__value }}</td>
+                                            <td>{{ item.value }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                        <div class="Tabs-block" id="sellers">
+                            {% for balance in other_balances %}
+                                <div class="Categories Categories_product">
+                                    <div class="Categories-row">
+                                        <div class="Categories-block Categories-block_info">
+                                            <div class="Categories-info">
+                                                <strong> {{ balance.seller__name }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="Categories-splitProps"></div>
+                                        <div class="Categories-block Categories-price">
+                                            <strong>€&#32; {{ balance.price }}</strong>
+                                        </div>
+                                        <div class="Categories-block Categories-button">
+                                            <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                                <a class="btn btn_primary" href="#">
+                                                    <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="data-id" value="{{ balance.id }}">
+                                                    <span class="submitter btn-content">{% trans 'Buy' %}</span>
+                                                </a>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="Tabs-block" id="reviews">
+                            <header class="Section-header">
+                                <h3 class="Section-title">{% trans 'Reviews quantity' %}: {{ detail_product.good_review.count }}
+                                    {{ bal.good.id }}
+                                </h3>
+                            </header>
+                            <div class="Comments">
+                                <div class="Comment">
+                                    <div class="Comment-column Comment-column_pict">
+                                        <div class="Comment-avatar"></div>
+                                    </div>
+                                    {% for comments in detail_product.good_review.all %}
+                                        <div class="Comment-column">
+                                            <header class="Comment-header">
+                                                <div>
+                                                    <strong class="Comment-title">{% trans 'Name' %}: {{ comments.user }} {% trans 'rate' %}:
+                                                        {{ comments.star }}
+                                                    </strong><span class="Comment-date">{{ comments.crated_at }}</span>
+                                                </div>
+                                            </header>
+                                            <div class="Comment-content">{{ comments.comment }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <header class="Section-header Section-header_product">
+                                <h3 class="Section-title">{% trans 'Add review' %}</h3>
+                            </header>
+                            <div class="Tabs-addComment">
+                                <form class="form" action="{% url 'add_review' detail_product.pk %}" method="post" id="formReview">
+                                    {% csrf_token %}
+                                    {{ review_form.as_p }}
+                                    <div class="form-group">
+                                        <button class="btn btn_muted" type="submit">{% trans 'Submit Review' %}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

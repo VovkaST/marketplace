@@ -7,15 +7,13 @@ from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from marketplace.settings import BASE_DIR
+from marketplace.settings import env
 
 
 class AuthTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        environ.Env.read_env(os.path.join(BASE_DIR.parent.parent, ".env"))
-        env = environ.Env(HOST_URL=(str, "http://teamdiploma.ru"))
         cls.host_url = env("HOST_URL")
         cls.driver = webdriver.Chrome()
 

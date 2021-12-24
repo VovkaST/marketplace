@@ -1,4 +1,6 @@
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import ContextMixin, TemplateView
+
 from services.cache_settings import cache_settings
 from services.main_page import get_banners, get_categories, get_top_goods
 
@@ -25,7 +27,7 @@ class CacheSettingsMixin(ContextMixin):
         return context
 
 
-class BannerMixin(ContextMixin):
+class BannerMixin(CacheSettingsMixin, ContextMixin):
     """Выбор баннеров и занесение их в context"""
 
     def get_context_data(self, **kwargs):
@@ -35,7 +37,7 @@ class BannerMixin(ContextMixin):
         return context
 
 
-class CategoryMixin(ContextMixin):
+class CategoryMixin(CacheSettingsMixin, ContextMixin):
     """Получение всех категорий для вывода на главную страницу"""
 
     def get_context_data(self, **kwargs):
@@ -54,7 +56,14 @@ class TopGoodsMixin(ContextMixin):
         return context
 
 
-class MarketMain(TemplateView, BannerMixin, CategoryMixin, TopGoodsMixin, CacheSettingsMixin):
+class MarketMain(BannerMixin, CategoryMixin, TopGoodsMixin, TemplateView):
     """Представление главной страницы магазина"""
 
     template_name = "main/index.html"
+
+
+class ContactsMain(PageInfoMixin, CategoryMixin, TemplateView):
+    """Представление страницы контактов магазина"""
+
+    template_name = "main/contacts.html"
+    page_title = _('Contacts')

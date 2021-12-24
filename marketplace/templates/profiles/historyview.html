@@ -9,7 +9,7 @@
                 <h1 class="Middle-title">{% trans 'Views history' %}
                 </h1>
                 <ul class="breadcrumbs Middle-breadcrumbs">
-                    <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">{% trans 'Home' %}</a>
                     </li>
                     <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Views history' %}</span>
                     </li>
@@ -34,13 +34,16 @@
                             {% endif %}
                         </a>
                         <div class="Card-content">
-                            <strong class="Card-title"><a href="#">{{ product.name }}</a>
+                            <strong class="Card-title">
+                                <a href="#">{{ product.name }}</a>
                             </strong>
                             <div class="Card-description">
-                                <div class="Card-cost"><span class="Card-priceOld">{{ product.biggest_price }}</span><span
-                                        class="Card-price">{{ product.lowest_price }}</span>
+                                <div class="Card-cost">
+                                    <span class="Card-priceOld">{{ product.biggest_price }}</span>
+                                    <span class="Card-price">{{ product.lowest_price }}</span>
                                 </div>
-                                <div class="Card-category">{{ product.category }}
+                                <div class="Card-category">
+                                    {{ product.category }}
                                 </div>
                                 <div class="Card-hover">
                                     <a class="Card-btn" href="{# url add to favorites #}">
@@ -58,7 +61,8 @@
                             </div>
                         </div>
                         {% if product.prices_diff %}
-                        <div class="Card-sale">{{ product.prices_diff }}
+                        <div class="Card-sale">
+                            {{ product.prices_diff }}
                         </div>
                         {% endif %}
                     </div>

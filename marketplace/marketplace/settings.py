@@ -13,13 +13,16 @@ import os
 from decimal import Decimal
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 import environ
 
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True),
-    ALLOWED_HOSTS=(str, "teamdiploma.ru"),
+    ALLOWED_HOSTS=(str, "127.0.0.1,teamdiploma.ru"),
     SECRET_KEY=(str, ""),
+    HOST_URL=(str, "teamdiploma.ru")
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,10 +51,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "main.apps.MainConfig",
     "profiles.apps.UsersConfig",
     "services.apps.ServicesConfig",
     "app_sellers.apps.AppSellersConfig",
+    "app_stocks.apps.AppStocksConfig",
     "app_basket.apps.AppBasketConfig",
     "app_import.apps.AppLoaderConfig",
     "catalog.apps.CatalogConfig",
@@ -64,6 +69,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'django.middleware.locale.LocaleMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -133,6 +139,11 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('ru', _('Russian')),
+)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

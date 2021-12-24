@@ -2,25 +2,25 @@
 {% load static i18n %}
 
 {% block content %}
-  <div class="Middle Middle_top">
+<div class="Middle Middle_top">
     <div class="Middle-top">
-      <div class="wrap">
-        <div class="Middle-header">
-          <h1 class="Middle-title">{% trans 'Profile' %}
-          </h1>
-          <ul class="breadcrumbs Middle-breadcrumbs">
-            <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
-            </li>
-            <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Profile' %}</span>
-            </li>
-          </ul>
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">{% trans 'Profile' %}
+                </h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">{% trans 'Home' %}</a>
+                    </li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Profile' %}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </div>
     <div class="Section Section_column Section_columnLeft">
-      <div class="wrap">
+        <div class="wrap">
 
-        {% include 'profiles/navigation.html' %}
+            {% include 'profiles/navigation.html' %}
 
         <div class="Section-content">
           <div class="Profile">
@@ -33,7 +33,6 @@
             {% endif %}
           </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 {% endblock %}

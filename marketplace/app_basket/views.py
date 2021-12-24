@@ -4,7 +4,7 @@ from django.views import generic
 
 from main.views import (
     CacheSettingsMixin,
-    PageInfoMixin,
+    PageInfoMixin, CategoryMixin,
 )
 from services.basket import (
     add_item_to_basket,
@@ -34,7 +34,7 @@ class BasketMetaMixin:
         return meta
 
 
-class BasketView(CacheSettingsMixin, PageInfoMixin, generic.TemplateView):
+class BasketView(CategoryMixin, PageInfoMixin, generic.TemplateView):
     template_name = 'app_basket/basket_detail.html'
     page_title = _('Basket')
 
