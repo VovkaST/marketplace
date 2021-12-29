@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static cache i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block content %}
+{% cache cache_settings.about_life_time about LANGUAGE_CODE %}
+    <div class="Middle Middle_top">
+        <div class="Middle-top">
+            <div class="wrap">
+                <div class="Middle-header">
+                    <h1 class="Middle-title">{% trans 'About Megano' %}</h1>
+                    <ul class="breadcrumbs Middle-breadcrumbs">
+                        <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
+                        <li class="breadcrumbs-item breadcrumbs-item_current"><span>About Us</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="Section Section_column Section_columnLeft Section_columnWide">
+            <div class="wrap">
+                <div class="Section-column">
+                    {% include 'main/panel_why_we_are.html' %}
+                    <div class="Section-columnSection Section-columnSection_mark">
+                        <div class="media media_middle">
+                            <div class="media-image">
+                                <img src="{% static '/img/icons/contacts/phone.svg' %}" alt="phone.svg"/>
+                            </div>
+                            <div class="media-content">
+                                {% trans 'Phone' %}:&#32;<nobr>+8 (200) 800-2000-600</nobr><br>
+                                {% trans 'Mobile' %}:&#32;<nobr>+8 (200) 800-2000-650</nobr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Section-columnSection Section-columnSection_mark">
+                        <div class="media media_middle">
+                            <div class="media-image">
+                                <img src="{% static '/img/icons/contacts/address.svg' %}" alt="address.svg"/>
+                            </div>
+                            <div class="media-content">
+                              Megano Business Center,
+                              0012 United States, Los Angeles
+                              Creative Street 15/4
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Section-columnSection Section-columnSection_mark">
+                        <div class="media media_middle">
+                            <div class="media-image">
+                                <img src="{% static '/img/icons/contacts/mail.svg' %}" alt="mail.svg"/>
+                            </div>
+                            <div class="media-content">
+                                {% trans 'General' %}: hello@ninzio.com<br>
+                                {% trans 'Editor' %}: editor@ninzio.com
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Section-columnSection">
+                        {% include 'main/panel_follow_us.html' %}
+                    </div>
+                </div>
+                <div class="Section-content">
+                    <div class="row row_verticalCenter row_maxHalf">
+                        <div class="row-block">
+                          <div class="pict">
+                              <img src="{% static '/img/content/home/bigGoods.png' %}" alt="bigGoods.png"/>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="row-block">
+                        <h2>{% trans 'Megano Store Hystory' %}</h2>
+                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem.</p>
+                        <ul>
+                            <li>Lorem ipsum dolor sit amet, consectetuer</li>
+                            <li>adipiscing elit doli. Aenean commodo ligula</li>
+                            <li>eget dolor. Aenean massa. Cumtipsu sociis</li>
+                            <li>natoque penatibus et magnis dis parturient</li>
+                            <li>montesti, nascetur ridiculus mus. Donec</li>
+                            <li>quam felis, ultricies nec, pellentesque eutu</li>
+                        </ul>
+                    </div>
+                    {% include 'main/popular_products.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endcache %}
+{% endblock content %}

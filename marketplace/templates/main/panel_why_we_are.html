@@ -1,0 +1,48 @@
+{% load static i18n %}
+
+{% block content %}
+    <div class="Section-columnSection Section-columnSection_mark">
+        <div class="media media_advantage">
+            <div class="media-image">
+                <img src="{% static '/img/icons/advantages/shipping.svg' %}" alt="shipping.svg"/>
+            </div>
+            <div class="media-content">
+                <strong class="media-title">{% trans 'Shipping & Returns' %}</strong>
+                <p class="media-text">{% trans 'World wide shipping' %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="Section-columnSection Section-columnSection_mark">
+        <div class="media media_advantage">
+            <div class="media-image">
+                <img src="{% static '/img/icons/advantages/moneyBack.svg' %}" alt="moneyBack.svg"/>
+            </div>
+            <div class="media-content">
+                <strong class="media-title">{% trans 'Money Back' %}</strong>
+                <p class="media-text">{% trans 'Guaranted payments' %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="Section-columnSection Section-columnSection_mark">
+        <div class="media media_advantage">
+            <div class="media-image">
+                <img src="{% static '/img/icons/advantages/support.svg' %}" alt="support.svg"/>
+            </div>
+            <div class="media-content">
+                <strong class="media-title">{% trans 'Support Policy' %}</strong>
+                <p class="media-text">{% trans 'Fast support team' %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="Section-columnSection Section-columnSection_mark">
+        <div class="media media_advantage">
+            <div class="media-image">
+                <img src="{% static '/img/icons/advantages/quality.svg' %}" alt="quality.svg"/>
+            </div>
+            <div class="media-content">
+                <strong class="media-title">{% trans 'Quality Guarantee' %}</strong>
+                <p class="media-text">{% trans 'Best guaranted items' %}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

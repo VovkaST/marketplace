@@ -1,21 +1,12 @@
 import django_filters
-from app_sellers.models import Balances, Goods
-from django.db.models.functions import Coalesce
+
+from app_sellers.models import Goods
 from django.utils.translation import gettext as _
 from django.views.generic import ListView
 from django_filters.widgets import BooleanWidget, LinkWidget, RangeWidget
 
-# fmt: off
-from django.db.models import (
-    Count,
-    Exists,
-    Min,
-    OuterRef,
-    Sum,
-    Value,
-)  # isort:skip
-
 from main.views import CategoryMixin, PageInfoMixin
+from services.goods import GoodsMinPriceMixin
 
 
 class CatalogFilter(django_filters.FilterSet):
@@ -55,20 +46,10 @@ class FilteredListView(CategoryMixin, PageInfoMixin, ListView):
         return context
 
 
-class CatalogView(FilteredListView):
-
-    # модель Balances вместо других моделей используется для отладки, пока нет моделей GoodsInStocks и Reviews
-
-    # здесь должно быть  stocks_subquery = GoodsInStocks.objects.filter(good=OuterRef('pk'))
-    stocks_subquery = Balances.objects.filter(good=OuterRef("pk"))
-
-    #               здесь должно быть reviews_count=Count("reviews_count")
-    queryset = Goods.objects.annotate(
-        reviews_count=Count("good_balance"),
-        min_price=Min("good_balance__price"),
-        on_sale=Exists(stocks_subquery),
-        sum_balance=Coalesce(Sum("good_balance__quantity"), Value(0)),
-    ).filter(good_balance__isnull=False)
+class CatalogView(GoodsMinPriceMixin, FilteredListView):
+    queryset = Goods.objects\
+        .filter(good_balance__isnull=False)\
+        .values('id', 'name', 'category__name')
 
     template_name = "catalog/catalog.html"
     context_object_name = "goods_list"

@@ -76,6 +76,7 @@ class GeneratorBaseView(FormView):
             self.generate_objects(**form.cleaned_data)
         except Exception as exc:
             error = f'{self.objects_name.capitalize()} generation error: {exc.args[0]}'
+            logger.error(error)
         response = {
             "success": not error,
             "message": error or f"{self.objects_name}s successfully created!",

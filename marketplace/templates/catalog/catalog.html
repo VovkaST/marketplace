@@ -46,9 +46,9 @@
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
-                                        <span class="Card-price">&#8381;{{ good.min_price|intcomma }}</span>
+                                        <span class="Card-price">&#8381;{{ good.price|intcomma }}</span>
                                     </div>
-                                    <div class="Card-category">{{ good.category }}</div>
+                                    <div class="Card-category">{{ good.category__name }}</div>
                                     <div class="Card-hover">
                                         <a class="Card-btn" href="#">
                                             <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>

@@ -6,12 +6,13 @@
     <div class="Middle-top">
         <div class="wrap">
             <div class="Middle-header">
-                <h1 class="Middle-title">{% trans 'Payment' %}
-                </h1>
+                <h1 class="Middle-title">{% trans 'Payment' %}</h1>
                 <ul class="breadcrumbs Middle-breadcrumbs">
-                    <li class="breadcrumbs-item"><a href="index.html">{% trans 'Home' %}</a>
+                    <li class="breadcrumbs-item">
+                        <a href="{% url 'main' %}">{% trans 'Home' %}</a>
                     </li>
-                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Payment' %}</span>
+                    <li class="breadcrumbs-item breadcrumbs-item_current">
+                        <span>{% trans 'Payment' %}</span>
                     </li>
                 </ul>
             </div>
@@ -36,14 +37,16 @@
             </div>
             <div class="form-group">
                 <label for="{{ form.bank_account.id_for_label }}" class="form-label">{{ form.bank_account.label }}</label>
-                {{ form.bank_account }}
+                <div id="bank_account__number" class="form-input Payment-bill">
+                    {{ form.bank_account }}
+                </div>
                 <div>
                     <small id="{{ form.bank_account.id_for_label }}" class="text-muted">
                         {{ form.bank_account.help_text }}
                         {% if form.bank_account.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.bank_account.errors.as_text }}
-                        </div>
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.bank_account.errors.as_text }}
+                            </div>
                         {% endif %}
                     </small>
                 </div>

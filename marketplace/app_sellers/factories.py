@@ -4,7 +4,9 @@ import factory
 
 # fmt: off
 from app_sellers.models import Balances, Goods, GoodsDescriptionsValues, Sellers  # isort:skip
-from main.factories import GoodCategoryFactory  # isort:skip
+from app_sellers.utils import get_random_category, get_random_seller, get_random_good  # isort:skip
+
+
 # fmt: on
 
 
@@ -50,7 +52,7 @@ class GoodsFactory(factory.django.DjangoModelFactory):
 
     pk = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"Good name {n}")
-    category = factory.SubFactory(GoodCategoryFactory)
+    category_id = factory.Sequence(get_random_category)
 
 
 class BalancesFactory(factory.django.DjangoModelFactory):
@@ -60,9 +62,8 @@ class BalancesFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Balances
-        django_get_or_create = ("seller", "good")
 
-    seller = factory.SubFactory(SellersFactory)
-    good = factory.SubFactory(GoodsFactory)
+    seller_id = factory.Sequence(get_random_seller)
+    good_id = factory.Sequence(get_random_good)
     quantity = factory.Sequence(lambda n: 10 * (n + 1))
     price = factory.Sequence(lambda n: Decimal(500) * (n + 1))

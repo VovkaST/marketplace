@@ -1,0 +1,42 @@
+{% load static i18n %}
+
+{% block content %}
+    <header class="Section-header">
+        <h2 class="Section-title">{% trans 'Popular Products' %}</h2>
+    </header>
+    <div class="Cards">
+        {% for good in top_goods %}
+            <div class="Card">
+                <a class="Card-picture" href="#">
+                    <img src="{% static good.image_url %}" alt="card.jpg"/>
+                </a>
+                <div class="Card-content">
+                    <strong class="Card-title">
+                        <a href="{% url 'prod_detail' good.id %}">{{ good.name }}</a>
+                    </strong>
+                    <div class="Card-description">
+                        <div class="Card-cost">
+                            <span class="Card-price">&#8381;{{ good.price|floatformat:2 }}</span>
+                        </div>
+                        <div class="Card-category">{{ good.category.name }}</div>
+                        <div class="Card-hover">
+                            <a class="Card-btn" href="#">
+                                <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/>
+                            </a>
+                            <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                {% csrf_token %}
+                                <input type="hidden" name="data-id" value="{{ good.balance_id }}">
+                                <a class="Card-btn submitter" href="#">
+                                    <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
+                                </a>
+                            </form>
+                            <a class="Card-btn" href="compare.html">
+                                <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
