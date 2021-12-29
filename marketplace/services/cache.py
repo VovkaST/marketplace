@@ -47,6 +47,8 @@ def basket_cache_clear(session_id: str = None, username: str = None, keys=None):
     :param username: Current user`s name.
     :param keys: Список имен сохраненных переменных.
     """
+    if not keys:
+        keys = ['goods_quantity', 'total_sum', 'items']
     user_key = username or session_id
     cache.delete(make_template_fragment_key('basket', (user_key, get_language())))
     for key in keys:

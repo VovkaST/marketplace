@@ -63,25 +63,25 @@
                             </div>
                         </div>
                         <div class="ProductCard-text"></div>
-                        <div class="ProductCard-cart">
-                            <div class="ProductCard-cartElement ProductCard-cartElement_amount">
-                                <div class="Amount Amount_product">
-                                    <button class="Amount-remove" type="button"></button>
-                                    <input class="Amount-input form-input" name="amount" type="text" value="1"/>
-                                    <button class="Amount-add" type="button"></button>
+                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                            <div class="ProductCard-cart">
+                                <div class="ProductCard-cartElement ProductCard-cartElement_amount">
+                                    <div class="Amount Amount_product">
+                                        <button class="Amount-remove" type="button"></button>
+                                        <input class="Amount-input form-input" name="quantity" type="text" value="1"/>
+                                        <button class="Amount-add" type="button"></button>
+                                    </div>
+                                </div>
+                                <div class="ProductCard-cartElement">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="data-id" value="{{ balance.id }}">
+                                    <a class="btn btn_primary submitter" href="#">
+                                        <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
+                                        <span class="btn-content">Add To Cart</span>
+                                    </a>
                                 </div>
                             </div>
-                            <div class="ProductCard-cartElement">
-                                <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
-                                    <a class="btn btn_primary submitter" href="#">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="data-id" value="{{ detail_product.id }}">
-                                        <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
-                                        <span class="submitter btn-content">Add To Cart</span>
-                                    </a>
-                                </form>
-                            </div>
-                        </div>
+                        </form>
                         <div class="ProductCard-footer">
                             <div class="ProductCard-tags">
                                 <strong class="ProductCard-tagsTitle">
@@ -147,11 +147,11 @@
                                         </div>
                                         <div class="Categories-block Categories-button">
                                             <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
-                                                <a class="btn btn_primary" href="#">
+                                                <a class="btn btn_primary submitter" href="#">
                                                     <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
                                                     {% csrf_token %}
                                                     <input type="hidden" name="data-id" value="{{ balance.id }}">
-                                                    <span class="submitter btn-content">{% trans 'Buy' %}</span>
+                                                    <span class="btn-content">{% trans 'Buy' %}</span>
                                                 </a>
                                             </form>
                                         </div>

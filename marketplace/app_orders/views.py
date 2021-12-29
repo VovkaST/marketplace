@@ -13,7 +13,7 @@ from django.views.generic.base import ContextMixin  # isort:skip
 from main.views import PageInfoMixin, CategoryMixin  # isort:skip
 from services.auth import registration  # isort:skip
 from services.basket import complete_order, get_order_summary  # isort:skip
-from services.cache import order_availability_cache_clear
+from services.cache import basket_cache_clear, order_availability_cache_clear  # isort:skip
 from services.financial import order_payment  # isort:skip
 from services.utils import update_instance_from_form  # isort:skip
 
@@ -265,7 +265,9 @@ class OrderConfirmationView(
         self.order.save(
             force_update=True, update_fields=["comment", "total_sum", "confirmed"]
         )
-        order_availability_cache_clear(session_id=self.request.session.session_key)
+        session_id = self.request.session.session_key
+        basket_cache_clear(session_id=session_id)
+        order_availability_cache_clear(session_id=session_id)
         return HttpResponseRedirect(self.get_success_url())
 
 

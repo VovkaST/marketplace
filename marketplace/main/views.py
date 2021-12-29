@@ -67,3 +67,10 @@ class ContactsMain(PageInfoMixin, CategoryMixin, TemplateView):
 
     template_name = "main/contacts.html"
     page_title = _('Contacts')
+
+
+class AboutUsView(PageInfoMixin, CategoryMixin, TopGoodsMixin, TemplateView):
+    """Представление страницы информации о магазине"""
+
+    template_name = "main/about.html"
+    page_title = _('About us')

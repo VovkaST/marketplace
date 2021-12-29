@@ -1,6 +1,7 @@
 MINUTE = 60
 DAY = 60 * 60 * 24
 WEEK = 60 * 60 * 24 * 7
+WEEK_4 = WEEK * 4
 MINUTES_10 = MINUTE * 10
 
 cache_settings = {
@@ -21,4 +22,7 @@ cache_settings = {
 
     # длительность кэша страницы списка продавцов
     'sellers_list_life_time': DAY,
+
+    # длительность кэша страницы "О нас"
+    'about_life_time': WEEK_4,
 }
