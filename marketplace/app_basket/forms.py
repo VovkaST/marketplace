@@ -10,7 +10,7 @@ class SellerForm(forms.Form):
     seller = forms.ChoiceField(
         widget=Select(
             attrs={
-                'class': 'basket-item__seller',
+                'class': 'basket-item__seller form-select',
                 'url': reverse_lazy('basket_patch_item_seller')
             }
         )
@@ -19,9 +19,9 @@ class SellerForm(forms.Form):
     quantity = forms.IntegerField(
         min_value=1,
         max_value=1,
-        widget=forms.NumberInput(
+        widget=forms.TextInput(
             attrs={
-                'class': 'basket-item__quantity',
+                'class': 'basket-item__quantity Amount-input form-input',
                 'url': reverse_lazy('basket_patch_item_quantity')
             }
         )

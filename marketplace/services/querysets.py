@@ -3,8 +3,6 @@ from typing import List
 from django.db import models
 from django.db.models import Q
 
-from loguru import logger
-
 
 class SoftDeleter(models.QuerySet):
     """QuerySet мягкого удаления объектов"""
@@ -20,6 +18,15 @@ class SoftDeleter(models.QuerySet):
     def recover(self):
         """Восстановить объект (снять отметку об удалении)."""
         self.update(deleted=False)
+
+
+class GoodsQuerySet(SoftDeleter):
+    def existing(self):
+        """Товары, связанные с балансом продавца."""
+        return self.filter(good_balance__isnull=False).distinct()
+
+    def in_category(self, category_id):
+        return self.existing().filter(category=category_id)
 
 
 class BasketQuerySet(models.QuerySet):
@@ -49,6 +56,37 @@ class BasketQuerySet(models.QuerySet):
         :param user_id: Идентификатор пользователя.
         """
         return self.filter(user_id=user_id).delete()
+
+
+class ComparisonQuerySet(models.QuerySet):
+    def user_comparison(self, session: str = None, user_id: int = None):
+        if all([user_id, session]):
+            filters = {
+                'user_id': user_id,
+                'session': session,
+            }
+        elif user_id:
+            filters = {'user_id': user_id}
+        else:
+            filters = {'session': session}
+        return self.filter(**filters)
+
+    def delete_user_comparison(self, session: str, user_id: int):
+        """Удаление списка сравнения пользователя.
+
+        :param user_id: Идентификатор пользователя.
+        :param session: Имя сессии.
+        """
+        return self.filter(Q(user_id=user_id) | Q(session=session)).delete()
+
+    def delete_good_comparison(self, good_id: int, session: str, user_id: int):
+        """Удаление списка сравнения пользователя.
+
+        :param good_id: Идентификатор товара.
+        :param user_id: Идентификатор пользователя.
+        :param session: Имя сессии.
+        """
+        return self.filter(Q(good_id=good_id), Q(user_id=user_id) | Q(session=session)).delete()
 
 
 class OrdersQuerySet(SoftDeleter):

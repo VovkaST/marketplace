@@ -1,10 +1,12 @@
 import django_filters
+from django.shortcuts import get_object_or_404
 
 from app_sellers.models import Goods
 from django.utils.translation import gettext as _
 from django.views.generic import ListView
 from django_filters.widgets import BooleanWidget, LinkWidget, RangeWidget
 
+from main.models import GoodCategory
 from main.views import CategoryMixin, PageInfoMixin
 from services.goods import GoodsMinPriceMixin
 
@@ -15,10 +17,17 @@ class CatalogFilter(django_filters.FilterSet):
     on_balance = django_filters.BooleanFilter(widget=BooleanWidget(), label=_('On balance'))
     on_sale = django_filters.BooleanFilter(widget=BooleanWidget(), label=_('On sale'))
 
-    o = django_filters.OrderingFilter(
-        fields=(_("reviews_count"), _("sales"), _("min_price")),
-        widget=LinkWidget,
+    reviews_filter = django_filters.OrderingFilter(
+        fields=(
+            (_("reviews_count"), _('Top')),
+        ),
+        widget=LinkWidget
     )
+
+    # o = django_filters.OrderingFilter(
+    #     fields=(_("reviews_count"), _("sales"), _("min_price")),
+    #     widget=LinkWidget,
+    # )
 
     class Meta:
         model = Goods
@@ -47,9 +56,7 @@ class FilteredListView(CategoryMixin, PageInfoMixin, ListView):
 
 
 class CatalogView(GoodsMinPriceMixin, FilteredListView):
-    queryset = Goods.objects\
-        .filter(good_balance__isnull=False)\
-        .values('id', 'name', 'category__name')
+    queryset = Goods.objects.existing().values('id', 'name', 'category__name')
 
     template_name = "catalog/catalog.html"
     context_object_name = "goods_list"
@@ -61,3 +68,36 @@ class CatalogView(GoodsMinPriceMixin, FilteredListView):
         if "pk" in self.kwargs:
             queryset = queryset.filter(category__id=self.kwargs["pk"])
         return queryset
+
+    def get_context_data(self, **kwargs):
+        goods_ids = [good['id'] for good in self.object_list.all().values('id')]
+        context = super().get_context_data(goods_ids=goods_ids, **kwargs)
+        return context
+
+
+class CategoryDetailView(CategoryMixin, PageInfoMixin, GoodsMinPriceMixin, ListView):
+    template_name = 'catalog/category_detail.html'
+    context_object_name = 'goods_list'
+    category = None
+
+    def get_category(self):
+        if not self.category:
+            self.category = get_object_or_404(GoodCategory, pk=self.kwargs['pk'])
+        return self.category
+
+    @property
+    def page_title(self):
+        category = self.get_category()
+        if category:
+            return category.name
+
+    def get_context_data(self, **kwargs):
+        category_id = self.kwargs['pk']
+        goods_ids = [good['id'] for good in Goods.objects.in_category(category_id=category_id).values('id')]
+        context = super().get_context_data(goods_ids=goods_ids, **kwargs)
+        context.update({'category': self.get_category()})
+        return context
+
+    def get_queryset(self):
+        category_id = self.kwargs['pk']
+        return Goods.objects.in_category(category_id=category_id).values('id', 'name', 'category__name')

@@ -820,7 +820,7 @@ select + select {
 }
 /*-----------  Формы  -----------*/
 .form {
-  margin-top: 39px;
+  /*margin-top: 39px;*/
   display: block;
   width: 100%;
 }

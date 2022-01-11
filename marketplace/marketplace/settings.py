@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "app_orders.apps.AppOrdersConfig",
     "selenium_tests",
+    "app_comparison.apps.AppComparisonConfig",
 ]
 
 MIDDLEWARE = [
@@ -75,7 +76,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "app_basket.middleware.session_user_data.SessionDataCollector",
+    "services.middleware.session_user_data.SessionDataCollector",
 ]
 
 ROOT_URLCONF = "marketplace.urls"

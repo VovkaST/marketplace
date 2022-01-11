@@ -155,14 +155,17 @@ p.error-browser
                         <li class="menu-item">
                             <a class="menu-link" href="{% url 'catalog' %}">{% trans "Catalog" %}</a>
                         </li>
-                        <li class="menu-item">
-                            <a class="menu-link" href="{% url 'contacts' %}">{% trans "Contacts" %}</a>
-                        </li>
                         {% if request.is_incomplete_order %}
                             <li class="menu-item">
                                 <a class="menu-link" href="{% url 'order_create' %}">{% trans "Purchase" %}</a>
                             </li>
                         {% endif %}
+                        <li class="menu-item">
+                            <a class="menu-link" href="{% url 'contacts' %}">{% trans "Contacts" %}</a>
+                        </li>
+                        <li class="menu-item">
+                            <a class="menu-link" href="{% url 'about' %}">{% trans "About us" %}</a>
+                        </li>
                         {% if request.user.is_superuser %}
                             <li class="menu-item">
                                 <a class="menu-link" href="{% url 'import_data' %}">{% trans "Import data" %}</a>
@@ -173,9 +176,9 @@ p.error-browser
             </nav>
             <div class="row-block">
                 <div class="CartBlock">
-                    <a class="CartBlock-block" href="#">
+                    <a class="CartBlock-block" href="{% url 'comparison' %}">
                         <img class="CartBlock-img" src="{% static 'img/icons/exchange.svg' %}" alt="exchange.svg"/>
-                        <span class="CartBlock-amount">4</span>
+                        <span class="CartBlock-amount" id="comparison__count">{{ request.comparison_count }}</span>
                     </a>
                     <a class="CartBlock-block" href="{% url 'basket' %}">
                         <img class="CartBlock-img" src="{% static 'img/icons/cart.svg' %}" alt="cart.svg"/>
@@ -220,7 +223,7 @@ p.error-browser
                                         <a class="CategoriesButton-arrow" href="#"></a>
                                         <div class="CategoriesButton-submenu">
                                             {% for sub in category.sub_category.all %}
-                                                <a class="CategoriesButton-link" href="#">
+                                                <a class="CategoriesButton-link" href="{% url 'category_catalog' sub.id %}">
                                                     <span class="CategoriesButton-text">{{ sub.name }}</span>
                                                 </a>
                                             {% endfor %}
@@ -228,7 +231,7 @@ p.error-browser
                                     </div>
                                 {% else %}
                                     <div class="CategoriesButton-link">
-                                        <a href="#">
+                                        <a href="{% url 'category_catalog' category.id %}">
                                              <div class="CategoriesButton-icon">
                                                 <img src="{{ category.image.url }}" alt="{{ category.name }} {% trans 'icon' %}"/>
                                             </div>

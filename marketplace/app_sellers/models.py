@@ -4,8 +4,8 @@ from django.utils.translation import gettext as _
 from main.models import GoodCategory
 from services.models import NaturalKeyModel
 from services.querysets import (
+    GoodsQuerySet,
     SellerQuerySet,
-    SoftDeleter,
 )
 from services.utils import slugify
 
@@ -92,8 +92,7 @@ class Goods(models.Model):
         related_name="good_descriptions",
     )
 
-    objects = SoftDeleter.as_manager()
-    # objects = GoodsQuerySet.as_manager()
+    objects = GoodsQuerySet.as_manager()
 
     class Meta:
         db_table = "mp_goods"

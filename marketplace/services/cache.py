@@ -68,3 +68,19 @@ def order_availability_cache_save(session_id: str, value: bool):
 def order_availability_cache_clear(session_id: str):
     """Удалить флаг незавершенного заказа в кэше."""
     return cache.delete(f'order_availability_{session_id}')
+
+
+def get_comparison_cache(session_id: str) -> int:
+    """Получить кэш количества товаров в списке сравнения."""
+    return cache.get(f'comparison_{session_id}')
+
+
+def comparison_cache_save(session: str, value: int):
+    """Сохранить количество товаров в списке сравнения в кэш."""
+    return cache.set(f'comparison_{session}', value)
+
+
+def comparison_cache_clear(session: str):
+    """Удалить список сравнения товаров из кэша."""
+    # todo: кэш страницы
+    return cache.delete(f'comparison_{session}')
