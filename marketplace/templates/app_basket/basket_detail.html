@@ -4,67 +4,83 @@
 {% block csrf %}{% csrf_token %}{% endblock %}
 
 {% block content %}
-
+<div class="Middle Middle_top">
+    <div class="Middle-top">
+        <div class="wrap">
+            <div class="Middle-header">
+                <h1 class="Middle-title">{% trans 'Basket' %}</h1>
+                <ul class="breadcrumbs Middle-breadcrumbs">
+                    <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
+                    <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Basket' %}</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="Section">
         <div class="wrap">
-            <div class="Section-content">
-                <header class="Section-header">
-                    <h2 class="Section-title">{% trans 'Basket' %}</h2>
-                </header>
-            </div>
-
             {% if items %}
                 {% cache cache_settings.basket_life_time basket cache_key LANGUAGE_CODE %}
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">{% trans 'Item name' %}</th>
-                                <th scope="col">{% trans 'Price' %}</th>
-                                <th scope="col">{% trans 'Seller' %}</th>
-                                <th scope="col">{% trans 'Quantity' %}</th>
-                                <th scope="col" colspan="2">{% trans 'Sum' %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <form action="#">
-                                {% for item in items %}
-                                    <tr class="basket-item-row" prefix="{{ item.form.prefix }}">
-                                        <td><a href="{% url 'prod_detail' item.good_id %}">{{ item.name }}</a></td>
-                                        <td class="text-right">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></td>
-                                        <td>{{ item.form.seller }}</td>
-                                        <td>
-                                            {{ item.form.quantity }}
-                                            <div class="note note-red">
-                                                {% trans 'Available to order' %}: <span class="basket-item__available">{{ item.available }}</span>
+                    <form action="#">
+                        {% for item in items %}
+
+                            <div class="Cart-product form basket-item-row">
+                                <div class="Cart-block Cart-block_row">
+                                    <div class="Cart-block Cart-block_pict">
+                                        <a class="Cart-pict" href="#">
+                                            <img class="Cart-img" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
+                                        </a>
+                                    </div>
+                                    <div class="Cart-block Cart-block_info">
+                                        <a href="{% url 'prod_detail' item.good_id %}">{{ item.name }}</a>
+                                        <div class="Cart-desc note note-red">
+                                            {% trans 'Available to order' %}: <span class="basket-item__available">{{ item.available }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="Cart-block Cart-block_price">
+                                      <div class="Cart-price">&#8381;<span class="basket-item__price">{{ item.price|floatformat:2 }}</span></div>
+                                    </div>
+                                </div>
+                                <div class="Cart-block Cart-block_row">
+                                    {{ item.form.reservation_id }}
+                                    <div class="Cart-block Cart-block_seller">
+                                        {{ item.form.seller }}
+                                    </div>
+                                    <div class="Cart-block Cart-block_amount">
+                                        <div class="Cart-amount">
+                                            <div class="Amount">
+                                                <button class="Amount-remove" type="button"></button>
+                                                {{ item.form.quantity }}
+                                                <button class="Amount-add" type="button"></button>
                                             </div>
-                                        </td>
-                                        <td class="text-right">&#8381;<span class="basket-item__sum">{{ item.total_price|floatformat:2 }}</span></td>
-                                        <td class="text-center">
-                                            {{ item.form.reservation_id }}
-                                            <button type="button" id="{{ item.form.prefix }}-delete_button" class="btn btn_danger btn_round delete-row" url="{% url 'basket_delete_item' %}">{% trans 'Delete' %}</button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                {{ items_formset.management_form }}
-                            </form>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="4" class="font-weight-bold">{% trans 'Total' %}</th>
-                                <th class="text-right font-weight-bold basket__total-sum" colspan="2">
-                                    &#8381;{{ total_sum|floatformat:2 }}
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <a href="{% url 'order_create' %}" class="btn btn_round btn_success">{% trans 'Order' %}</a>
+                                        </div>
+                                    </div>
+                                    <div class="Cart-block Cart-block_delete">
+                                        <button type="button" id="{{ item.form.prefix }}-delete_button" class="Cart-delete delete-row" url="{% url 'basket_delete_item' %}">
+                                            <img src="{% static '/img/icons/card/delete.svg' %}" alt="delete.svg"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {{ items_formset.management_form }}
+
+                        <div class="Cart-total">
+                            <div class="Cart-block Cart-block_total">
+                                <strong class="Cart-title">{% trans 'Total' %}:</strong>
+                                <span class="Cart-price basket__total-sum">&#8381;{{ total_sum|floatformat:2 }}</span>
+                            </div>
+                            <div class="Cart-block">
+                                <a href="{% url 'order_create' %}" class="btn btn_success btn_lg">{% trans 'Order' %}</a>
+                            </div>
+                        </div>
+                    </form>
                 {% endcache %}
             {% else %}
                 <p>{% trans 'Your basket is empty!' %}</p>
             {% endif %}
         </div>
     </div>
-
+</div>
 {% endblock content %}
 
 {% block scripts %}

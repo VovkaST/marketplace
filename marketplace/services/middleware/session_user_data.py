@@ -1,8 +1,9 @@
+from app_comparison.models import Comparison
 from services.basket import get_basket_meta
 from services.cache import (
     basket_cache_save,
     get_basket_cache,
-    get_order_availability_cache,
+    get_order_availability_cache, get_comparison_cache, comparison_cache_save,
 )
 from services.orders import is_incomplete_order
 
@@ -16,6 +17,7 @@ class SessionDataCollector:
             request.session.create()
         self.basket_info(request)
         self.order_info(request)
+        self.comparison_info(request)
         return self.get_response(request)
 
     def basket_info(self, request):
@@ -46,3 +48,17 @@ class SessionDataCollector:
         if not incomplete_order_cache:
             incomplete_order_cache = is_incomplete_order(user=request.user)
         request.is_incomplete_order = incomplete_order_cache
+
+    def comparison_info(self, request):
+        """Получает данные о количестве товаров в пользовательском
+        списке сравнения."""
+        session_key = request.session.session_key
+        count = get_comparison_cache(session_id=session_key)
+        if count is None:
+            user_data = {
+                'user_id': request.user.id if request.user.is_authenticated else None,
+                'session': session_key,
+            }
+            count = Comparison.objects.user_comparison(**user_data).count()
+            comparison_cache_save(session=session_key, value=count)
+        request.comparison_count = count

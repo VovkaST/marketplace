@@ -661,13 +661,13 @@ var Amount = function(){
                 e.preventDefault();
                 var $inputThis = $(this).siblings($input).filter($input);
                 var value = parseFloat($inputThis.val());
-                $inputThis.val( value + 1);
+                $inputThis.val( value + 1).change();
             });
             $remove.on('click', function(e){
                 e.preventDefault();
                 var $inputThis = $(this).siblings($input).filter($input);
                 var value = parseFloat($inputThis.val());
-                $inputThis.val(value>0?value - 1:0);
+                $inputThis.val(value>0?value - 1:0).change();
             });
         }
     };
@@ -967,6 +967,11 @@ function setBasketFullness(quantity, total_sum) {
 }
 
 
+function setComparisonCount(count) {
+    $('#comparison__count').text(count);
+}
+
+
 function basketSetSeller($row, data) {
     let formPrefix = $row.attr('prefix');
     $row.find('.basket-item__price').text(data.price);
@@ -982,7 +987,7 @@ function responseBasketAdd(response) {
         setBasketFullness(response.goods_quantity, response.total_sum);
         alert('Товар успешно добавлен в корзину!');
     } else
-        alert(`Ошибка: ${response.error.message}`);
+        alert(`Ошибка: ${response.error}`);
     return response.success;
 }
 
@@ -994,7 +999,7 @@ function responseBasketChangeItemQuantity(response) {
         setBasketRowTotalPrice($row, response.changed_item);
         setBasketTotalSum(response.total_sum);
     } else
-        alert(`Ошибка: ${response.error.message}`);
+        alert(`Ошибка: ${response.error}`);
     return response.success;
 }
 
@@ -1004,7 +1009,7 @@ function responseObjectsGeneration(response) {
         alert(response.message)
         window.location = response.redirect;
     } else
-        alert(`Ошибка: ${response.error.message}`);
+        alert(`Ошибка: ${response.error}`);
     return response.success;
 }
 
@@ -1017,7 +1022,7 @@ function responseBasketChangeItemSeller(response) {
         setBasketRowTotalPrice($row, response.changed_item);
         setBasketTotalSum(response.total_sum);
     } else
-        alert(`Ошибка: ${response.error.message}`);
+        alert(`Ошибка: ${response.error}`);
     return response.success;
 }
 
@@ -1029,8 +1034,38 @@ function basketDeleteItem($row) {
     setBasketFullness(result.jqXHRResponse.goods_quantity, result.jqXHRResponse.total_sum);
     setBasketTotalSum(result.jqXHRResponse.total_sum);
     if (!result.jqXHRResponse.success)
-        alert(`Error: ${result.jqXHRResponse.error.message}`)
+        alert(`Error: ${result.jqXHRResponse.error}`)
     return result.jqXHRResponse.success;
+}
+
+
+function comparisonDeleteItem(columnId, block) {
+    let blockId = block.attr('id');
+    block.find(`.Compare-product[column_id="${columnId}"]`).remove();
+    if (!block.find('.Compare-product[column_id]').length) {
+        block.remove();
+        $(`.Tabs-links .Tabs-link[for="${blockId}"]`).remove();
+    }
+}
+
+
+function responseComparisonDeleteItem(response) {
+    if (response.success) {
+        let columnItem = response.elem,
+            columnId = columnItem.attr('column_id'),
+            block = columnItem.closest('.Compare');
+        comparisonDeleteItem(columnId, block);
+        setComparisonCount(response.count);
+    } else
+        alert(`Ошибка: ${response.error}`);
+}
+
+
+function responseComparisonAddItem(response) {
+    if (response.success) {
+        setComparisonCount(response.count);
+    } else
+        alert(`Ошибка: ${response.error}`);
 }
 
 
@@ -1090,6 +1125,19 @@ $(function() {
     $('.basket-form__add').submit(function() {
         let $form = $(this);
         ajax($form.attr('action'), $form.serialize(), responseBasketAdd);
+        return false;
+    });
+
+    $('.comparison-form__add').submit(function() {
+        let $form = $(this);
+        ajax($form.attr('action'), $form.serialize(), responseComparisonAddItem);
+        return false;
+    });
+
+    $('.comparison-form__remove').submit(function() {
+        let $form = $(this),
+            columnitem = $form.closest('.Compare-product[column_id]')
+        ajax($form.attr('action'), $form.serialize(), responseComparisonDeleteItem, columnitem);
         return false;
     });
 

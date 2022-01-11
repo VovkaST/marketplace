@@ -24,15 +24,17 @@
                                 <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="{% static 'img/icons/card/bookmark.svg' %}"/>
                             </a>
                             <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
-                                {% csrf_token %}
                                 <input type="hidden" name="data-id" value="{{ good.balance_id }}">
                                 <a class="Card-btn submitter" href="#">
                                     <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
                                 </a>
                             </form>
-                            <a class="Card-btn" href="compare.html">
-                                <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
-                            </a>
+                            <form action="{% url 'comparison_add' %}" method="post" class="comparison-form__add">
+                                <input type="hidden" name="good_id" value="{{ good.id }}">
+                                <a class="Card-btn submitter" href="#">
+                                    <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+                                </a>
+                            </form>
                         </div>
                     </div>
                 </div>
