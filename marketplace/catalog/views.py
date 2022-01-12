@@ -70,7 +70,7 @@ class CatalogView(GoodsMinPriceMixin, FilteredListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        goods_ids = [good['id'] for good in self.object_list.all().values('id')]
+        goods_ids = self.object_list.all().values_list('id', flat=True)
         context = super().get_context_data(goods_ids=goods_ids, **kwargs)
         return context
 
@@ -93,7 +93,7 @@ class CategoryDetailView(CategoryMixin, PageInfoMixin, GoodsMinPriceMixin, ListV
 
     def get_context_data(self, **kwargs):
         category_id = self.kwargs['pk']
-        goods_ids = [good['id'] for good in Goods.objects.in_category(category_id=category_id).values('id')]
+        goods_ids = Goods.objects.in_category(category_id=category_id).values_list('id', flat=True)
         context = super().get_context_data(goods_ids=goods_ids, **kwargs)
         context.update({'category': self.get_category()})
         return context

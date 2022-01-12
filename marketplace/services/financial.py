@@ -24,12 +24,11 @@ def order_payment(order_pk: int, card_number: str) -> dict:
 
 
 def get_order_payment_status(card_number: str) -> dict:
-    """
-    :card_number: номер карты покупателя
-    Функция - замена настоящего сервиса оплаты,
+    """Функция - замена настоящего сервиса оплаты,
     если номер карты четный возвращается ответ об успешной оплате
-    в ином случае возвращается ответ о неудаче и одна из трех ошибок
-    :return: dict(status: bool, message: str)
+    в ином случае возвращается ответ о неудаче и одна из трех ошибок.
+    :card_number: номер карты покупателя.
+    :return: dict(status: bool, message: str).
     """
     if int(card_number[-1]) != 0 and (int(card_number) % 2) == 0:
         response = {"status": True, "message": "Success!"}

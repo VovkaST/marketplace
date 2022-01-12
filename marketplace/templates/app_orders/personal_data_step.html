@@ -1,0 +1,80 @@
+{% load i18n %}
+
+<form action="#" method="post" class="form">
+    {% csrf_token %}
+
+    <div class="Order-block Order-block_OPEN">
+        <header class="Section-header Section-header_sm">
+            <h2 class="Section-title">{{ step_name }}</h2>
+        </header>
+        <div class="row">
+            <div class="row-block">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label}}</label>
+                    {{ form.first_name }}
+                    <small id="{{ form.first_name.id_for_label }}" class="text-muted">
+                        {{ form.first_name.help_text }}
+                        {% if form.first_name.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.first_name.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label}}</label>
+                    {{ form.last_name }}
+                    <small id="{{ form.last_name.id_for_label }}" class="text-muted">
+                        {{ form.last_name.help_text }}
+                        {% if form.last_name.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.last_name.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.patronymic.id_for_label }}">{{ form.patronymic.label}}</label>
+                    {{ form.patronymic }}
+                    <small id="{{ form.patronymic.id_for_label }}" class="text-muted">
+                        {{ form.patronymic.help_text }}
+                        {% if form.patronymic.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.patronymic.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="row-block">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label}}</label>
+                    {{ form.phone_number }}
+                    <small id="{{ form.phone_number.id_for_label }}" class="text-muted">
+                        {{ form.phone_number.help_text }}
+                        {% if form.phone_number.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.phone_number.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label}}</label>
+                    {{ form.email }}
+                    <small id="{{ form.email.id_for_label }}" class="text-muted">
+                        {{ form.email.help_text }}
+                        {% if form.email.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                form.email.first_name.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="Order-footer">
+            <button type="submit" class="btn btn_success">{% trans 'Next' %}</button>
+        </div>
+    </div>
+</form>

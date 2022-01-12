@@ -9,9 +9,9 @@ class Profile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="profile", verbose_name=_("User")
     )
-    avatar = models.ImageField(upload_to="files/", blank=True, verbose_name=_("Avatar"))
+    avatar = models.ImageField(upload_to="files/", blank=True, null=True, verbose_name=_("Avatar"))
     patronymic = models.CharField(
-        max_length=150, blank=True, verbose_name=_("Patronymic")
+        max_length=150, blank=True, null=True, verbose_name=_("Patronymic")
     )
     phone_number = models.CharField(max_length=17, verbose_name=_("Phone"))
 

@@ -2,10 +2,13 @@ from app_comparison.models import Comparison
 from services.basket import get_basket_meta
 from services.cache import (
     basket_cache_save,
+    comparison_cache_save,
     get_basket_cache,
-    get_order_availability_cache, get_comparison_cache, comparison_cache_save,
+    get_comparison_cache,
+    get_order_cache,
+    order_cache_save,
 )
-from services.orders import is_incomplete_order
+from services.orders import is_not_confirmed_order, is_not_payed_order
 
 
 class SessionDataCollector:
@@ -44,10 +47,13 @@ class SessionDataCollector:
         присваивает атрибуту (is_incomplete_order) запроса (request)
         соответствующее значение.
         """
-        incomplete_order_cache = get_order_availability_cache(session_id=request.session.session_key)
-        if not incomplete_order_cache:
-            incomplete_order_cache = is_incomplete_order(user=request.user)
-        request.is_incomplete_order = incomplete_order_cache
+        order_cache = get_order_cache(session_id=request.session.session_key)
+        if not order_cache:
+            order_cache['is_not_confirmed'] = is_not_confirmed_order(user=request.user)
+            order_cache['is_not_payed'] = is_not_payed_order(user=request.user)
+            order_cache_save(session_id=request.session.session_key, **order_cache)
+        request.is_not_confirmed_order = order_cache['is_not_confirmed']
+        request.is_not_payed_order = order_cache['is_not_payed']
 
     def comparison_info(self, request):
         """Получает данные о количестве товаров в пользовательском

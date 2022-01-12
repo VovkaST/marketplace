@@ -1,0 +1,94 @@
+{% load i18n static %}
+
+<form action="#" method="post" class="form">
+    {% csrf_token %}
+
+    <div class="Order-block Order-block_OPEN">
+        <header class="Section-header Section-header_sm">
+            <h2 class="Section-title">{{ step_name }}</h2>
+        </header>
+        <div class="Order-infoBlock">
+            <div class="Order-personal">
+                <div class="row">
+                    <div class="row-block">
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Receiver' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.receiver }}</div>
+                        </div>
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Phone' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.phone }}</div>
+                        </div>
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Email' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.email }}</div>
+                        </div>
+                    </div>
+                    <div class="row-block">
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Delivery method' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.delivery_method }}</div>
+                        </div>
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'City' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.city }}</div>
+                        </div>
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Address' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.address }}</div>
+                        </div>
+                        <div class="Order-info Order-info_pay">
+                            <div class="Order-infoType">{% trans 'Payment method' %}:</div>
+                            <div class="Order-infoContent">{{ order_data.payment_method }}</div>
+                        </div>
+                        <div class="Order-info">
+                            <div class="Order-infoType">{% trans 'Comment' %}:</div>
+                            <div class="Order-infoContent">{{ form.comment }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row-block">
+
+                    </div>
+                </div>
+            </div>
+            <div class="Cart Cart_order">
+                {% for item in order_data.items %}
+                    <div class="Cart-product">
+                        <div class="Cart-block Cart-block_row">
+                            <div class="Cart-block Cart-block_pict">
+                                <a class="Cart-pict" href="#">
+                                    <img class="Cart-img" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
+                                </a>
+                            </div>
+                            <div class="Cart-block Cart-block_info">
+                                <a class="Cart-title" href="#">{{ item.name }}</a>
+                            </div>
+                            <div class="Cart-block Cart-block_price">
+                                <div class="Cart-price">&#8381;{{ item.reservation.price }}</div>
+                            </div>
+                        </div>
+                        <div class="Cart-block Cart-block_row">
+                            <div class="Cart-block Cart-block_seller">
+                                <div>{% trans 'Seller' %}:</div>
+                                <div>{{ item.reservation.seller.name }}</div>
+                            </div>
+                            <div class="Cart-block Cart-block_amount">{{ item.quantity }} {% trans 'pcs' %}.</div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="Cart-total">
+                    <div class="Cart-block Cart-block_total">
+                        <strong class="Cart-title">{% trans 'Total sum' %}:</strong>
+                        <span class="Cart-price">&#8381;{{ order_data.total_sum }}</span>
+                    </div>
+                    <div class="Cart-block">
+                        <button class="btn btn_primary btn_lg" type="submit">{% trans 'Pay' %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

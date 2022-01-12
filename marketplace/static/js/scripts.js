@@ -673,43 +673,43 @@ var Amount = function(){
     };
 };
 Amount().init();
-var Order = function(){
-    var $next = $('.Order-next'),
-        $blocks = $('.Order-block'),
-        $navigate = $('.Order-navigate');
-    return {
-        init: function(){
-            $next.add($navigate.find('.menu-link')).on('click', function(e){
-                e.preventDefault();
-                var $this = $(this),
-                    href = $this.attr('href'),
-                    error = false,
-                    $validate = $this.closest($blocks).find('[data-validate]')
-                if ($(e.target).is('.Order-next')) {
-                    $validate.each(function(){
-                        var $this = $(this);
-                        $this.trigger('blur');
-                        if ($this.data('errorinput')){
-                            error = true
-                        }
-                    });
-                }
-                if ( error===false && ($(e.target).is('.Order-next') ||
-                    $blocks.index($(href)) < $blocks.index($blocks.filter('.Order-block_OPEN')))
-                ) {
-                    $blocks.removeClass('Order-block_OPEN');
-                    $(href).addClass('Order-block_OPEN');
-                    $navigate.find('.menu-item').removeClass('menu-item_ACTIVE');
-                    $navigate.find('.menu-link[href="' + href + '"]')
-                        .closest('.menu-item')
-                        .addClass('menu-item_ACTIVE');
-                }
-                
-            });
-        }
-    };
-};
-Order().init();
+// var Order = function(){
+//     var $next = $('.Order-next'),
+//         $blocks = $('.Order-block'),
+//         $navigate = $('.Order-navigate');
+//     return {
+//         init: function(){
+//             $next.add($navigate.find('.menu-link')).on('click', function(e){
+//                 e.preventDefault();
+//                 var $this = $(this),
+//                     href = $this.attr('href'),
+//                     error = false,
+//                     $validate = $this.closest($blocks).find('[data-validate]')
+//                 if ($(e.target).is('.Order-next')) {
+//                     $validate.each(function(){
+//                         var $this = $(this);
+//                         $this.trigger('blur');
+//                         if ($this.data('errorinput')){
+//                             error = true
+//                         }
+//                     });
+//                 }
+//                 if ( error===false && ($(e.target).is('.Order-next') ||
+//                     $blocks.index($(href)) < $blocks.index($blocks.filter('.Order-block_OPEN')))
+//                 ) {
+//                     $blocks.removeClass('Order-block_OPEN');
+//                     $(href).addClass('Order-block_OPEN');
+//                     $navigate.find('.menu-item').removeClass('menu-item_ACTIVE');
+//                     $navigate.find('.menu-link[href="' + href + '"]')
+//                         .closest('.menu-item')
+//                         .addClass('menu-item_ACTIVE');
+//                 }
+//
+//             });
+//         }
+//     };
+// };
+// Order().init();
 var Account = function(){
     return {
         init: function(){
@@ -1120,7 +1120,7 @@ function makeid(length) {
 
 
 $(function() {
-    $('input[name="phone"]').mask('+7 (999) 999-99-99');
+    $('input[name="phone_number"]').mask('+7 (999) 999-99-99');
 
     $('.basket-form__add').submit(function() {
         let $form = $(this);

@@ -3043,7 +3043,7 @@ a.Cart-title {
 .Order .form {
   margin-top: 0;
 }
-.Order .form .Section-header:first-child {
+.Order .Section-header {
   padding-top: 3px;
   margin-top: 0;
 }

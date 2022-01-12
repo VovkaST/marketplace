@@ -4,7 +4,7 @@ from app_orders.models import Orders, OrderItems  # isort:skip
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin  # isort:skip
 from django.core.exceptions import BadRequest  # isort:skip
 from django.http import HttpResponseRedirect  # isort:skip
-from django.shortcuts import redirect  # isort:skip
+from django.shortcuts import redirect, get_object_or_404  # isort:skip
 from django.urls import reverse_lazy  # isort:skip
 from django.utils.translation import gettext_lazy as _  # isort:skip
 from django.views import generic  # isort:skip
@@ -13,12 +13,13 @@ from django.views.generic.base import ContextMixin  # isort:skip
 from main.views import PageInfoMixin, CategoryMixin  # isort:skip
 from services.auth import registration  # isort:skip
 from services.basket import complete_order, get_order_summary  # isort:skip
-from services.cache import basket_cache_clear, order_availability_cache_clear  # isort:skip
+from services.cache import basket_cache_clear, order_cache_clear  # isort:skip
 from services.financial import order_payment  # isort:skip
 from services.utils import update_instance_from_form  # isort:skip
 
 from app_orders.forms import (  # isort:skip
     OrderConfirmationForm,  # isort:skip
+    OrderPaymentForm,  # isort:skip
     OrderStep1AuthorizedForm,  # isort:skip
     OrderStep1NotAuthorizedForm,  # isort:skip
     OrderStep2Form,  # isort:skip
@@ -35,7 +36,7 @@ class OrderBaseMixin:
         пользователя (атрибут self.order). В случае отсутствия
         вычисляет его."""
         if not getattr(self, "order", None):
-            self.order = Orders.objects.incomplete_order(
+            self.order = Orders.objects.not_confirmed_order(
                 user=user, related=self.prefetch_related_objects
             )
         return self.order
@@ -118,9 +119,10 @@ class OrderCreateStep1View(
 ):
     """Первый этап оформления Заказа (Персональные данные)"""
 
+    form_template_name = 'app_orders/personal_data_step.html'
     success_url = reverse_lazy("order_create_step_2")
     page_title = _("Order: personal data")
-    step_name = _("Personal data")
+    step_name = _("Step 1. Personal data")
 
     def get_initial(self):
         obj = self.request.user
@@ -163,7 +165,7 @@ class OrderCreateStep1View(
                 form=form, instance=form.instance.profile, fields=profile_fields
             )
 
-        if not Orders.objects.incomplete_order(user=self.request.user):
+        if not Orders.objects.not_confirmed_order(user=self.request.user):
             Orders.objects.create(user=self.request.user)
         return super().form_valid(form)
 
@@ -180,8 +182,9 @@ class OrderCreateStep2View(
 
     success_url = reverse_lazy("order_create_step_3")
     form_class = OrderStep2Form
+    form_template_name = 'app_orders/delivery_step.html'
     page_title = _("Order: delivery")
-    step_name = _("Delivery method")
+    step_name = _("Step 2. Delivery method")
     step = 2
     step_fields = ["delivery", "city", "address"]
 
@@ -200,30 +203,9 @@ class OrderCreateStep3View(
     success_url = reverse_lazy("order_create_confirmation")
     form_class = OrderStep3Form
     page_title = _("Order: payment")
-    step_name = _("Payment method")
+    step_name = _("Step 3. Payment method")
     step = 3
     step_fields = ["payment", "bank_account"]
-
-    def post(self, request, *args, **kwargs):
-        """
-        При запросе сначала происходит валидация формы. Если форма
-        валидна производится попытка оплатить заказ, и попытка получить ответ
-        от сервиса, если ответ отрицательный, он выводится в шаблон как ошибка
-        формы
-        """
-        context = self.get_context_data(**kwargs)
-        form = OrderStep3Form(request.POST)
-        if form.is_valid():
-            order = self.get_order(user=self.request.user)
-            response = order_payment(
-                order_pk=order.pk, card_number=form.cleaned_data["bank_account"]
-            )
-            if response["status"]:
-                return redirect(self.get_success_url())
-            else:
-                form.add_error("bank_account", response["message"])
-        context["form"] = form
-        return self.render_to_response(context)
 
 
 class OrderConfirmationView(
@@ -237,27 +219,31 @@ class OrderConfirmationView(
     """Четвертый этап оформления Заказа (Проверка
     и подтверждение данных)"""
 
-    success_url = reverse_lazy("basket")
     form_class = OrderConfirmationForm
+    form_template_name = "app_orders/confirmation_step.html"
     page_title = _("Order: confirmation")
-    step_name = _("Completion")
+    step_name = _("Step 4. Completion")
     step = 4
     step_fields = ["comment"]
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        summary = get_order_summary(user=self.request.user)
-        summary.update(
-            {
-                _("Total sum"): self.request.basket_total_sum,
-            }
-        )
-        data.update(
-            {
-                "order_data": summary,
-            }
-        )
+        order = self.get_order(user=self.request.user)
+        summary = get_order_summary(order)
+        session = self.request.session.session_key
+        user = self.request.user if self.request.user.is_authenticated else None
+        summary.update({
+            "total_sum": self.request.basket_total_sum,
+            "items": Basket.objects.user_basket(session_id=session, user_id=user.id if user else None),
+        })
+        data.update({
+            "order_data": summary,
+        })
         return data
+
+    def get_success_url(self):
+        order = self.get_order(user=self.request.user)
+        return reverse_lazy("order_payment", kwargs={'pk': order.id})
 
     def form_valid(self, form):
         self.order.comment = form.cleaned_data["comment"]
@@ -267,7 +253,7 @@ class OrderConfirmationView(
         )
         session_id = self.request.session.session_key
         basket_cache_clear(session_id=session_id)
-        order_availability_cache_clear(session_id=session_id)
+        order_cache_clear(session_id=session_id)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -291,30 +277,38 @@ steps_links = (
 )
 
 
-class OrderPaymentView(CategoryMixin, PageInfoMixin, FormView):
+class OrderPaymentView(AccessMixin, CategoryMixin, PageInfoMixin, FormView):
     """
     View для отдельной оплаты заказа, если этот шаг был пропущен при
     создании заказа.
     """
 
     page_title = _('Order payment')
-    form_class = OrderStep3Form
-    template_name = "app_orders/payment_step.html"
-    success_url = "ordershistory"
+    form_class = OrderPaymentForm
+    template_name = "app_orders/order_pay.html"
+    success_url = reverse_lazy('"ordershistory"')
 
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        form = OrderStep3Form(request.POST)
-        if form.is_valid():
-            response = order_payment(
-                order_pk=kwargs.get("pk"), card_number=form.cleaned_data["bank_account"]
-            )
-            if response["status"]:
-                return redirect(self.get_success_url())
-            else:
-                form.add_error("bank_account", response["message"])
-        context["form"] = form
-        return self.render_to_response(context)
+    def dispatch(self, request, *args, **kwargs):
+        order = get_object_or_404(Orders, pk=kwargs.get("pk"))
+        if order.payment_state:
+            raise BadRequest(_("Order is already payed."))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'order': Orders.objects.get(id=self.kwargs.get("pk")),
+        })
+        return context
+
+    def form_valid(self, form):
+        response = order_payment(
+            order_pk=self.kwargs.get("pk"), card_number=form.cleaned_data["bank_account"]
+        )
+        if response["status"]:
+            return redirect(self.get_success_url())
+        form.add_error("bank_account", response["message"])
+        return self.form_invalid(form)
 
 
 class OrderDetailView(CategoryMixin, PageInfoMixin, generic.DetailView):
