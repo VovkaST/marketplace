@@ -284,22 +284,22 @@ def init_basket_formset(items: List[dict]) -> BasketFormSet:
     return formset
 
 
-def get_order_summary(user: User) -> dict:
+def get_order_summary(order: Orders) -> dict:
     """Собирает словарь сводных данных по Заказу.
 
-    :param user: экземпляр авторизованного пользователя.
+    :param order: экземпляр Заказа.
     """
-    order = Orders.objects.incomplete_order(user=user, related=True)
     return {
-        _('Date, time'): order.date_time.strftime('%d %B %Y, %H:%M'),
-        _('Receiver'): f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic}',
-        _('Phone'): order.user.profile.phone_number_formatted,
-        _('Total sum'): None,
-        _('City'): order.city,
-        _('Address'): order.address,
-        _('Delivery method'): order.delivery.name,
-        _('Payment method'): order.payment.name,
-        _('Bank account'): order.bank_account,
+        'date_time': order.date_time.strftime('%d %B %Y, %H:%M'),
+        'receiver': f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic or ""}',
+        'phone': order.user.profile.phone_number_formatted,
+        'email': order.user.email,
+        'total_sum': None,
+        'city': order.city,
+        'address': order.address,
+        'delivery_method': order.delivery.name,
+        'payment_method': order.payment.name,
+        'bank_account': order.bank_account,
     }
 
 

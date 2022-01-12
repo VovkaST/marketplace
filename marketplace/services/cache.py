@@ -7,6 +7,7 @@ from services.cache_settings import cache_settings
 
 
 BASKET_LIFE_TIME = cache_settings['basket_life_time']
+ORDER_KEYS = ['not_confirmed', 'not_payed']
 
 
 def reset_seller_page_cache(seller: Sellers):
@@ -55,19 +56,25 @@ def basket_cache_clear(session_id: str = None, username: str = None, keys=None):
         cache.delete(f'basket_{session_id}_{key}')
 
 
-def get_order_availability_cache(session_id: str) -> bool:
-    """Получить кэш флага незавершенного заказа."""
-    return cache.get(f'order_availability_{session_id}')
+def get_order_cache(session_id: str) -> dict:
+    """Получить кэш незавершенного и неоплаченного заказа."""
+    return {
+        key: cache.get(f'order_{session_id}_{key}')
+        for key in ORDER_KEYS if cache.get(f'order_{session_id}_{key}') is not None
+    }
 
 
-def order_availability_cache_save(session_id: str, value: bool):
-    """Сохранить флаг незавершенного заказа в кэше."""
-    return cache.set(f'order_availability_{session_id}', value)
+def order_cache_save(session_id: str, **kwargs):
+    """Сохранить кэш заказа."""
+    for key in ORDER_KEYS:
+        if key in kwargs:
+            cache.set(f'order_{session_id}_{key}', kwargs[key])
 
 
-def order_availability_cache_clear(session_id: str):
-    """Удалить флаг незавершенного заказа в кэше."""
-    return cache.delete(f'order_availability_{session_id}')
+def order_cache_clear(session_id: str):
+    """Удалить кэш незавершенного и неоплаченного заказа."""
+    for key in ORDER_KEYS:
+        cache.delete(f'order_{session_id}_{key}')
 
 
 def get_comparison_cache(session_id: str) -> int:

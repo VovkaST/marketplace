@@ -155,9 +155,14 @@ p.error-browser
                         <li class="menu-item">
                             <a class="menu-link" href="{% url 'catalog' %}">{% trans "Catalog" %}</a>
                         </li>
-                        {% if request.is_incomplete_order %}
+                        {% if request.is_not_confirmed_order or request.is_not_payed_order %}
                             <li class="menu-item">
-                                <a class="menu-link" href="{% url 'order_create' %}">{% trans "Purchase" %}</a>
+                                {% if request.is_not_payed_order %}
+                                    <span class="menu-label menu-label_success">{% trans 'Pay' %}</span>
+                                    <a class="menu-link" href="{% url 'ordershistory' %}">{% trans "Purchase" %}</a>
+                                {% else %}
+                                    <a class="menu-link" href="{% url 'order_create' %}">{% trans "Purchase" %}</a>
+                                {% endif %}
                             </li>
                         {% endif %}
                         <li class="menu-item">

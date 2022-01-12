@@ -14,7 +14,7 @@
                     </li>
 
                     <li class="breadcrumbs-item">
-                        <a href="historyorder.html">{% trans 'Orders history' %}</a>
+                        <a href="{% url 'ordershistory' %}">{% trans 'Orders history' %}</a>
                     </li>
 
                     <li class="breadcrumbs-item breadcrumbs-item_current">
@@ -47,8 +47,8 @@
                                         </div>
                                         <div class="Order-infoContent">
                                             {{ order.user.first_name }}
-                                            {{ order.user.profile.patronymic }}
                                             {{ order.user.last_name }}
+                                            {{ order.user.profile.patronymic|default:'' }}
                                         </div>
                                     </div>
                                     <div class="Order-info">
@@ -119,7 +119,16 @@
                                         </div>
                                     </div>
 
-                                    {% ifequal order.payment_state False %}
+                                    {% if order.payment_state %}
+                                        <div class="Order-info">
+                                            <div class="Order-infoType">
+                                                {% trans 'Bank account' %}:
+                                            </div>
+                                            <div class="Order-infoContent">
+                                                {{ order.bank_account }}
+                                            </div>
+                                        </div>
+                                    {% else %}
                                         <div class="Order-info Order-info_error">
                                             <div class="Order-infoType">
                                                 {% trans 'Not payed' %}:
@@ -128,7 +137,7 @@
                                                 {% trans 'order has not been paid yet, because of payment server internal error' %}
                                             </div>
                                         </div>
-                                    {% endifequal %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -191,7 +200,7 @@
                                 </div>
                                 {% ifequal order.payment_state False %}
                                     <div class="Cart-block">
-                                        <a class="btn btn_primary btn_lg" href="#">
+                                        <a class="btn btn_primary btn_lg" href="{% url 'order_payment' order.id %}">
                                             {% trans 'Pay' %}
                                         </a>
                                     </div>

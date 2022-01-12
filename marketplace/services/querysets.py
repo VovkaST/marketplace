@@ -99,7 +99,7 @@ class OrdersQuerySet(SoftDeleter):
         """
         return self.filter(user=user)
 
-    def incomplete_order(self, user, related=False):
+    def not_confirmed_order(self, user, related=False):
         """Фильтр получения экземпляра незавершенного
         Заказа пользователя user.
 
@@ -114,6 +114,15 @@ class OrdersQuerySet(SoftDeleter):
         if related:
             queryset.select_related('delivery', 'payment', 'user')
         return queryset.first()
+
+    def not_payed_orders(self, user, related=False):
+        if user.is_anonymous:
+            return self.model.objects.none()
+
+        queryset = self.user_order(user=user).filter(confirmed=True, payment_state=False)
+        if related:
+            queryset.select_related('delivery', 'payment', 'user')
+        return queryset
 
 
 class SellerQuerySet(models.QuerySet):

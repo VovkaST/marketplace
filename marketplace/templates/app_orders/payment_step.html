@@ -1,65 +1,33 @@
-{% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n %}
 
-{% block content %}
-<div class="Middle Middle_top">
-    <div class="Middle-top">
-        <div class="wrap">
-            <div class="Middle-header">
-                <h1 class="Middle-title">{% trans 'Payment' %}</h1>
-                <ul class="breadcrumbs Middle-breadcrumbs">
-                    <li class="breadcrumbs-item">
-                        <a href="{% url 'main' %}">{% trans 'Home' %}</a>
-                    </li>
-                    <li class="breadcrumbs-item breadcrumbs-item_current">
-                        <span>{% trans 'Payment' %}</span>
-                    </li>
-                </ul>
-            </div>
+<form action="#" method="post" class="form">
+    {% csrf_token %}
+
+    <div class="Order-block Order-block_OPEN">
+        <header class="Section-header Section-header_sm">
+            <h2 class="Section-title">{{ step_name }}</h2>
+        </header>
+        <div class="form-group">
+            {% for method in form.payment %}
+                <div>
+                    <label class="toggle">
+                        <input type="radio" name="{{ form.payment.name }}" value="{{ method.data.value }}"/>
+                        <span class="toggle-box"></span>
+                        <span class="toggle-text">{{ method.data.label }}</span>
+                    </label>
+                </div>
+            {% endfor %}
+            <small id="{{ form.payment.id_for_label }}" class="text-muted">
+                {{ form.payment.help_text }}
+                {% if form.payment.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.payment.errors.as_text }}
+                    </div>
+                {% endif %}
+            </small>
+        </div>
+        <div class="Order-footer">
+            <button type="submit" class="btn btn_success">{% trans 'Next' %}</button>
         </div>
     </div>
-    <form action="#" method="post" class="form Payment">
-        {% csrf_token %}
-        <div class="Payment-card">
-            <div class="form-group">
-                <label for="{{ form.payment.id_for_label }}" class="form-label">{{ form.payment.label}}</label>
-                {{ form.payment }}
-                <div>
-                    <small id="{{ form.payment.id_for_label }}" class="text-muted">
-                        {{ form.payment.help_text }}
-                        {% if form.payment.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.payment.errors.as_text }}
-                        </div>
-                        {% endif %}
-                    </small>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="{{ form.bank_account.id_for_label }}" class="form-label">{{ form.bank_account.label }}</label>
-                <div id="bank_account__number" class="form-input Payment-bill">
-                    {{ form.bank_account }}
-                </div>
-                <div>
-                    <small id="{{ form.bank_account.id_for_label }}" class="text-muted">
-                        {{ form.bank_account.help_text }}
-                        {% if form.bank_account.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{ form.bank_account.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </small>
-                </div>
-            </div>
-            <div class="form-group">
-                <button id="bank_account__generate" class="btn btn_success Payment-generate" type="button">
-                    {% trans 'Generate random account' %}
-                </button>
-            </div>
-        </div>
-        <div class="Payment-pay">
-            <button type="submit" class="btn btn_primary">{% trans 'Pay' %}</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
+</form>

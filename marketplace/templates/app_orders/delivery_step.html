@@ -1,0 +1,57 @@
+{% load i18n %}
+
+<form action="#" method="post" class="form">
+    {% csrf_token %}
+
+    <div class="Order-block Order-block_OPEN">
+        <header class="Section-header Section-header_sm">
+            <h2 class="Section-title">{{ step_name }}</h2>
+        </header>
+        <div class="form-group">
+            {% for method in form.delivery %}
+                <div>
+                    <label class="toggle">
+                        <input type="radio" name="{{ form.delivery.name }}" value="{{ method.data.value }}"/>
+                        <span class="toggle-box"></span>
+                        <span class="toggle-text">{{ method.data.label }}</span>
+                    </label>
+                </div>
+            {% endfor %}
+            <small id="{{ form.delivery.id_for_label }}" class="text-muted">
+                {{ form.delivery.help_text }}
+                {% if form.delivery.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.delivery.errors.as_text }}
+                    </div>
+                {% endif %}
+            </small>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.city.id_for_label }}">{{ form.city.label}}</label>
+            {{ form.city }}
+            <small id="{{ form.city.id_for_label }}" class="text-muted">
+                {{ form.city.help_text }}
+                {% if form.city.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.city.errors.as_text }}
+                    </div>
+                {% endif %}
+            </small>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.address.id_for_label }}">{{ form.address.label}}</label>
+            {{ form.address }}
+            <small id="{{ form.address.id_for_label }}" class="text-muted">
+                {{ form.address.help_text }}
+                {% if form.address.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.address.errors.as_text }}
+                    </div>
+                {% endif %}
+            </small>
+        </div>
+        <div class="Order-footer">
+            <button type="submit" class="btn btn_success">{% trans 'Next' %}</button>
+        </div>
+    </div>
+</form>

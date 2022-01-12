@@ -7,55 +7,38 @@
             <div class="wrap">
                 <div class="Middle-header">
                     <h1 class="Middle-title">{% trans 'Order' %}</h1>
+                    <ul class="breadcrumbs Middle-breadcrumbs">
+                        <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
+                        <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'Order' %}</span></li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="Section Section_column Section_columnLeft">
+        <div class="Section Section_column Section_columnRight Section_columnWide Order">
             <div class="wrap">
                 <div class="Section-column">
                     <div class="Section-columnSection">
                         <header class="Section-header">
-                            <strong class="Section-title">{% trans 'Navigation' %}</strong>
+                            <strong class="Section-title">{% trans 'Filling progress' %}</strong>
                         </header>
                         <div class="Section-columnContent">
-                            <div class="NavigateProfile">
-                                <ul class="menu menu_vt">
-                                    {% for step in order_steps %}
-                                        <li class="menu-item {% if step.is_current %} menu-item_ACTIVE {% endif %}">
-                                            {% if step.url %}
-                                                <a href="{{ step.url }}" class="menu-link">{{ step.name }}</a>
-                                            {% else %}
-                                                <span class="menu-text">{{ step.name }}</span>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                            <ul class="menu menu_vt Order-navigate">
+                                {% for step in order_steps %}
+                                    <li class="menu-item {% if step.is_current %} menu-item_ACTIVE {% endif %}">
+                                        {% if step.url %}
+                                            <a href="{{ step.url }}" class="menu-link">{{ step.name }}</a>
+                                        {% else %}
+                                            <span class="menu-text">{{ step.name }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="Section-content">
-                    <div class="Section-columnSection">
-                        <header class="Section-header">
-                            <strong class="Section-title">{{ step_name }}</strong>
-                        </header>
-                        <div class="Section-columnContent">
-                            {% if order_data %}
-                                <table>
-                                    <tbody>
-                                        {% for field_name, value in order_data.items %}
-                                            <tr>
-                                                <td>{{ field_name }}</td>
-                                                <td>{{ value }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% endif %}
-                            {% include form_template %}
-                        </div>
-                    </div>
+                    {% include form_template %}
                 </div>
             </div>
         </div>

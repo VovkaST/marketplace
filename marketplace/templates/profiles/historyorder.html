@@ -23,13 +23,12 @@
             {% include 'profiles/navigation.html' %}
             <div class="Section-content">
                 <div class="Orders">
-                    {% if orders %}
                     {% for order in orders %}
                     <div class="Order Order_anons">
                         <div class="Order-personal">
                             <div class="row">
                                 <div class="row-block">
-                                    <a class="Order-title" href="{# url order detail #}">
+                                    <a class="Order-title" href="{% url 'order_detail' order.pk %}">
                                         {% trans 'Order' %}&#32;
                                         <span class="Order-numberOrder">№{{ order.pk }}</span>
                                         &#32;{% trans 'from' %}&#32;
@@ -38,59 +37,45 @@
                                 </div>
                                 <div class="row-block">
                                     <div class="Order-info Order-info_delivery">
-                                        <div class="Order-infoType">{% trans 'Delivery type' %}:
-                                        </div>
-                                        <div class="Order-infoContent">{{ order.delivery.name }}
-                                        </div>
+                                        <div class="Order-infoType">{% trans 'Delivery type' %}:</div>
+                                        <div class="Order-infoContent">{{ order.delivery.name }}</div>
                                     </div>
                                     <div class="Order-info Order-info_pay">
-                                        <div class="Order-infoType">{% trans 'Payment' %}:
-                                        </div>
-                                        <div class="Order-infoContent">{{ order.payment.name }}
-                                        </div>
+                                        <div class="Order-infoType">{% trans 'Payment' %}:</div>
+                                        <div class="Order-infoContent">{{ order.payment.name }}</div>
                                     </div>
                                     <div class="Order-info">
-                                        <div class="Order-infoType">{% trans 'Total sum' %}:
-                                        </div>
+                                        <div class="Order-infoType">{% trans 'Total sum' %}:</div>
                                         <div class="Order-infoContent">
                                             <span class="Order-price">{{ order.total_sum }}</span>
                                         </div>
                                     </div>
                                     <div class="Order-info Order-info_status">
-                                        <div class="Order-infoType">{% trans 'Status' %}:
-                                        </div>
-                                        {% ifequal order.payment_state False %}
-                                        <a class="Order-infoContent" href="{% url 'order_payment' order.pk %}">
-                                            {% trans 'Not paid' %}
-                                        </a>
+                                        <div class="Order-infoType">{% trans 'Status' %}:</div>
+                                        {% if order.payment_state %}
+                                            <div class="Order-infoContent">{% trans 'Paid' %}</div>
                                         {% else %}
-                                        <div class="Order-infoContent">
-                                            {% trans 'Paid' %}
-                                        </div>
-                                        {% endifequal %}
+                                            <a class="Order-infoContent" href="{% url 'order_payment' order.pk %}">
+                                                {% trans 'Not paid' %}
+                                            </a>
+                                        {% endif %}
                                     </div>
 
                                     <div class="Order-info Order-info_status">
-                                        <div class="Order-infoType">
-                                        </div>
-
+                                        <div class="Order-infoType"></div>
                                     </div>
 
                                     {% if order.payment_errors %}
-                                    <div class="Order-info Order-info_error">
-                                        <div class="Order-infoType">{% trans 'Payment failed' %}:
+                                        <div class="Order-info Order-info_error">
+                                            <div class="Order-infoType">{% trans 'Payment failed' %}:</div>
+                                            <div class="Order-infoContent">{{ order.payment_errors }}</div>
                                         </div>
-                                        <div class="Order-infoContent">
-                                            {{ order.payment_errors }}
-                                        </div>
-                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
-                    {% endif %}
                 </div>
             </div>
         </div>
