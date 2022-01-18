@@ -87,10 +87,11 @@
                                 <strong class="ProductCard-tagsTitle">
                                     {% trans 'Tags' %}:
                                 </strong>
-                                <a href="#">{% trans 'Accesories' %}</a>,
-                                <a href="#">{% trans 'Creative' %}</a>,
-                                <a href="#">{% trans 'Design' %}</a>,
-                                <a href="#">{% trans 'Gaming' %}</a>
+                                {% for category_id, category_name in good_categories.items %}
+                                    {% if category_id %}
+                                        <a href="{% url 'category_catalog' category_id %}">{{ category_name }}</a>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
