@@ -56,9 +56,12 @@
                                 </div>
 
                                 <div class="ProductCard-compare">
-                                    <a class="btn btn_default" href="#">
-                                        <img class="btn-icon" src={% static "/img/icons/card/change.svg" %} alt="change.svg"/>
-                                    </a>
+                                    <form action="{% url 'comparison_add' %}" method="post" class="comparison-form__add">
+                                        <input type="hidden" name="good_id" value="{{ detail_product.id }}">
+                                        <a class="btn btn_default submitter" href="#">
+                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}" class="btn-icon"/>
+                                        </a>
+                                    </form>
                                 </div>
                             </div>
                         </div>
