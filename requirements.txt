@@ -1,6 +1,5 @@
 Django==3.2.8
 Pillow==8.4.0
-nodeenv
 transliterate==1.10.2
 factory-boy==3.2.1
 django-environ==0.8.1
@@ -36,7 +35,6 @@ humanize==3.13.1
 identify==2.3.0
 isort==5.9.3
 kombu==5.2.2
-loguru==0.5.3
 mccabe==0.6.1
 mypy-extensions==0.4.3
 nodeenv==1.6.0
@@ -65,7 +63,6 @@ virtualenv==20.8.1
 wcwidth==0.2.5
 win32-setctime==1.0.4
 django_extensions
-celery
 
 # test
 selenium==4.1.0
