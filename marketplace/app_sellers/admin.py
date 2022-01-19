@@ -4,6 +4,9 @@ from app_sellers.models import (
     Balances,
     Goods,
     GoodsDescriptionsValues,
+    GoodsImage,
+    RatingStar,
+    Reviews,
     Sellers,
 )
 from services.cache import reset_seller_page_cache
@@ -31,3 +34,15 @@ class BalancesAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Reviews)
+class ReviewsAdmin(admin.ModelAdmin):
+    model = Reviews
+    list_display = ["user", "good_review", "comment", "star", "crated_at"]
+
+
+@admin.register(RatingStar)
+class RatingStarAdmin(admin.ModelAdmin):
+    model = RatingStar
+    list_display = [
+        "value",
+    ]

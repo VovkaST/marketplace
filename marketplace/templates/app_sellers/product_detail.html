@@ -107,15 +107,21 @@
                         <a class="Tabs-link" href="#sellers">
                             <span>{% trans 'Sellers' %}</span>
                         </a>
-                        <a class="Tabs-link" href="#addit">
-                            <span>{% trans 'Additional info' %}</span>
-                        </a>
                         <a class="Tabs-link" href="#reviews">
-                            <span>{% trans 'Reviews' %} (3)</span>
+                            <span>{% trans 'Reviews' %}</span>
                         </a>
                     </div>
                     <div class="Tabs-wrap">
                         <div class="Tabs-block" id="description">
+                            <h2>{% trans "Description" %}
+                            </h2>
+                        {% if detail_product.description.first %}
+                            <p>{{ detail_product.description.first }}</p>
+                        {% else %}
+                            <p>{% trans "Description not found or not add" %}</p>
+                        {% endif %}
+                            <div class="clearfix">
+                            </div>
                             <div class="table">
                                 <table>
                                     <tr>
@@ -132,24 +138,24 @@
                             </div>
                         </div>
                         <div class="Tabs-block" id="sellers">
-                            {% for balance in other_balances %}
+                            {% for balances in other_balances %}
                                 <div class="Categories Categories_product">
                                     <div class="Categories-row">
                                         <div class="Categories-block Categories-block_info">
                                             <div class="Categories-info">
-                                                <strong> {{ balance.seller__name }}</strong>
+                                                <strong> {{ balances.seller__name }}</strong>
                                             </div>
                                         </div>
                                         <div class="Categories-splitProps"></div>
                                         <div class="Categories-block Categories-price">
-                                            <strong>€&#32; {{ balance.price }}</strong>
+                                            <strong>€&#32; {{ balances.price }}</strong>
                                         </div>
                                         <div class="Categories-block Categories-button">
                                             <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
                                                 <a class="btn btn_primary submitter" href="#">
                                                     <img class="btn-icon" src={% static "/img/icons/card/cart_white.svg" %} alt="cart_white.svg"/>
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="data-id" value="{{ balance.id }}">
+                                                    <input type="hidden" name="data-id" value="{{ balances.id }}">
                                                     <span class="btn-content">{% trans 'Buy' %}</span>
                                                 </a>
                                             </form>
