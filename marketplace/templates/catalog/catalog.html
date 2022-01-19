@@ -25,13 +25,29 @@
                     </header>
                     <div class="Section-columnContent">
                         <form class="form" action="" method="get">
-{#                            {% for field in filterset.form %}#}
-{#                                {{ field }}#}
-{#                            {% endfor %}#}
-                            {{ filterset.form.reviews_filter }}
-{#                            {{ filterset.form.as_p }}#}
-                            <div class="buttons">
-                                <button type="submit" class="btn btn_square btn_dark btn_narrow">{% trans 'Filter' %}</button>
+                            <div class="form-group">
+                                <div class="range Section-columnRange">
+                                    {{ filterset.form.price }}
+                                    <div class="range-price">Price:&#32;
+                                        <div class="rangePrice"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ filterset.form.name }}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="toggle">
+                                    <input type="checkbox" name="on_balance" value="1"/>
+                                    <span class="toggle-box"></span>
+                                    <span class="toggle-text">{{ filterset.form.on_balance.label }}</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div class="buttons">
+                                    <button type="submit" class="btn btn_square btn_dark btn_narrow">{% trans 'Filter' %}</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -48,14 +64,14 @@
                     </div>
                 </div>
                 <div class="Cards">
-                    {% for good in goods_list %}
+                    {% for good_id, good in goods.items %}
                         <div class="Card">
                             <a class="Card-picture" href="#">
                                 <img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/>
                             </a>
                             <div class="Card-content">
                                 <strong class="Card-title">
-                                    <a href="{% url 'prod_detail' good.id %}">{{ good.name }}</a>
+                                    <a href="{% url 'prod_detail' good_id %}">{{ good.name }}</a>
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">

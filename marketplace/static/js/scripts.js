@@ -291,13 +291,13 @@ var range = function(){
             
             $line.ionRangeSlider({
                 onStart: function(data){
-                    $('.rangePrice').text(
-                        '$' + data.from + ' - $' + data.to
+                    $('.rangePrice').html(
+                        '&#8381;' + data.from + ' - &#8381;' + data.to
                     )
                 },
                 onChange: function(data){
-                    $('.rangePrice').text(
-                        '$' + data.from + ' - $' + data.to
+                    $('.rangePrice').html(
+                        '&#8381;' + data.from + ' - &#8381;' + data.to
                     )
                 }
             });
@@ -1100,8 +1100,7 @@ function generateNumberString($place, $input, stringLength, interval=300) {
             generator = setInterval(randomSign, 1, $place, value);
         else {
             clearInterval(executor);
-            $place.val = $place.text();
-            document.getElementById('id_bank_account').value = $place.val;
+            $input.val($place.text());
         }
     }, interval);
 }
