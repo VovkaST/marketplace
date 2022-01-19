@@ -10,7 +10,7 @@ from django_filters.widgets import BooleanWidget, LinkWidget
 from main.models import GoodCategory
 from main.views import CategoryMixin, PageInfoMixin
 from services.goods import (
-    GoodsMinPriceMixin,
+    GoodsPriceMixin,
     get_balances_in_range,
     get_cheapest_good_price,
     get_most_expensive_good_price,
@@ -87,7 +87,7 @@ class FilteredListView(CategoryMixin, PageInfoMixin, ListView):
         return context
 
 
-class CatalogView(GoodsMinPriceMixin, FilteredListView):
+class CatalogView(GoodsPriceMixin, FilteredListView):
     queryset = Goods.objects.existing().values('id', 'name', 'category__name')
     template_name = "catalog/catalog.html"
     filterset_class = CatalogFilter
@@ -120,7 +120,7 @@ class CatalogView(GoodsMinPriceMixin, FilteredListView):
         return context
 
 
-class CategoryDetailView(CategoryMixin, PageInfoMixin, GoodsMinPriceMixin, ListView):
+class CategoryDetailView(CategoryMixin, PageInfoMixin, GoodsPriceMixin, ListView):
     template_name = 'catalog/category_detail.html'
     context_object_name = 'goods_list'
     category = None

@@ -10,9 +10,9 @@ from app_sellers.models import Balances
 from services.cache import comparison_cache_clear
 
 
-class GoodsMinPriceMixin(ContextMixin):
+class GoodsPriceMixin(ContextMixin):
     """Миксин добавляет в контекст словарь goods
-    с данными о минимальной цене товара.
+    с данными о цене товара.
     Для корректного использования queryset должен возвращать
     данные в виде словаря (применять метод values)."""
 
@@ -31,7 +31,11 @@ class GoodsMinPriceMixin(ContextMixin):
         return context
 
 
-def balances_to_dict(balances):
+def balances_to_dict(balances) -> dict:
+    """Функция преобразования объектов Balances в словарь
+    определенной структуры.
+    :param balances: Balances QuerySet.
+    """
     goods = dict()
     for balance in balances:
         goods[balance.good_id] = {
@@ -56,7 +60,13 @@ def get_cheapest_balances(goods_ids: List[int]) -> dict:
     return balances_to_dict(balances)
 
 
-def get_balances_in_range(goods_ids: List[int], price_min: Decimal, price_max: Decimal) -> dict:
+def get_balances_in_range(goods_ids: List[int], price_min: str, price_max: str) -> dict:
+    """Получение данных о минимальной цене товаров по их id
+    наличию баланса в указанном ценовом диапазоне.
+    :param goods_ids: список идентификаторов товаров.
+    :param price_min: Начало диапазона цены товара.
+    :param price_max: Конец диапазона цены товара.
+    """
     placeholder = ['%s' for _ in range(len(goods_ids))]
     balances = Balances.objects.raw(f'''
         SELECT mpb.id, mpb.good_id, min(mpb.price) "min_price", mpb.quantity
