@@ -28,6 +28,9 @@ class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
         obj = self.get_object()
         return obj.name
 
+    def get_queryset(self):
+        return super().get_queryset().select_related('category')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         obj = self.get_object()
@@ -35,6 +38,10 @@ class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
             .values("id", "seller__name", "quantity", "price")\
             .order_by('price')
         context.update({
+            'good_categories': ({
+                obj.category.id: obj.category.name,
+                obj.category.parent_id: obj.category.parent.name if obj.category.parent_id else None,
+            }),
             'seller': get_choices_sellers_by_good(obj.id),
             'balance': balances[0],
             'other_balances': balances[1:],
