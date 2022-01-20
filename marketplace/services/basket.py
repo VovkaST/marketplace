@@ -242,7 +242,7 @@ def merge_baskets(old_session: str, new_session: str, user: User):
     anon_user_goods = Basket.objects.filter(session=old_session)
     duplicates = list()
     for good in anon_user_goods:
-        exist_good = Basket.objects.user_basket(user_id=user.id).get(reservation=good.reservation)
+        exist_good = Basket.objects.user_basket(user_id=user.id).filter(reservation=good.reservation).first()
         if exist_good:
             exist_good.quantity += good.quantity
             exist_good.save(force_update=True, update_fields=['quantity'])

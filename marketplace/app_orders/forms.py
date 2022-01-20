@@ -18,7 +18,7 @@ class OrderStep1AuthorizedForm(forms.ModelForm):
 
     def is_valid(self):
         super().is_valid()
-        if not is_user_exists(email=self.cleaned_data["email"]):
+        if is_user_exists(email=self.cleaned_data["email"]):
             self.add_error("email", _("User with such email address already exists."))
         return super().is_valid()
 
@@ -27,17 +27,21 @@ class OrderStep1NotAuthorizedForm(OrderStep1AuthorizedForm):
     password1 = forms.CharField(
         label=_("Password"),
         strip=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password", 'class': 'form-input'}),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password", 'class': 'form-input'}),
         strip=False,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-input'
+
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email", "password1", "password2"]
+        fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
 
 
 class OrderStep2Form(forms.Form):
