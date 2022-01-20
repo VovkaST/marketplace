@@ -9,6 +9,11 @@
         </header>
         <div class="row">
             <div class="row-block">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.non_field_errors.as_text }}
+                    </div>
+                {% endif %}
                 <div class="form-group">
                     <label class="form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label}}</label>
                     {{ form.first_name }}
@@ -45,6 +50,20 @@
                         {% endif %}
                     </small>
                 </div>
+                {% if form.username %}
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.username.id_for_label }}">{{ form.username.label}}</label>
+                        {{ form.username }}
+                        <small id="{{ form.username.id_for_label }}" class="text-muted">
+                            {{ form.username.help_text }}
+                            {% if form.username.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.username.errors.as_text }}
+                                </div>
+                            {% endif %}
+                        </small>
+                    </div>
+                {% endif %}
             </div>
             <div class="row-block">
                 <div class="form-group">
@@ -66,11 +85,41 @@
                         {{ form.email.help_text }}
                         {% if form.email.errors %}
                             <div class="alert alert-danger" role="alert">
-                                form.email.first_name.errors.as_text }}
+                                {{ form.email.errors.as_text }}
                             </div>
                         {% endif %}
                     </small>
                 </div>
+
+                {% if form.password1 %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">{{ form.password1.label}}</label>
+                    {{ form.password1 }}
+                    <small id="{{ form.password1.id_for_label }}" class="text-muted">
+                        {{ form.password1.help_text }}
+                        {% if form.password1.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.password1.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+                {% endif %}
+
+                {% if form.password2 %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">{{ form.password2.label}}</label>
+                    {{ form.password2 }}
+                    <small id="{{ form.password2.id_for_label }}" class="text-muted">
+                        {{ form.password2.help_text }}
+                        {% if form.password2.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.password2.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </small>
+                </div>
+                {% endif %}
             </div>
         </div>
         <div class="Order-footer">

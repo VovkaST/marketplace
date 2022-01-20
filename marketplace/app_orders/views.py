@@ -12,7 +12,7 @@ from django.views.generic import FormView  # isort:skip
 from django.views.generic.base import ContextMixin  # isort:skip
 from main.views import PageInfoMixin, CategoryMixin  # isort:skip
 from services.auth import registration  # isort:skip
-from services.basket import complete_order, get_order_summary  # isort:skip
+from services.basket import complete_order, get_order_summary, merge_baskets  # isort:skip
 from services.cache import basket_cache_clear, order_cache_clear  # isort:skip
 from services.financial import order_payment  # isort:skip
 from services.utils import update_instance_from_form  # isort:skip
@@ -153,7 +153,14 @@ class OrderCreateStep1View(
 
     def form_valid(self, form):
         if not self.request.user.is_authenticated:
+            old_session_key = self.request.session.session_key
             registration(request=self.request, registration_form=form)
+            new_session_key = self.request.session.session_key
+            merge_baskets(
+                old_session=old_session_key,
+                new_session=new_session_key,
+                user=self.request.user,
+            )
         if form.changed_data:
             user_fields = ["first_name", "last_name", "email"]
             profile_fields = ["patronymic", "phone"]
