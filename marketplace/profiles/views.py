@@ -14,13 +14,14 @@ from profiles.forms import ChangeInfoForm, RegisterForm
 from profiles.models import Profile
 from services.auth import registration
 from services.basket import merge_baskets
+from services.goods import GoodsPriceMixin
 from services.orders import get_user_orders
 from services.view_history import get_goods_in_view_history
 
 # fmt: on
 
 
-class AccountView(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.DetailView):
+class AccountView(GoodsPriceMixin, CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.DetailView):
     page_title = _('Your profile')
     model = Profile
     template_name = "profiles/account.html"
@@ -30,15 +31,20 @@ class AccountView(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.Deta
         return self.request.user
 
     def get_context_data(self, **kwargs):
-        context = super(AccountView, self).get_context_data(**kwargs)
-        context["orders"] = get_user_orders(user=self.request.user, limit=3)
+        orders = get_user_orders(user=self.request.user, limit=3)
         start_date = datetime.datetime.now() - datetime.timedelta(days=30)
-        context["view_history"] = get_goods_in_view_history(
+        view_history = get_goods_in_view_history(
             user=self.request.user,
             start_date=start_date,
             end_date=datetime.datetime.now(),
             limit=3,
-        )
+        ).values('id', 'name', 'category__name')
+        goods_ids = [good['id'] for good in view_history]
+        context = super().get_context_data(goods_ids=goods_ids, object_list=view_history, **kwargs)
+        context.update({
+            'orders': orders,
+            'view_history': view_history,
+        })
         return context
 
 
@@ -92,7 +98,7 @@ class RegistrationView(CategoryMixin, PageInfoMixin, generic.FormView):
         return super().form_valid(form=form)
 
 
-class ViewsHistoryView(CategoryMixin, PageInfoMixin, ListView):
+class ViewsHistoryView(GoodsPriceMixin, CategoryMixin, PageInfoMixin, ListView):
     page_title = _('View history')
     template_name = "profiles/historyview.html"
     context_object_name = "viewed_products"
@@ -103,8 +109,12 @@ class ViewsHistoryView(CategoryMixin, PageInfoMixin, ListView):
             user=self.request.user,
             start_date=start_date,
             end_date=datetime.datetime.now(),
-        )
+        ).values('id', 'name', 'category__name')
         return queryset
+
+    def get_context_data(self, **kwargs):
+        goods_ids = [good['id'] for good in self.object_list]
+        return super().get_context_data(goods_ids=goods_ids, **kwargs)
 
 
 class OrdersHistoryView(CategoryMixin, PageInfoMixin, ListView):

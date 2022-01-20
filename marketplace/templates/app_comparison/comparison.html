@@ -43,7 +43,9 @@
                                     <div class="Compare-products">
                                     {% for good in goods %}
                                         <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                            <div class="Compare-nameProduct Compare-nameProduct_main">{{ good.name}}</div>
+                                            <div class="Compare-nameProduct Compare-nameProduct_main">
+                                                <a href="{% url 'prod_detail' good.id %}">{{ good.name}}</a>
+                                            </div>
                                             <div class="Compare-feature">
                                                 <img class="Compare-pict" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
                                             </div>

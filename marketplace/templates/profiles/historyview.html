@@ -24,39 +24,39 @@
 
             <div class="Section-content">
                 <div class="Cards">
-                    {% for product in viewed_products %}
+                    {% for good_id, good in goods.items %}
                     <div class="Card">
-                        <a class="Card-picture" href="{# url product detail #}">
-                            {% if product.good_images.first %}
-                            <img src="{{ product.good_images.first.image.url }}" alt="{{ product.name }} image"/>
-                            {% else %}
+                        <a class="Card-picture" href="#">
                             <img src="{% static 'img/content/home/pepe.jpg' %}" alt="pepe.jpg"/>
-                            {% endif %}
                         </a>
                         <div class="Card-content">
                             <strong class="Card-title">
-                                <a href="#">{{ product.name }}</a>
+                                <a href="#">{{ good.name }}</a>
                             </strong>
                             <div class="Card-description">
                                 <div class="Card-cost">
-                                    <span class="Card-priceOld">{{ product.biggest_price }}</span>
-                                    <span class="Card-price">{{ product.lowest_price }}</span>
+                                    <span class="Card-price">{{ good.price }}</span>
                                 </div>
                                 <div class="Card-category">
-                                    {{ product.category }}
+                                    {{ good.category__name }}
                                 </div>
                                 <div class="Card-hover">
-                                    <a class="Card-btn" href="{# url add to favorites #}">
+                                    <a class="Card-btn" href="#">
                                         <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
                                     </a>
 
-                                    <a class="Card-btn" href="{# url add to cart #}">
-                                        <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
-                                    </a>
-
-                                    <a class="Card-btn" href="{# url add to compare #}">
-                                        <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
-                                    </a>
+                                    <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                        <input type="hidden" name="data-id" value="{{ good.balance_id }}">
+                                        <a class="Card-btn submitter" href="#">
+                                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
+                                        </a>
+                                    </form>
+                                    <form action="{% url 'comparison_add' %}" method="post" class="comparison-form__add">
+                                        <input type="hidden" name="good_id" value="{{ good_id }}">
+                                        <a class="Card-btn submitter" href="#">
+                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+                                        </a>
+                                    </form>
                                 </div>
                             </div>
                         </div>

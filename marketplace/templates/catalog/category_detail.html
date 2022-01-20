@@ -20,14 +20,14 @@
         <div class="wrap">
             <div class="Section-content">
                 <div class="Cards">
-                    {% for good in goods_list %}
+                    {% for good_id, good in goods.items %}
                         <div class="Card">
                             <a class="Card-picture" href="#">
                                 <img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/>
                             </a>
                             <div class="Card-content">
                                 <strong class="Card-title">
-                                    <a href="{% url 'prod_detail' good.id %}">{{ good.name }}</a>
+                                    <a href="{% url 'prod_detail' good_id %}">{{ good.name }}</a>
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
@@ -45,9 +45,12 @@
                                                 <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
                                             </a>
                                         </form>
-                                        <a class="Card-btn" href="compare.html">
-                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
-                                        </a>
+                                        <form action="{% url 'comparison_add' %}" method="post" class="comparison-form__add">
+                                            <input type="hidden" name="good_id" value="{{ good_id }}">
+                                            <a class="Card-btn submitter" href="#">
+                                                <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+                                            </a>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

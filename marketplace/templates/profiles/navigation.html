@@ -14,10 +14,10 @@
           <li class="menu-item {% if request.path|if_current_url:'profile' %} menu-item_ACTIVE {% endif %}">
               <a class="menu-link" href="{% url 'profile' %}">{% trans 'Profile' %}</a>
           </li>
-          <li class="menu-item">
+          <li class="menu-item {% if request.path|if_current_url:'ordershistory' %} menu-item_ACTIVE {% endif %}">
               <a class="menu-link" href="{% url 'ordershistory' %}">{% trans 'Orders history' %}</a>
           </li>
-          <li class="menu-item">
+          <li class="menu-item {% if request.path|if_current_url:'historyview' %} menu-item_ACTIVE {% endif %}">
               <a class="menu-link" href="{% url 'historyview' %}">{% trans 'View history' %}</a>
           </li>
         </ul>

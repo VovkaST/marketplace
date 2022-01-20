@@ -219,7 +219,7 @@ p.error-browser
                             {% for category in categories %}
                                 {% if category.sub_category.all %}
                                     <div class="CategoriesButton-link">
-                                        <a href="#">
+                                        <a href="{% url 'category_catalog' category.id %}">
                                             <div class="CategoriesButton-icon">
                                                 <img src="{{ category.image.url }}" alt="{{ category.name }} {% trans 'icon' %}"/>
                                             </div>
