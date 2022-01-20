@@ -286,7 +286,7 @@ class OrderPaymentView(AccessMixin, CategoryMixin, PageInfoMixin, FormView):
     page_title = _('Order payment')
     form_class = OrderPaymentForm
     template_name = "app_orders/order_pay.html"
-    success_url = reverse_lazy('"ordershistory"')
+    success_url = reverse_lazy("ordershistory")
 
     def dispatch(self, request, *args, **kwargs):
         order = get_object_or_404(Orders, pk=kwargs.get("pk"))

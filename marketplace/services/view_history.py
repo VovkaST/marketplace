@@ -1,5 +1,7 @@
 from django.utils import timezone
 from loguru import logger
+
+from app_sellers.models import Goods
 from profiles.models import ViewHistory
 
 
@@ -53,15 +55,14 @@ def get_goods_in_view_history(user, start_date, end_date, limit=20):
     Function to used to get goods from user view history
     :return: list[GooodsObject(1), GoodsObject(2), ...]
     """
-    views_queryset = ViewHistory.objects.filter(user=user)
+    views_queryset = Goods.objects.filter(views_history__user=user)
     if start_date:
-        views_queryset = views_queryset.filter(viewed_at__gte=start_date)
+        views_queryset = views_queryset.filter(views_history__viewed_at__gte=start_date)
     if end_date:
-        views_queryset = views_queryset.filter(viewed_at__lte=end_date)
+        views_queryset = views_queryset.filter(views_history__viewed_at__lte=end_date)
     if limit:
-        views_queryset = views_queryset.order_by("-viewed_at")[:limit]
-    viewed_goods = [view_history.goods for view_history in views_queryset]
-    return viewed_goods
+        views_queryset = views_queryset.order_by("-views_history__viewed_at")[:limit]
+    return views_queryset
 
 
 def get_goods_quantity_in_view_history(user, start_date, end_date):

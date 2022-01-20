@@ -1,9 +1,65 @@
 {% extends 'base.html' %}
-{% load cache %}
-{% load i18n %}
+{% load i18n static cache %}
 
 {% block content %}
     {% cache cache_settings.seller_info_life_time seller_info object.slug %}
-        {{ object.name }}
+        <div class="Middle Middle_top">
+            <div class="Middle-top">
+                <div class="wrap">
+                    <div class="Middle-header">
+                        <h1 class="Middle-title">{{ object.name }}</h1>
+                        <ul class="breadcrumbs Middle-breadcrumbs">
+                            <li class="breadcrumbs-item">
+                                <a href="{% url 'main' %}">{% trans 'home' %}</a>
+                            </li>
+                            <li class="breadcrumbs-item">
+                                <a href="{% url 'sellers_list' %}">{% trans 'Sellers' %}</a>
+                            </li>
+                            <li class="breadcrumbs-item breadcrumbs-item_current">
+                                <span>{{ object.name }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="Section Section_column Section_columnRight Section_columnWide">
+                <div class="wrap">
+                    <div class="Section-content">
+                        <div class="Contacts Contacts_main">
+                            <div class="Contacts-block">
+                                <div class="media">
+                                    <div class="media-image">
+                                        <img src="{% static '/img/icons/contacts/phone.svg' %}" alt="phone.svg"/>
+                                    </div>
+                                    <div class="media-content">
+                                        {{ object.phone }}<br>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="Contacts-block">
+                                <div class="media">
+                                    <div class="media-image">
+                                        <img src="{% static '/img/icons/contacts/address.svg' %}" alt="address.svg"/>
+                                    </div>
+                                    <div class="media-content">
+                                        {{ object.address }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="Contacts-block">
+                                <div class="media">
+                                    <div class="media-image">
+                                        <img src="{% static '/img/icons/contacts/mail.svg' %}" alt="mail.svg"/>
+                                    </div>
+                                    <div class="media-content">
+                                        {{ object.email }}<br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endcache %}
 {% endblock content %}

@@ -91,7 +91,7 @@ class CatalogView(GoodsPriceMixin, FilteredListView):
     queryset = Goods.objects.existing().values('id', 'name', 'category__name')
     template_name = "catalog/catalog.html"
     filterset_class = CatalogFilter
-    paginate_by = 9
+    paginate_by = 6
 
     def get_balances(self, goods_ids, *args, **kwargs):
         if all((kwargs.get('price_min'), kwargs.get('price_max'))):
@@ -107,7 +107,7 @@ class CatalogView(GoodsPriceMixin, FilteredListView):
     def get_context_data(self, **kwargs):
         goods_ids = self.object_list.all().values_list('id', flat=True)
         from_price, to_price = None, None
-        if self.filterset.data:
+        if 'price' in self.filterset.data:
             _from_price, _to_price = self.filterset.form.data['price'].split(';')
             attrs = self.filterset.form.fields['price'].widget.attrs
             if attrs['data-min'] != _from_price or attrs['data-max'] != _to_price:
