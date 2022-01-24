@@ -6,6 +6,14 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Profile(models.Model):
+    """Модель профиля
+
+    :param user: Стандартная модель из коробки.
+    - Lirst_name, Last_name, Email
+    :param avatar: Аватар.
+    :param patronymic: Отчество.
+    :param phone_number: Телефон.
+    """
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="profile", verbose_name=_("User")
     )
@@ -24,11 +32,19 @@ class Profile(models.Model):
 
     @property
     def phone_number_formatted(self):
+        """Регулярное выражение для проверки мобильного телефона"""
         phone = re.findall(pattern=r'(\d{3})(\d{3})(\d{2})(\d{2})', string=self.phone_number)
         return '+7 ({0}) {1}-{2}-{3}'.format(*phone[0]) if phone else self.phone_number
 
 
 class UserAddress(models.Model):
+    """Модель профиля
+        :param user: Профиль.
+        :param country: Город.
+        :param region: Регион.
+        :param street: Улица.
+        :param apartment: Квартира.
+        """
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

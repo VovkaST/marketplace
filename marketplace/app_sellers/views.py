@@ -19,6 +19,11 @@ class SellerDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
 
 
 class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
+    """Детальная страница товаров
+
+    :param balances: Информация о товаре.
+    :param context: Остальная информация о товаре и продавце
+    """
     model = Goods
     template_name = "app_sellers/product_detail.html"
     context_object_name = "detail_product"
@@ -54,8 +59,12 @@ class GoodDetailView(PageInfoMixin, CategoryMixin, generic.DetailView):
 
 
 class AddReviews(View):
-    """Отзывы"""
+    """Отзывы
 
+    :param form: Форма.
+    :param good: Товар.
+
+    """
     def post(self, request, pk, *args, **kwargs):
         form = ReviewForm(request.POST)
         good = Goods.objects.get(id=pk)
