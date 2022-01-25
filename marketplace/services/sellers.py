@@ -1,9 +1,9 @@
 from typing import List, Tuple, Union
 
-from app_sellers.models import Goods, Sellers
+from app_sellers.models import Sellers
 
 
-def get_choices_sellers_by_good(good: Union[Goods, int]) -> List[Tuple]:
+def get_choices_sellers_by_good(good: int) -> List[Tuple]:
     """Возвращает список продавцов определенного товара
     для помещения в ChoiceField.
 

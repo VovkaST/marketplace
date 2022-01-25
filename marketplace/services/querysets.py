@@ -26,24 +26,23 @@ class GoodsQuerySet(SoftDeleter):
         return self.filter(good_balance__isnull=False).distinct()
 
     def in_category(self, category_id):
+        """Товары из категории category_id."""
         return self.existing().filter(category=category_id)
 
 
 class BasketQuerySet(models.QuerySet):
     """QuerySet Корзины"""
 
-    def user_basket(self, session_id: str = None, user_id: int = None):
+    def user_basket(self, session_id: str, user_id: int = None):
         """Фильтр получения Корзины пользователя по его идентификатору
-        (user_id), имени сессии (session_id) или их связке.
+        (user_id), имени сессии (session_id).
 
         :param session_id: Имя сессии.
         :param user_id: Идентификатор пользователя.
         """
         if user_id:
-            filters = {'user_id': user_id}
-        else:
-            filters = {'session': session_id}
-        return self.filter(**filters)
+            return self.filter(user_id=user_id)
+        return self.filter(session=session_id)
 
     def delete_user_basket(self, user_id: int):
         """Удаление Корзины пользователя.
@@ -54,17 +53,15 @@ class BasketQuerySet(models.QuerySet):
 
 
 class ComparisonQuerySet(models.QuerySet):
-    def user_comparison(self, session: str = None, user_id: int = None):
-        if all([user_id, session]):
-            filters = {
-                'user_id': user_id,
-                'session': session,
-            }
-        elif user_id:
-            filters = {'user_id': user_id}
-        else:
-            filters = {'session': session}
-        return self.filter(**filters)
+    def user_comparison(self, session: str, user_id: int = None):
+        """Список товаров к сравнению пользователя user_id.
+
+        :param user_id: Идентификатор пользователя.
+        :param session: Имя сессии.
+        """
+        if user_id:
+            return self.filter(user_id=user_id)
+        return self.filter(session=session)
 
     def delete_user_comparison(self, session: str, user_id: int):
         """Удаление списка сравнения пользователя.
@@ -121,7 +118,13 @@ class OrdersQuerySet(SoftDeleter):
 
 
 class SellerQuerySet(models.QuerySet):
-    def by_good(self, good, only_available=True):
+    def by_good(self, good: int, only_available: bool = True):
+        """Фильтр продавцов по товару.
+
+        :param good: Целевой товар.
+        :param only_available: Флаг необходимости фильтрации только
+        тех продавцов, у которых товар good есть в наличии.
+        """
         filters = dict()
         if isinstance(good, int):
             filters.update({'balance_owner__good_id': good})
@@ -137,16 +140,10 @@ class SellerQuerySet(models.QuerySet):
 
 class ImportProtocolQuerySet(models.QuerySet):
     def active_tasks(self, user):
+        """Фильтр заданий пользователя."""
         return self.filter(~Q(task_id=''), user=user)
 
     def tasks_results(self, user, tasks: List[str]):
+        """Получение результатов выполнения задания по их id."""
         values = ['task_id', 'is_imported', 'total_objects', 'new_objects', 'updated_objects']
         return self.active_tasks(user=user).filter(task_id__in=tasks).values(*values)
-
-
-# class GoodsQuerySet(SoftDeleter):
-# class GoodsQuerySet(models.QuerySet):
-#     def annotate_with_reviews_count(self):
-#         return self.annotate(
-#             reviews_count=Count('good_balance'),
-#         )
