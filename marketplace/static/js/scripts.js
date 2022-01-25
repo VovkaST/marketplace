@@ -577,11 +577,17 @@ var Compare = function(){
             $checkDifferent.on('change', function(){
                 var $this = $(this),
                     $rowsHide = $this.closest($compare).find('.Compare-row_hide');
-                if ($this.prop('checked')){
-                    $rowsHide.hide(0);
-                } else {
-                    $rowsHide.show(0);
-                }
+                $rowsHide.each(function(index, value) {
+                    let $row = $(this),
+                        rowItems = $row.find('.Compare-feature').length;
+                    if (rowItems > 1 && !$row.find('.Compare-feature[differ]').length) {
+                        if ($this.prop('checked')){
+                            $row.hide(0);
+                        } else {
+                            $row.show(0);
+                        }
+                    }
+                });
             });
             $checkDifferent.trigger('change');
         }

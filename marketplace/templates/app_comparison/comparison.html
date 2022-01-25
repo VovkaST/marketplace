@@ -33,7 +33,7 @@
                                 <div class="Compare Tabs-block" id="{% transliterate category_name %}">
                                     <div class="Compare-header">
                                         <label class="toggle Compare-checkDifferent">
-                                            <input type="checkbox" name="differentFeature" value="true" checked="checked"/>
+                                            <input type="checkbox" name="differentFeature" value="true"/>
                                             <span class="toggle-box"></span>
                                             <span class="toggle-text">{% trans 'Only differs' %}</span>
                                         </label>
@@ -79,45 +79,54 @@
                                         </div>
                                     </div>
 
-                                    <div class="Compare-row">
+                                    <div class="Compare-row Compare-row_hide">
                                         <div class="Compare-title">{% trans 'Rating' %}</div>
                                         <div class="Compare-products">
-                                        {% for good in goods %}
-                                            <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                                <div class="Compare-feature">
-                                                    <div class="Rating">
-                                                        <div class="Rating-stars">{% rating good.rating  %}</div>
+                                        {% with goods.0.rating as row_rating %}
+                                            {% for good in goods %}
+                                                <div class="Compare-product" column_id="{{ forloop.counter }}">
+                                                    <div class="Compare-feature" {% if row_rating != good.rating %}differ{% endif %}>
+                                                        <div class="Rating">
+                                                            <div class="Rating-stars">{% rating good.rating  %}</div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        {% endfor %}
+                                            {% endfor %}
+                                        {% endwith %}
                                         </div>
                                     </div>
 
                                     {% for feature in features|get:category_name %}
-                                        <div class="Compare-row">
+                                        <div class="Compare-row Compare-row_hide">
                                             <div class="Compare-title">{{ feature }}</div>
                                             <div class="Compare-products">
-                                            {% for good in goods %}
-                                                <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                                    <div class="Compare-nameProduct">{{ good.name }}</div>
-                                                    <div class="Compare-feature">{{ good.features|get:feature }}</div>
-                                                </div>
-                                            {% endfor %}
+                                            {% with goods.0.features|get:feature as feature_row_value %}
+                                                {% for good in goods %}
+                                                    {% with good.features|get:feature as feature_value %}
+                                                        <div class="Compare-product" column_id="{{ forloop.counter }}">
+                                                            <div class="Compare-feature" {% if feature_row_value != feature_value %}differ{% endif %}>
+                                                                {{ good.features|get:feature }}
+                                                            </div>
+                                                        </div>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            {% endwith %}
                                             </div>
                                         </div>
                                     {% endfor %}
 
-                                    <div class="Compare-row">
+                                    <div class="Compare-row Compare-row_hide">
                                         <div class="Compare-title">{% trans 'Price' %}</div>
                                         <div class="Compare-products">
+                                        {% with goods.0.price as row_price %}
                                             {% for good in goods %}
                                                 <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                                    <div class="Compare-feature">
+                                                    <div class="Compare-feature" {% if row_price != good.price %}differ{% endif %}>
                                                         <strong class="Compare-price">&#8381;{{ good.price }}</strong>
                                                     </div>
                                                 </div>
                                             {% endfor %}
+                                        {% endwith %}
                                         </div>
                                     </div>
 
