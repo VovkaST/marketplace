@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views import generic
 
 from main.views import (
-    CacheSettingsMixin,
-    PageInfoMixin, CategoryMixin,
+    CategoryMixin,
+    PageInfoMixin,
 )
 from services.basket import (
     add_item_to_basket,

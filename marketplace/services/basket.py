@@ -161,7 +161,7 @@ def add_item_to_basket(user_id: int, session: str, reservation_id: str, quantity
     return obj_data, error
 
 
-def get_basket_meta(session_id: str, user_id=None, items=False) -> Dict[str, str]:
+def get_basket_meta(session_id: str, user_id: int = None, items: bool = False) -> Dict[str, str]:
     """Получает количественные показатели пользовательской корзины.
 
     :param session_id: Идентификатор сессии.
