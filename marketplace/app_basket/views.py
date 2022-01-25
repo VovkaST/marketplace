@@ -57,8 +57,9 @@ class BasketPatchItemQuantityView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         quantity = request.POST.get('quantity')
+        user_id = request.user.id if request.user.is_authenticated else None
         obj_data, error = patch_item_quantity(
-            session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
+            user_id=user_id, session=request.session.session_key, reservation_id=reservation_id, quantity=quantity
         )
         return JsonResponse({
             'success': not error,
@@ -74,8 +75,9 @@ class BasketPatchItemSellerView(BasketMetaMixin, generic.View):
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
         seller_id = request.POST.get('seller')
+        user_id = request.user.id if request.user.is_authenticated else None
         obj_data, error = patch_item_seller(
-            session=request.session.session_key, reservation_id=reservation_id, seller=seller_id
+            user_id=user_id, session=request.session.session_key, reservation_id=reservation_id, seller=seller_id
         )
         return JsonResponse({
             'success': not error,
@@ -90,7 +92,10 @@ class BasketDeleteItemView(BasketMetaMixin, generic.View):
 
     def post(self, request, *args, **kwargs):
         reservation_id = request.POST.get('reservation_id')
-        error = delete_item_from_basket(session=request.session.session_key, reservation_id=reservation_id)
+        user_id = request.user.id if request.user.is_authenticated else None
+        error = delete_item_from_basket(
+            user_id=user_id, session=request.session.session_key, reservation_id=reservation_id
+        )
         return JsonResponse({
             'success': not error,
             'error': error,
@@ -105,8 +110,8 @@ class BasketAddItemView(BasketMetaMixin, generic.View):
         reservation = request.POST.get('data-id')
         quantity = int(request.POST.get('quantity', 1))
         session = request.session.session_key
-        user = request.user if request.user.is_authenticated else None
-        obj_data, error = add_item_to_basket(user=user, session=session, reservation_id=reservation, quantity=quantity)
+        user_id = request.user.id if request.user.is_authenticated else None
+        obj_data, error = add_item_to_basket(user_id=user_id, session=session, reservation_id=reservation, quantity=quantity)
         return JsonResponse({
             'success': not error,
             'error': error,

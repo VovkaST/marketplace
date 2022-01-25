@@ -12,7 +12,8 @@ from django.views.generic import FormView  # isort:skip
 from django.views.generic.base import ContextMixin  # isort:skip
 from main.views import PageInfoMixin, CategoryMixin  # isort:skip
 from services.auth import registration  # isort:skip
-from services.basket import complete_order, get_order_summary, merge_baskets  # isort:skip
+from services.basket import merge_baskets  # isort:skip
+from services.orders import get_order_summary, complete_order
 from services.cache import basket_cache_clear, order_cache_clear  # isort:skip
 from services.financial import order_payment  # isort:skip
 from services.utils import update_instance_from_form  # isort:skip

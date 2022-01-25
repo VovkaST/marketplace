@@ -897,8 +897,13 @@ const PREFIX = 'basket_item'
 const CSRF_TOKEN = $('[name=csrfmiddlewaretoken]').val();
 
 
-function setBasketRowTotalPrice($row, item) {
-    $row.find('.basket-item__sum').text(item.total_price);
+function setBasketRowTotalPrice($row, total_price) {
+    $row.find('.basket-item__sum').text(total_price);
+}
+
+
+function setReservationId($row, reservationId) {
+    $row.find('[name$="reservation_id"]').val(reservationId);
 }
 
 
@@ -996,7 +1001,7 @@ function responseBasketChangeItemQuantity(response) {
     if (response.success) {
         let $row = response.elem.closest('.basket-item-row');
         setBasketFullness(response.goods_quantity, response.total_sum);
-        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketRowTotalPrice($row, response.changed_item.total_price);
         setBasketTotalSum(response.total_sum);
     } else
         alert(`Ошибка: ${response.error}`);
@@ -1019,7 +1024,8 @@ function responseBasketChangeItemSeller(response) {
         let $row = response.elem.closest('.basket-item-row');
         basketSetSeller($row, response.changed_item)
         setBasketFullness(response.goods_quantity, response.total_sum);
-        setBasketRowTotalPrice($row, response.changed_item);
+        setBasketRowTotalPrice($row, response.changed_item.total_price);
+        setReservationId($row, response.changed_item.reservation_id)
         setBasketTotalSum(response.total_sum);
     } else
         alert(`Ошибка: ${response.error}`);

@@ -39,12 +39,7 @@ class BasketQuerySet(models.QuerySet):
         :param session_id: Имя сессии.
         :param user_id: Идентификатор пользователя.
         """
-        if all([user_id, session_id]):
-            filters = {
-                'user_id': user_id,
-                'session': session_id,
-            }
-        elif user_id:
+        if user_id:
             filters = {'user_id': user_id}
         else:
             filters = {'session': session_id}
