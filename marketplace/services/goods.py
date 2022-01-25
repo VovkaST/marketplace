@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Tuple, List
 
 from django.contrib.auth.models import User
