@@ -16,7 +16,7 @@ def reset_seller_page_cache(seller: Sellers):
     cache.delete(key)
 
 
-def basket_cache_save(session_id: str, lifetime=BASKET_LIFE_TIME, **kwargs):
+def basket_cache_save(session_id: str, lifetime: int = BASKET_LIFE_TIME, **kwargs):
     """Сохраняет мета-данные пользовательской корзины в кэше.
 
     :param session_id: Идентификатор сессии.
@@ -27,7 +27,7 @@ def basket_cache_save(session_id: str, lifetime=BASKET_LIFE_TIME, **kwargs):
             cache.set(f'basket_{session_id}_{key}', value, lifetime)
 
 
-def get_basket_cache(session_id: str, keys=None) -> dict:
+def get_basket_cache(session_id: str, keys: list = None) -> dict:
     """Получает значения из кэша для переменных, указанных
     в списке keys.
 
@@ -41,7 +41,7 @@ def get_basket_cache(session_id: str, keys=None) -> dict:
     }
 
 
-def basket_cache_clear(session_id: str = None, username: str = None, keys=None):
+def basket_cache_clear(session_id: str = None, username: str = None, keys: list = None):
     """Clear user`s basket cache.
 
     :param session_id: Current session key.
@@ -87,7 +87,8 @@ def comparison_cache_save(session: str, value: int):
     return cache.set(f'comparison_{session}', value)
 
 
-def comparison_cache_clear(session: str):
+def comparison_cache_clear(session: str, username: str = None):
     """Удалить список сравнения товаров из кэша."""
-    # todo: кэш страницы
-    return cache.delete(f'comparison_{session}')
+    user_key = username or session
+    cache.delete(make_template_fragment_key('comparison', (user_key, get_language())))
+    cache.delete(f'comparison_{session}')

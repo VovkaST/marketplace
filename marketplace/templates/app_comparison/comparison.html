@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static tags %}
+{% load i18n static tags cache %}
 
 {% block content %}
     <div class="Middle Middle_top">
@@ -19,111 +19,113 @@
                 <article class="Article">
                     <p>{% trans 'Diverse and rich experience continuous quantitative growth and scope of our activity provides a wide range of (specialists) participation in the formation of the training system personnel, meets the urgent needs. Ideological considerations of a higher order, as well as consultation with a broad asset require the definition and clarification of the appropriate conditions of activation.' %}</p>
                 </article>
-                <div class="Tabs Tabs_default">
-                    <div class="Tabs-links">
-                        {% for category_name in comp_items.keys %}
-                            <a class="Tabs-link_ACTIVE Tabs-link" for="{% transliterate category_name %}" href="#{% transliterate category_name %}">
-                                <span>{{ category_name }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
-                    <div class="Tabs-wrap">
-                        {% for category_name, goods in comp_items.items %}
-                            <div class="Compare Tabs-block" id="{% transliterate category_name %}">
-                                <div class="Compare-header">
-                                    <label class="toggle Compare-checkDifferent">
-                                        <input type="checkbox" name="differentFeature" value="true" checked="checked"/>
-                                        <span class="toggle-box"></span>
-                                        <span class="toggle-text">{% trans 'Only differs' %}</span>
-                                    </label>
-                                </div>
-
-                                <div class="Compare-row">
-                                    <div class="Compare-title Compare-title_blank"></div>
-                                    <div class="Compare-products">
-                                    {% for good in goods %}
-                                        <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                            <div class="Compare-nameProduct Compare-nameProduct_main">
-                                                <a href="{% url 'prod_detail' good.id %}">{{ good.name}}</a>
-                                            </div>
-                                            <div class="Compare-feature">
-                                                <img class="Compare-pict" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
+                {% cache cache_settings.comparison_life_time comparison cache_key LANGUAGE_CODE %}
+                    <div class="Tabs Tabs_default">
+                        <div class="Tabs-links">
+                            {% for category_name in comp_items.keys %}
+                                <a class="Tabs-link_ACTIVE Tabs-link" for="{% transliterate category_name %}" href="#{% transliterate category_name %}">
+                                    <span>{{ category_name }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        <div class="Tabs-wrap">
+                            {% for category_name, goods in comp_items.items %}
+                                <div class="Compare Tabs-block" id="{% transliterate category_name %}">
+                                    <div class="Compare-header">
+                                        <label class="toggle Compare-checkDifferent">
+                                            <input type="checkbox" name="differentFeature" value="true" checked="checked"/>
+                                            <span class="toggle-box"></span>
+                                            <span class="toggle-text">{% trans 'Only differs' %}</span>
+                                        </label>
                                     </div>
-                                </div>
 
-                                <div class="Compare-row">
-                                    <div class="Compare-title Compare-title_blank"></div>
-                                    <div class="Compare-products">
-                                        {% for good in goods %}
-                                            <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                                <div class="Compare-feature">
-                                                    <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
-                                                        <input type="hidden" name="data-id" value="{{ good.balance_id }}">
-                                                        <a class="Card-btn submitter" href="#">
-                                                            <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
-                                                        </a>
-                                                    </form>
-                                                    <form action="{% url 'comparison_remove' %}" method="post" class="comparison-form__remove">
-                                                        <input type="hidden" name="good_id" value="{{ good.id }}">
-                                                        <a class="Card-btn submitter" href="#">
-                                                            <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
-                                                        </a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-
-                                <div class="Compare-row">
-                                    <div class="Compare-title">{% trans 'Rating' %}</div>
-                                    <div class="Compare-products">
-                                    {% for good in goods %}
-                                        <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                            <div class="Compare-feature">
-                                                <div class="Rating">
-                                                    <div class="Rating-stars">{% rating good.rating  %}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                    </div>
-                                </div>
-
-                                {% for feature in features|get:category_name %}
                                     <div class="Compare-row">
-                                        <div class="Compare-title">{{ feature }}</div>
+                                        <div class="Compare-title Compare-title_blank"></div>
                                         <div class="Compare-products">
                                         {% for good in goods %}
                                             <div class="Compare-product" column_id="{{ forloop.counter }}">
-                                                <div class="Compare-nameProduct">{{ good.name }}</div>
-                                                <div class="Compare-feature">{{ good.features|get:feature }}</div>
+                                                <div class="Compare-nameProduct Compare-nameProduct_main">
+                                                    <a href="{% url 'prod_detail' good.id %}">{{ good.name}}</a>
+                                                </div>
+                                                <div class="Compare-feature">
+                                                    <img class="Compare-pict" src="{% static '/img/content/home/card.jpg' %}" alt="card.jpg"/>
+                                                </div>
                                             </div>
                                         {% endfor %}
                                         </div>
                                     </div>
-                                {% endfor %}
 
-                                <div class="Compare-row">
-                                    <div class="Compare-title">{% trans 'Price' %}</div>
-                                    <div class="Compare-products">
+                                    <div class="Compare-row">
+                                        <div class="Compare-title Compare-title_blank"></div>
+                                        <div class="Compare-products">
+                                            {% for good in goods %}
+                                                <div class="Compare-product" column_id="{{ forloop.counter }}">
+                                                    <div class="Compare-feature">
+                                                        <form action="{% url 'basket_add_item' %}" method="post" class="basket-form__add">
+                                                            <input type="hidden" name="data-id" value="{{ good.balance_id }}">
+                                                            <a class="Card-btn submitter" href="#">
+                                                                <img src="{% static 'img/icons/card/cart.svg' %}" alt="{% static 'img/icons/card/cart.svg' %}"/>
+                                                            </a>
+                                                        </form>
+                                                        <form action="{% url 'comparison_remove' %}" method="post" class="comparison-form__remove">
+                                                            <input type="hidden" name="good_id" value="{{ good.id }}">
+                                                            <a class="Card-btn submitter" href="#">
+                                                                <img src="{% static 'img/icons/card/change.svg' %}" alt="{% static 'img/icons/card/change.svg' %}"/>
+                                                            </a>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="Compare-row">
+                                        <div class="Compare-title">{% trans 'Rating' %}</div>
+                                        <div class="Compare-products">
                                         {% for good in goods %}
                                             <div class="Compare-product" column_id="{{ forloop.counter }}">
                                                 <div class="Compare-feature">
-                                                    <strong class="Compare-price">&#8381;{{ good.price }}</strong>
+                                                    <div class="Rating">
+                                                        <div class="Rating-stars">{% rating good.rating  %}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         {% endfor %}
+                                        </div>
                                     </div>
-                                </div>
 
-                            </div>
-                        {% endfor %}
+                                    {% for feature in features|get:category_name %}
+                                        <div class="Compare-row">
+                                            <div class="Compare-title">{{ feature }}</div>
+                                            <div class="Compare-products">
+                                            {% for good in goods %}
+                                                <div class="Compare-product" column_id="{{ forloop.counter }}">
+                                                    <div class="Compare-nameProduct">{{ good.name }}</div>
+                                                    <div class="Compare-feature">{{ good.features|get:feature }}</div>
+                                                </div>
+                                            {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                    <div class="Compare-row">
+                                        <div class="Compare-title">{% trans 'Price' %}</div>
+                                        <div class="Compare-products">
+                                            {% for good in goods %}
+                                                <div class="Compare-product" column_id="{{ forloop.counter }}">
+                                                    <div class="Compare-feature">
+                                                        <strong class="Compare-price">&#8381;{{ good.price }}</strong>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
+                {% endcache %}
             </div>
         </div>
     </div>

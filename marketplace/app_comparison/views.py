@@ -3,18 +3,23 @@ from django.views import generic
 from django.utils.translation import gettext_lazy as _
 
 from app_comparison.forms import ComparisonForm
-from main.views import PageInfoMixin, CategoryMixin
+from main.views import CacheSettingsMixin, CategoryMixin, PageInfoMixin
 from services.comparison import get_comparison_context
 from services.goods import comparison_good_add, comparison_good_remove
 
 
-class ComparisonView(CategoryMixin, PageInfoMixin, generic.TemplateView):
+class ComparisonView(CategoryMixin, PageInfoMixin, CacheSettingsMixin, generic.TemplateView):
     page_title = _('Goods comparison')
     template_name = 'app_comparison/comparison.html'
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         user = self.request.user if self.request.user.is_authenticated else None
-        return get_comparison_context(user=user, session=self.request.session.session_key)
+        context.update(get_comparison_context(user=user, session=self.request.session.session_key))
+        context.update({
+            'cache_key': user.username or self.request.session.session_key,
+        })
+        return context
 
 
 class ComparisonAddView(generic.FormView):

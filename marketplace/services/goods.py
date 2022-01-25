@@ -96,7 +96,7 @@ def comparison_good_add(good_id: int, user: User, session: str) -> Tuple[dict, s
     except Exception as exc:
         error = exc.args[0]
     data['count'] = Comparison.objects.user_comparison(**user_data).count()
-    comparison_cache_clear(session=session)
+    comparison_cache_clear(session=session, username=user.username if user else None)
     return data, error
 
 
@@ -118,7 +118,7 @@ def comparison_good_remove(good_id: int, user: User, session: str) -> Tuple[dict
     except Exception as exc:
         error = exc.args[0]
     data['count'] = Comparison.objects.user_comparison(**user_data).count()
-    comparison_cache_clear(session=session)
+    comparison_cache_clear(session=session, username=user.username if user else None)
     return data, error
 
 
