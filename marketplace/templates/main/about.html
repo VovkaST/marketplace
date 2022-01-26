@@ -10,8 +10,8 @@
                 <div class="Middle-header">
                     <h1 class="Middle-title">{% trans 'About Megano' %}</h1>
                     <ul class="breadcrumbs Middle-breadcrumbs">
-                        <li class="breadcrumbs-item"><a href="{% url 'main' %}">home</a></li>
-                        <li class="breadcrumbs-item breadcrumbs-item_current"><span>About Us</span></li>
+                        <li class="breadcrumbs-item"><a href="{% url 'main' %}">{% trans 'Home' %}</a></li>
+                        <li class="breadcrumbs-item breadcrumbs-item_current"><span>{% trans 'About Us' %}</span></li>
                     </ul>
                 </div>
             </div>
@@ -37,9 +37,9 @@
                                 <img src="{% static '/img/icons/contacts/address.svg' %}" alt="address.svg"/>
                             </div>
                             <div class="media-content">
-                              Megano Business Center,
-                              0012 United States, Los Angeles
-                              Creative Street 15/4
+                              {% trans 'Megano Business Center' %},
+                              {% trans '0012 United States, Los Angeles' %}
+                              {% trans 'Creative Street' %} 15/4
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,11 @@
                     </div>
                     <div class="row-block">
                         <h2>{% trans 'Megano Store Hystory' %}</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem.</p>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget
+                            dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti,
+                            nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem.
+                        </p>
                         <ul>
                             <li>Lorem ipsum dolor sit amet, consectetuer</li>
                             <li>adipiscing elit doli. Aenean commodo ligula</li>

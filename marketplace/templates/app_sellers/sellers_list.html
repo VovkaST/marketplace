@@ -27,7 +27,11 @@
                             <a href="{% url 'seller_detail' seller.slug %}" class="sellers-list__link">
                                 <div class="sellers-list__item">
                                     <div class="sellers-list__item__image">
+                                        {% if seller.image %}
                                         <img src="{% static seller.image %}" alt="{{ seller.name }}">
+                                        {% else %}
+                                        <img src="{% static 'img/icons/advantages/quality.svg' %}" alt="{{ seller.name }}">
+                                        {% endif %}
                                     </div>
                                     <div class="seller-list__item__description">
                                         <h3>{{ seller.name }}</h3>

@@ -1,7 +1,7 @@
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.db import models
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Banner(models.Model):
@@ -44,22 +44,24 @@ class Banner(models.Model):
 
 
 class GoodCategory(models.Model):
-    name = models.CharField(max_length=255, verbose_name=_('Name'))
-    parent = models.ForeignKey('self',
-                               null=True,
-                               blank=True,
-                               on_delete=models.CASCADE,
-                               related_name='sub_category',
-                               verbose_name=_('Parent Category'))
-    image = models.FileField(upload_to='images/categories', null=True, blank=True)
-    deleted = models.BooleanField(verbose_name=_('Deleted'), default=False)
-    active = models.BooleanField(verbose_name=_('Active'), default=True)
-    order_index = models.IntegerField(verbose_name=_('Order Index'))
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="sub_category",
+        verbose_name=_("Parent Category"),
+    )
+    image = models.FileField(upload_to="images/categories", null=True, blank=True)
+    deleted = models.BooleanField(verbose_name=_("Deleted"), default=False)
+    active = models.BooleanField(verbose_name=_("Active"), default=True)
+    order_index = models.IntegerField(verbose_name=_("Order Index"))
 
     class Meta:
-        db_table = 'mp_goods_categories'
-        verbose_name = _('Good Category')
-        verbose_name_plural = _('Goods Categories')
+        db_table = "mp_goods_categories"
+        verbose_name = _("Good Category")
+        verbose_name_plural = _("Goods Categories")
 
     def __str__(self):
         if not self.active:
@@ -68,7 +70,7 @@ class GoodCategory(models.Model):
 
     @property
     def photo_url(self):
-        return self.image.url if self.image else ''
+        return self.image.url if self.image else ""
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

@@ -238,7 +238,9 @@ p.error-browser
                                     <div class="CategoriesButton-link">
                                         <a href="{% url 'category_catalog' category.id %}">
                                              <div class="CategoriesButton-icon">
+                                                 {% if category.image %}
                                                 <img src="{{ category.image.url }}" alt="{{ category.name }} {% trans 'icon' %}"/>
+                                                 {% endif %}
                                             </div>
                                             <span class="CategoriesButton-text">{{ category.name }}</span>
                                         </a>
@@ -256,7 +258,8 @@ p.error-browser
             <div class="Header-search">
                 <div class="search">
                     <form class="form form_search" action="#" method="post">
-                        <input class="search-input" id="query" name="query" type="text" placeholder="What are you looking for ..."/>
+                        <input class="search-input" id="query" name="query" type="text"
+                               placeholder="{% trans 'What are you looking for ...' %}"/>
                         <button class="search-button" type="submit" name="search" id="search">
                             <img src="{% static 'img/icons/search.svg' %}" alt="search.svg"/>
                             {% trans 'Search' %}
@@ -335,8 +338,12 @@ p.error-browser
             <div class="row-block"></div>
             <div class="row-block">
                 <strong class="Footer-title">{% trans 'Contacts' %}</strong>
-                <p>{% trans 'Phone' %}: 8.800.200.600<br>Email: Support@ninzio.com<br>Skype: techno<br>Address: New York, north<br>Avenue
-                    26/7<br>0057
+                <p>{% trans 'Phone' %}: 8.800.200.600<br>
+                    Email: Support@ninzio.com<br>
+                    Skype: techno<br>
+                    {% trans 'Address: New York, north' %}<br>
+                    {% trans 'Avenue' %} 26/7<br>
+                    0057
                 </p>
             </div>
         </div>
@@ -347,7 +354,7 @@ p.error-browser
                 <div class="row-block">
                     © Copyright&#32;
                     <a href="{% url 'main' %}">Megano {% trans 'Store' %}.</a>
-                    &#32;All rights reserved.
+                    &#32;{% trans 'All rights reserved' %}.
                 </div>
                 <div class="row-block">
                     <span>{% trans 'Accepted Payments' %}</span>
