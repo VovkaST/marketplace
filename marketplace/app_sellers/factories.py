@@ -63,7 +63,7 @@ class BalancesFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Balances
 
-    seller_id = factory.Sequence(get_random_seller)
-    good_id = factory.Sequence(get_random_good)
+    seller = factory.SubFactory(SellersFactory)
+    good = factory.SubFactory(GoodsFactory)
     quantity = factory.Sequence(lambda n: 10 * (n + 1))
     price = factory.Sequence(lambda n: Decimal(500) * (n + 1))

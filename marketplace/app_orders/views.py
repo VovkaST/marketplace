@@ -15,6 +15,8 @@ from services.auth import registration  # isort:skip
 from services.basket import complete_order, get_order_summary, merge_baskets  # isort:skip
 from services.cache import basket_cache_clear, order_cache_clear  # isort:skip
 from services.financial import order_payment  # isort:skip
+from services.orders import is_enough_goods_on_balance, write_off_balances
+
 from services.utils import update_instance_from_form  # isort:skip
 
 from app_orders.forms import (  # isort:skip
@@ -119,7 +121,7 @@ class OrderCreateStep1View(
 ):
     """Первый этап оформления Заказа (Персональные данные)"""
 
-    form_template_name = 'app_orders/personal_data_step.html'
+    form_template_name = "app_orders/personal_data_step.html"
     success_url = reverse_lazy("order_create_step_2")
     page_title = _("Order: personal data")
     step_name = _("Step 1. Personal data")
@@ -189,7 +191,7 @@ class OrderCreateStep2View(
 
     success_url = reverse_lazy("order_create_step_3")
     form_class = OrderStep2Form
-    form_template_name = 'app_orders/delivery_step.html'
+    form_template_name = "app_orders/delivery_step.html"
     page_title = _("Order: delivery")
     step_name = _("Step 2. Delivery method")
     step = 2
@@ -239,18 +241,24 @@ class OrderConfirmationView(
         summary = get_order_summary(order)
         session = self.request.session.session_key
         user = self.request.user if self.request.user.is_authenticated else None
-        summary.update({
-            "total_sum": self.request.basket_total_sum,
-            "items": Basket.objects.user_basket(session_id=session, user_id=user.id if user else None),
-        })
-        data.update({
-            "order_data": summary,
-        })
+        summary.update(
+            {
+                "total_sum": self.request.basket_total_sum,
+                "items": Basket.objects.user_basket(
+                    session_id=session, user_id=user.id if user else None
+                ),
+            }
+        )
+        data.update(
+            {
+                "order_data": summary,
+            }
+        )
         return data
 
     def get_success_url(self):
         order = self.get_order(user=self.request.user)
-        return reverse_lazy("order_payment", kwargs={'pk': order.id})
+        return reverse_lazy("order_payment", kwargs={"pk": order.id})
 
     def form_valid(self, form):
         self.order.comment = form.cleaned_data["comment"]
@@ -290,7 +298,7 @@ class OrderPaymentView(AccessMixin, CategoryMixin, PageInfoMixin, FormView):
     создании заказа.
     """
 
-    page_title = _('Order payment')
+    page_title = _("Order payment")
     form_class = OrderPaymentForm
     template_name = "app_orders/order_pay.html"
     success_url = reverse_lazy("ordershistory")
@@ -303,39 +311,52 @@ class OrderPaymentView(AccessMixin, CategoryMixin, PageInfoMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'order': Orders.objects.get(id=self.kwargs.get("pk")),
-        })
+        context.update(
+            {
+                "order": Orders.objects.get(id=self.kwargs.get("pk")),
+            }
+        )
         return context
 
     def form_valid(self, form):
-        response = order_payment(
-            order_pk=self.kwargs.get("pk"), card_number=form.cleaned_data["bank_account"]
-        )
-        if response["status"]:
-            return redirect(self.get_success_url())
-        form.add_error("bank_account", response["message"])
+        balance_response = is_enough_goods_on_balance(order_pk=self.kwargs.get("pk"))
+        if balance_response["status"]:
+            payment_response = order_payment(
+                order_pk=self.kwargs.get("pk"),
+                card_number=form.cleaned_data["bank_account"],
+            )
+            if payment_response["status"]:
+                write_off_balances(order_pk=self.kwargs.get("pk"))
+                return redirect(self.get_success_url())
+            else:
+                form.add_error("bank_account", payment_response["message"])
+        else:
+            form.add_error("bank_account", balance_response["message"])
         return self.form_invalid(form)
 
 
 class OrderDetailView(CategoryMixin, PageInfoMixin, generic.DetailView):
     """Представление детальной страницы заказа"""
+
     model = Orders
-    context_object_name = 'order'
+    context_object_name = "order"
 
     @property
     def page_title(self):
-        return '{} № {} details'.format(_('Order'), self.get_object().id)
+        return "{} № {} details".format(_("Order"), self.get_object().id)
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.select_related('delivery', 'payment', 'user__profile')
+        return queryset.select_related("delivery", "payment", "user__profile")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        items = OrderItems.objects.filter(order_id=self.object)\
-            .select_related('seller', 'good__category')
-        context.update({
-            'order_items': items,
-        })
+        items = OrderItems.objects.filter(order_id=self.object).select_related(
+            "seller", "good__category"
+        )
+        context.update(
+            {
+                "order_items": items,
+            }
+        )
         return context

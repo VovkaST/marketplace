@@ -1,11 +1,14 @@
+# fmt: off
+from app_orders.models import (DeliveryMethods, OrderItems, Orders,
+                               PaymentMethods)
 from django.contrib import admin
+from django.contrib.admin import TabularInline
 
-from app_orders.models import (
-    DeliveryMethods,
-    OrderItems,
-    Orders,
-    PaymentMethods,
-)
+# fmt: on
+
+
+class OrderItemsInline(TabularInline):
+    model = OrderItems
 
 
 @admin.register(DeliveryMethods)
@@ -20,9 +23,10 @@ class PaymentMethodsAdmin(admin.ModelAdmin):
 
 @admin.register(Orders)
 class OrdersAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("user", "total_sum", "date_time", "payment_state")
+    inlines = (OrderItemsInline,)
 
 
 @admin.register(OrderItems)
 class OrderItemsAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("order", "seller", "good", "quantity", "total_price")

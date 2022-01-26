@@ -59,7 +59,7 @@
             <div class="Section-content">
                 <div class="Slider Slider_carousel">
                     <header class="Section-header">
-                        <h2 class="Section-title">Hot Offers</h2>
+                        <h2 class="Section-title">{% trans 'Hot Offers' %}</h2>
                         <div class="Section-control">
                             <div class="Slider-navigate"></div>
                         </div>
@@ -204,14 +204,14 @@
                                     </a>
                                     <div class="Card-content">
                                         <strong class="Card-title">
-                                            <a href="#">Barand New Phone Smart Business</a>
+                                            <a href="#">{% trans 'Brand New Phone Smart Business' %}</a>
                                         </strong>
                                         <div class="Card-description">
                                             <div class="Card-cost">
                                                 <span class="Card-priceOld">$115.00</span>
                                                 <span class="Card-price">$85.00</span>
                                             </div>
-                                            <div class="Card-category">Games / xbox</div>
+                                            <div class="Card-category">{% trans 'Games' %}/ xbox</div>
                                             <div class="Card-hover">
                                                 <a class="Card-btn" href="#">
                                                     <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
@@ -237,14 +237,14 @@
                                     </a>
                                     <div class="Card-content">
                                         <strong class="Card-title">
-                                            <a href="#">Mavic PRO Mini Drones Hobby RC Quadcopter</a>
+                                            <a href="#">Mavic PRO {% trans 'Mini Drones' %} Hobby RC {% trans 'Quadcopter' %}</a>
                                         </strong>
                                         <div class="Card-description">
                                             <div class="Card-cost">
                                                 <span class="Card-priceOld">$115.00</span>
                                                 <span class="Card-price">$185.00</span>
                                             </div>
-                                            <div class="Card-category">Digital / xbox</div>
+                                            <div class="Card-category">{% trans 'Digital' %} / xbox</div>
                                             <div class="Card-hover">
                                                 <a class="Card-btn" href="#">
                                                     <img src="img/icons/card/bookmark.svg" alt="bookmark.svg"/>
@@ -273,7 +273,7 @@
                 <div class="Section-columnSection Section-columnSection_mark">
                     <div class="media media_advantage">
                         <div class="media-image">
-                            <img src="{% static 'img/icons/advantages/shipping.svg' %}"alt="shipping.svg"/>
+                            <img src="{% static 'img/icons/advantages/shipping.svg' %}" alt="shipping.svg"/>
                         </div>
                         <div class="media-content">
                             <strong class="media-title">{% trans 'Shipping & Returns' %}</strong>
@@ -339,14 +339,18 @@
                                             <div class="Card-cost"><span class="Card-priceOld">$115.00</span><span
                                                     class="Card-price">$85.00</span>
                                             </div>
-                                            <div class="Card-category">Games / xbox
+                                            <div class="Card-category">{% trans 'Games' %} / xbox
                                             </div>
-                                            <div class="Card-hover"><a class="Card-btn" href="#"><img
-                                                    src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/></a><a
-                                                    class="Card-btn" href="#"><img src="{% static 'img/icons/card/cart.svg' %}"
-                                                                                   alt="cart.svg"/></a><a
-                                                    class="Card-btn" href="compare.html"><img
-                                                    src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/></a>
+                                            <div class="Card-hover">
+                                                <a class="Card-btn" href="#">
+                                                    <img src="{% static 'img/icons/card/bookmark.svg' %}" alt="bookmark.svg"/>
+                                                </a>
+                                                <a class="Card-btn" href="#">
+                                                    <img src="{% static 'img/icons/card/cart.svg' %}" alt="cart.svg"/>
+                                                </a>
+                                                <a class="Card-btn" href="compare.html">
+                                                    <img src="{% static 'img/icons/card/change.svg' %}" alt="change.svg"/>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

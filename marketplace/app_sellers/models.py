@@ -1,12 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from main.models import GoodCategory
 from services.models import NaturalKeyModel
-from services.querysets import (
-    GoodsQuerySet,
-    SellerQuerySet,
-)
+from services.querysets import GoodsQuerySet, SellerQuerySet
 from services.utils import slugify
 
 
@@ -30,7 +27,7 @@ class Sellers(NaturalKeyModel, models.Model):
         if not self.slug:
             self.clean()
         return {
-            'slug': self.slug,
+            "slug": self.slug,
         }
 
     class Meta:
@@ -59,7 +56,7 @@ class GoodsDescriptionsValues(NaturalKeyModel, models.Model):
 
     def natural_key(self):
         return {
-            'id': self.id,
+            "id": self.id,
         }
 
     def __str__(self):

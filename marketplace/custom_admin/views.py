@@ -1,24 +1,19 @@
 import json
 
-from django.urls import reverse_lazy
-
-from app_orders.factories import (
-    DeliveryMethodsFactory,
-    OrderItemsFactory,
-    PaymentMethodsFactory,
-    MAX_DELIVERY_METHODS,
-    MAX_PAYMENTS_METHODS,
-)
-from app_orders.models import PaymentMethods, DeliveryMethods
+# fmt: off
+from app_orders.factories import (MAX_DELIVERY_METHODS, MAX_PAYMENTS_METHODS,
+                                  DeliveryMethodsFactory, OrderItemsFactory,
+                                  OrdersFactory, PaymentMethodsFactory)
+from app_orders.models import DeliveryMethods, PaymentMethods
 from app_sellers.factories import BalancesFactory, GoodsFactory, SellersFactory
 from custom_admin.utlis import clear_cache
 from django.conf import settings
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, TemplateView
 from loguru import logger
 
-# fmt: off
 from custom_admin.forms import (  # isort:skip
     ClearCacheForm,  # isort:skip
     GenerateBalancesForm,  # isort:skip
@@ -30,6 +25,8 @@ from custom_admin.forms import (  # isort:skip
 
 
 class SettingsView(TemplateView):
+    """View для страницы настроек в панели администрирования"""
+
     template_name = "admin/settings.html"
 
     def get_context_data(self, **kwargs):
@@ -44,6 +41,8 @@ class ObjectGenerationView(TemplateView):
 
 
 class ClearAllCacheView(View):
+    """View для полной очистки кэша"""
+
     def post(self, request, *args, **kwargs):
         # fmt: off
         try:
@@ -64,23 +63,23 @@ class ClearAllCacheView(View):
 
 
 class GeneratorBaseView(FormView):
-    objects_name = ''
+    objects_name = ""
 
     def generate_objects(self, **kwargs):
         """Метод генерации объектов"""
         pass
 
     def form_valid(self, form):
-        error = ''
+        error = ""
         try:
             self.generate_objects(**form.cleaned_data)
         except Exception as exc:
-            error = f'{self.objects_name.capitalize()} generation error: {exc.args[0]}'
+            error = f"{self.objects_name.capitalize()} generation error: {exc.args[0]}"
             logger.error(error)
         response = {
             "success": not error,
             "message": error or f"{self.objects_name}s successfully created!",
-            "redirect": self.success_url
+            "redirect": self.success_url,
         }
         return JsonResponse(data=response, status=200, safe=False)
 
@@ -92,10 +91,10 @@ class GenerateBalancesView(GeneratorBaseView):
     же наоборот для одного продавца (у которого будет несколько товаров)
     """
 
-    objects_name = 'Balances'
+    objects_name = "Balances"
     template_name = "admin/forms/balances_generate_form.html"
     form_class = GenerateBalancesForm
-    success_url = reverse_lazy('admin:app_sellers_balances_changelist')
+    success_url = reverse_lazy("admin:app_sellers_balances_changelist")
 
     def generate_objects(self, single_choice, balances_quantity):
         if single_choice == "Good":
@@ -110,17 +109,17 @@ class GenerateBalancesView(GeneratorBaseView):
             )
             logger.info(f"Created balances {balances}")
         else:
-            balances = BalancesFactory.create_batch(
-                size=balances_quantity
-            )
+            balances = BalancesFactory.create_batch(size=balances_quantity)
             logger.info(f"Created balances {balances}")
 
 
 class GenerateGoodsView(GeneratorBaseView):
-    objects_name = 'Goods'
+    """Генерирует заданное количество различных товаров, но без остатков у продавцов"""
+
+    objects_name = "Goods"
     template_name = "admin/forms/goods_generate_form.html"
     form_class = GenerateGoodsForm
-    success_url = reverse_lazy('admin:app_sellers_goods_changelist')
+    success_url = reverse_lazy("admin:app_sellers_goods_changelist")
 
     def generate_objects(self, quantity: int):
         goods = GoodsFactory.create_batch(size=quantity)
@@ -128,10 +127,12 @@ class GenerateGoodsView(GeneratorBaseView):
 
 
 class GenerateSellersView(GeneratorBaseView):
-    objects_name = 'Sellers'
+    """Генерирует указанное количество различных продавцов, без остатков товаров"""
+
+    objects_name = "Sellers"
     template_name = "admin/forms/sellers_generate_form.html"
     form_class = GenerateSellersForm
-    success_url = reverse_lazy('admin:app_sellers_sellers_changelist')
+    success_url = reverse_lazy("admin:app_sellers_sellers_changelist")
 
     def generate_objects(self, quantity):
         sellers = SellersFactory.create_batch(size=quantity)
@@ -139,10 +140,16 @@ class GenerateSellersView(GeneratorBaseView):
 
 
 class GenerateOrdersView(GeneratorBaseView):
-    objects_name = 'Orders'
+    """
+    Генерирует указанное количество заказов, для каждого заказа также создается по 4 вида товара,
+    и для каждого товара создаются остатки у продавцов (вместе с продавцами), конечные суммы заказов
+    пересчитываются в соответствии со сгенерированными ценами
+    """
+
+    objects_name = "Orders"
     template_name = "admin/forms/orders_generate_form.html"
     form_class = OrdersGenerateForm
-    success_url = reverse_lazy('admin:app_orders_orderitems_changelist')
+    success_url = reverse_lazy("admin:app_orders_orderitems_changelist")
 
     def generate_objects(self, quantity):
         payments_methods_exists = PaymentMethods.objects.all().count()
@@ -155,8 +162,16 @@ class GenerateOrdersView(GeneratorBaseView):
         if delivery_methods_need > 0:
             DeliveryMethodsFactory.create_batch(size=delivery_methods_need)
 
-        orders = []
-        for order in range(quantity):
-            orders.append(
-                OrderItemsFactory.create_batch(size=4, order__user=self.request.user)
-            )
+        for i in range(quantity):
+            order = OrdersFactory.create(user=self.request.user)
+            order_items = OrderItemsFactory.create_batch(size=4, order=order)
+            order.total_sum = 0
+            for order_item in order_items:
+                order.total_sum += order_item.total_price
+                BalancesFactory(
+                    good=order_item.good,
+                    seller=order_item.seller,
+                    quantity=order_item.quantity * 2,
+                )
+            order.total_sum += order.delivery.price
+            order.save()
