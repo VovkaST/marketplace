@@ -108,7 +108,7 @@ class RegistrationView(CategoryMixin, PageInfoMixin, generic.FormView):
 
     def form_valid(self, form):
         """Валидация формы"""
-        registration(request=self.request, registration_form=self.get_form())
+        registration(request=self.request, registration_form=form)
         return super().form_valid(form=form)
 
 
@@ -140,3 +140,4 @@ class OrdersHistoryView(CategoryMixin, PageInfoMixin, ListView):
     def get_queryset(self):
         queryset = get_user_orders(user=self.request.user, limit=None)
         return queryset
+
