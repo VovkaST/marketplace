@@ -144,6 +144,10 @@ class Balances(models.Model):
 
 
 class RatingStar(models.Model):
+    """Рейтинг
+    :param value: Значение оценки.
+
+    """
     value = models.SmallIntegerField(verbose_name=_("value"), default=0)
 
     class Meta:
@@ -156,6 +160,12 @@ class RatingStar(models.Model):
 
 
 class Reviews(models.Model):
+    """Отзывы
+
+    :param good_review: Отзыв к товару.
+    :param comment: коментарий
+    :param comment:
+    """
     user = models.ForeignKey(
         User,
         verbose_name=_("user"),
@@ -174,6 +184,8 @@ class Reviews(models.Model):
         verbose_name=_("star"),
         on_delete=models.CASCADE,
         related_name="star",
+        blank=True,
+        null=True,
     )
     crated_at = models.DateTimeField(auto_now=True, verbose_name=_("Crated at"))
 

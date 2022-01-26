@@ -10,6 +10,13 @@ from profiles.models import UserAddress
 
 
 class RegisterForm(UserCreationForm):
+    """Изменения профиля
+
+    :param patronymic: Отчество.
+    :param phone: Телефон.
+    :param avatar: Аватар.
+
+    """
     first_name = forms.CharField(max_length=30, label=_("Name"))
     last_name = forms.CharField(max_length=30, label=_("Last Name"))
     patronymic = forms.CharField(max_length=30, label=_("Patronymic"), required=False)
@@ -23,11 +30,25 @@ class RegisterForm(UserCreationForm):
 
 
 class ChangeInfoForm(forms.ModelForm):
-    patronymic = forms.CharField(max_length=150)
-    phone = forms.CharField(max_length=30)
+    """Изменения профиля
+
+    :param patronymic: Отчество.
+    :param phone: Телефон.
+    :param avatar: Аватар.
+
+    """
+    patronymic = forms.CharField(max_length=150, required=False)
+    phone = forms.CharField(max_length=30, required=False)
     avatar = forms.ImageField(required=False)
 
     class Meta:
+        """
+
+        :param first_name: Имя.
+        :param last_name: Фамилия.
+        :param email: Почта.
+
+        """
         model = User
         fields = ["first_name", "last_name", "email"]
 

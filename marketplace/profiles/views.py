@@ -1,4 +1,3 @@
-# fmt: off
 import datetime
 
 from app_orders.models import Orders
@@ -18,10 +17,12 @@ from services.goods import GoodsPriceMixin
 from services.orders import get_user_orders
 from services.view_history import get_goods_in_view_history
 
-# fmt: on
-
 
 class AccountView(GoodsPriceMixin, CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.DetailView):
+    """
+    Аккаунт
+
+    """
     page_title = _('Your profile')
     model = Profile
     template_name = "profiles/account.html"
@@ -56,6 +57,12 @@ class UpdateProfile(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.Up
     success_url = reverse_lazy("profile")
 
     def get_initial(self):
+        """Валидация формы
+
+        :param obj: Объект обновления.
+        :param initial: Инициализация формы.
+
+        """
         obj = self.get_object()
         initial = super().get_initial()
         initial.update(
@@ -76,6 +83,11 @@ class ClientLoginView(CategoryMixin, PageInfoMixin, LoginView):
     template_name = "profiles/base_login_form.html"
 
     def form_valid(self, form):
+        """Валидация формы
+
+        :param old_session_key: Идентификатор старой сессии.
+        :param new_session_key: Новый идентификатор.
+        """
         old_session_key = self.request.session.session_key
         response = super().form_valid(form=form)
         new_session_key = self.request.session.session_key
@@ -88,12 +100,14 @@ class ClientLoginView(CategoryMixin, PageInfoMixin, LoginView):
 
 
 class RegistrationView(CategoryMixin, PageInfoMixin, generic.FormView):
+    """Регистрация"""
     page_title = _('Registration')
     form_class = RegisterForm
     template_name = "profiles/base_registration.html"
     success_url = reverse_lazy("main")
 
     def form_valid(self, form):
+        """Валидация формы"""
         registration(request=self.request, registration_form=self.get_form())
         return super().form_valid(form=form)
 
