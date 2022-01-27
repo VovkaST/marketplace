@@ -63,6 +63,7 @@ virtualenv==20.8.1
 wcwidth==0.2.5
 win32-setctime==1.0.4
 django_extensions
+redis
 
 # test
 selenium==4.1.0

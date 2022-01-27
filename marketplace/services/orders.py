@@ -88,7 +88,7 @@ def get_order_summary(order: Orders) -> dict:
     }
 
 
-def complete_order(user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
+def complete_order(session, user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
     """Сохраняет позиции Заказа, подсчитывает общую сумму
     заказа, помещает ее в экземпляр order. Возвращает измененный
     order и созданные экземпляры OrderItems, помечает Заказ
@@ -98,9 +98,10 @@ def complete_order(user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]
     :param order: экземпляр Заказа.
     """
     items = list()
+
     with transaction.atomic():
         total_sum = 0
-        for basket_item in Basket.objects.user_basket(user_id=user.id):
+        for basket_item in Basket.objects.user_basket(session_id=session, user_id=user.id):
             total_price = Decimal(basket_item.quantity) * basket_item.reservation.price
             data = {
                 'order': order,

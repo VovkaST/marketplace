@@ -232,7 +232,7 @@ def merge_baskets(old_session: str, new_session: str, user: User):
     :param new_session: id сессии после авторизации.
     :param user: экземпляр авторизованного пользователя.
     """
-    Basket.objects.user_basket(user_id=user.id).update(session=new_session)
+    Basket.objects.user_basket(session_id=old_session, user_id=user.id).update(session=new_session)
     anon_user_goods = Basket.objects.filter(session=old_session)
     duplicates = list()
     for good in anon_user_goods:

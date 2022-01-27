@@ -263,7 +263,7 @@ class OrderConfirmationView(
 
     def form_valid(self, form):
         self.order.comment = form.cleaned_data["comment"]
-        complete_order(user=self.request.user, order=self.order)
+        complete_order(session=self.request.session.session_key, user=self.request.user, order=self.order)
         self.order.save(
             force_update=True, update_fields=["comment", "total_sum", "confirmed"]
         )
