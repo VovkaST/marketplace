@@ -16,12 +16,6 @@ class OrderStep1AuthorizedForm(forms.ModelForm):
         model = User
         fields = ["first_name", "last_name", "patronymic", "email", "phone_number"]
 
-    def is_valid(self):
-        super().is_valid()
-        if is_user_exists(email=self.cleaned_data["email"]):
-            self.add_error("email", _("User with such email address already exists."))
-        return super().is_valid()
-
 
 class OrderStep1NotAuthorizedForm(OrderStep1AuthorizedForm):
     password1 = forms.CharField(
@@ -38,6 +32,12 @@ class OrderStep1NotAuthorizedForm(OrderStep1AuthorizedForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-input'
+
+    def is_valid(self):
+        super().is_valid()
+        if is_user_exists(email=self.cleaned_data["email"]):
+            self.add_error("email", _("User with such email address already exists."))
+        return super().is_valid()
 
     class Meta:
         model = User

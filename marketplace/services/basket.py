@@ -1,8 +1,7 @@
 from decimal import Decimal
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from django.contrib.auth.models import User
-from django.db import transaction
 from django.db.models import (
     DecimalField,
     F,
@@ -18,10 +17,6 @@ from app_sellers.models import (
     Goods,
     Sellers,
 )
-from app_orders.models import (
-    OrderItems,
-    Orders,
-)
 from marketplace.settings import DECIMAL_SUM_TEMPLATE
 from services.cache import basket_cache_clear
 
@@ -35,9 +30,10 @@ def is_enough_shop_balances(basket) -> bool:
     return all([goods_item.quantity >= goods_item.balance.quantity for goods_item in basket])
 
 
-def patch_item_quantity(session: str, reservation_id: str, quantity: int = 1) -> Tuple[dict, str]:
+def patch_item_quantity(user_id: int, session: str, reservation_id: str, quantity: int = 1) -> Tuple[dict, str]:
     """Изменяет количество единиц товара в пользовательской корзине.
 
+    :param user_id: Идентификатор авторизованного пользователя.
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :param quantity: Количество единиц товара.
@@ -45,12 +41,10 @@ def patch_item_quantity(session: str, reservation_id: str, quantity: int = 1) ->
     """
     obj_data, error = None, None
 
-    searchable = {
-        'reservation_id': reservation_id,
-        'session': session,
-    }
     try:
-        obj = Basket.objects.filter(**searchable).select_related('reservation').first()
+        obj = Basket.objects.user_basket(session_id=session, user_id=user_id)\
+            .filter(reservation_id=reservation_id)\
+            .first()
         if not obj:
             raise Exception(_('Item not found in basket.'))
         obj.quantity = quantity
@@ -67,9 +61,11 @@ def patch_item_quantity(session: str, reservation_id: str, quantity: int = 1) ->
     return obj_data, error
 
 
-def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> Tuple[dict, str]:
+def patch_item_seller(user_id: int, session: str, reservation_id: str, seller: int = None)\
+        -> Tuple[dict, Union[str, None]]:
     """Изменяет продавца товара в пользовательской корзине.
 
+    :param user_id: Идентификатор авторизованного пользователя.
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :param seller: ...
@@ -77,12 +73,11 @@ def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> 
     """
     obj_data, error = None, None
 
-    searchable = {
-        'reservation_id': reservation_id,
-        'session': session,
-    }
     try:
-        obj = Basket.objects.filter(**searchable).select_related('reservation', 'reservation__seller').first()
+        obj = Basket.objects.user_basket(session_id=session, user_id=user_id)\
+            .filter(reservation_id=reservation_id)\
+            .select_related('reservation', 'reservation__seller')\
+            .first()
         if not obj:
             raise Exception(_('Item not found in basket.'))
         obj_balance = Balances.objects\
@@ -111,20 +106,19 @@ def patch_item_seller(session: str, reservation_id: str, seller: int = None) -> 
     return obj_data, error
 
 
-def delete_item_from_basket(session: str, reservation_id: str) -> dict:
+def delete_item_from_basket(user_id: int, session: str, reservation_id: str) -> dict:
     """Удаляет товар из пользовательской корзины.
 
+    :param user_id: Идентификатор авторизованного пользователя.
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :return: Ошибки в виде словаря.
     """
     error = dict()
-    searchable = {
-        'reservation_id': reservation_id,
-        'session': session
-    }
     try:
-        deleted, _ = Basket.objects.filter(**searchable).delete()
+        deleted, _ = Basket.objects.user_basket(session_id=session, user_id=user_id)\
+            .filter(reservation_id=reservation_id)\
+            .delete()
         if not deleted:
             raise Exception(_('Item not found in basket.'))
     except Exception as exc:
@@ -134,10 +128,10 @@ def delete_item_from_basket(session: str, reservation_id: str) -> dict:
     return error
 
 
-def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: int = 1) -> Tuple[dict, str]:
+def add_item_to_basket(user_id: int, session: str, reservation_id: str, quantity: int = 1) -> Tuple[dict, str]:
     """Добавляет товар из баланса продавцов в пользовательскую корзину.
 
-    :param user: Экземпляр пользователя.
+    :param user_id: Идентификатор авторизованного пользователя.
     :param session: Строка идентификатора сессии.
     :param reservation_id: Идентификатор баланса продавца.
     :param quantity: Количество единиц товара.
@@ -146,14 +140,14 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     obj_data, error = None, None
     searchable = {
         'reservation_id': reservation_id,
-        'user_id': user.id if user else None,
+        'user_id': user_id,
         'session': session,
     }
     try:
         obj, created = Basket.objects.get_or_create(**searchable, defaults={'quantity': quantity})
         if not created:
             return patch_item_quantity(
-                session=session, reservation_id=reservation_id, quantity=obj.quantity + quantity
+                user_id=user_id, session=session, reservation_id=reservation_id, quantity=obj.quantity + quantity
             )
         obj_data = {
             'good_id': obj.reservation.good_id,
@@ -167,7 +161,7 @@ def add_item_to_basket(user: User, session: str, reservation_id: str, quantity: 
     return obj_data, error
 
 
-def get_basket_meta(session_id: str, user_id=None, items=False) -> Dict[str, str]:
+def get_basket_meta(session_id: str, user_id: int = None, items: bool = False) -> Dict[str, str]:
     """Получает количественные показатели пользовательской корзины.
 
     :param session_id: Идентификатор сессии.
@@ -191,7 +185,7 @@ def get_basket_meta(session_id: str, user_id=None, items=False) -> Dict[str, str
         total_sum = Decimal(data['total_sum'] or 0).quantize(DECIMAL_SUM_TEMPLATE)
     else:
         data = Basket.objects \
-            .user_basket(session_id=session_id) \
+            .user_basket(user_id=user_id, session_id=session_id) \
             .select_related('reservation__good', 'reservation__seller')
         goods_quantity = len(data)
         for item in data:
@@ -282,52 +276,3 @@ def init_basket_formset(items: List[dict]) -> BasketFormSet:
     if initial:
         [items[i].update({'form': form}) for i, form in enumerate(formset)]
     return formset
-
-
-def get_order_summary(order: Orders) -> dict:
-    """Собирает словарь сводных данных по Заказу.
-
-    :param order: экземпляр Заказа.
-    """
-    return {
-        'date_time': order.date_time.strftime('%d %B %Y, %H:%M'),
-        'receiver': f'{order.user.last_name} {order.user.first_name} {order.user.profile.patronymic or ""}',
-        'phone': order.user.profile.phone_number_formatted,
-        'email': order.user.email,
-        'total_sum': None,
-        'city': order.city,
-        'address': order.address,
-        'delivery_method': order.delivery.name,
-        'payment_method': order.payment.name,
-        'bank_account': order.bank_account,
-    }
-
-
-def complete_order(user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
-    """Сохраняет позиции Заказа, подсчитывает общую сумму
-    заказа, помещает ее в экземпляр order. Возвращает измененный
-    order и созданные экземпляры OrderItems, помечает Заказ
-    как "Подтвержденный" (confirmed = True).
-
-    :param user: экземпляр авторизованного пользователя.
-    :param order: экземпляр Заказа.
-    """
-    items = list()
-    with transaction.atomic():
-        total_sum = 0
-        for basket_item in Basket.objects.user_basket(user_id=user.id):
-            total_price = Decimal(basket_item.quantity) * basket_item.reservation.price
-            data = {
-                'order': order,
-                'seller': basket_item.reservation.seller,
-                'good': basket_item.reservation.good,
-                'quantity': basket_item.quantity,
-                'price': basket_item.reservation.price,
-                'total_price': total_price,
-            }
-            total_sum += total_price
-            items.append(OrderItems.objects.create(**data))
-        order.total_sum = total_sum + order.delivery.price
-        order.confirmed = True
-        Basket.objects.delete_user_basket(user_id=user.id)
-    return order, items

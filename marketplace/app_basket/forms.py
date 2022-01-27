@@ -35,10 +35,6 @@ class SellerForm(forms.Form):
             self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
 
 
-class BasketBaseFormSet(forms.BaseFormSet):
-    pass
-
-
 BasketFormSet = forms.formset_factory(
-    form=SellerForm, formset=BasketBaseFormSet, min_num=1, extra=0, can_delete=True, validate_min=True
+    form=SellerForm, min_num=1, extra=0, can_delete=True, validate_min=True
 )

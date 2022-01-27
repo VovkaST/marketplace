@@ -112,8 +112,8 @@
                             <div class="Cards Cards_account">
                                 {% for good_id, good in goods.items %}
                                 <div class="Card">
-                                    <a class="Card-picture" href="{# url product detail #}">
-                                        <img src="{% static 'img/content/home/pepe.jpg' %}" alt="pepe.jpg"/>
+                                    <a class="Card-picture" href="{% url 'prod_detail' good_id %}">
+                                        <img src="{% static 'img/content/home/card.jpg' %}" alt="card.jpg"/>
                                     </a>
                                     <div class="Card-content">
                                         <strong class="Card-title">

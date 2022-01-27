@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Tuple, List
 
 from app_comparison.models import Comparison
 from app_sellers.models import Balances
@@ -101,8 +101,8 @@ def comparison_good_add(good_id: int, user: User, session: str) -> Tuple[dict, s
         Comparison.objects.get_or_create(good_id=good_id, **user_data)
     except Exception as exc:
         error = exc.args[0]
-    data["count"] = Comparison.objects.user_comparison(**user_data).count()
-    comparison_cache_clear(session=session)
+    data['count'] = Comparison.objects.user_comparison(**user_data).count()
+    comparison_cache_clear(session=session, username=user.username if user else None)
     return data, error
 
 
@@ -123,8 +123,8 @@ def comparison_good_remove(good_id: int, user: User, session: str) -> Tuple[dict
         Comparison.objects.delete_good_comparison(good_id=good_id, **user_data)
     except Exception as exc:
         error = exc.args[0]
-    data["count"] = Comparison.objects.user_comparison(**user_data).count()
-    comparison_cache_clear(session=session)
+    data['count'] = Comparison.objects.user_comparison(**user_data).count()
+    comparison_cache_clear(session=session, username=user.username if user else None)
     return data, error
 
 
@@ -146,3 +146,4 @@ def get_cheapest_good_price():
     except OperationalError as exc:
         logger.error(exc)
         return 0
+

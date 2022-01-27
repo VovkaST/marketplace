@@ -1,3 +1,5 @@
+from django.core.handlers.wsgi import WSGIRequest
+
 from app_comparison.models import Comparison
 from services.basket import get_basket_meta
 from services.cache import (
@@ -15,7 +17,7 @@ class SessionDataCollector:
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: WSGIRequest):
         if not request.session.session_key:
             request.session.create()
         self.basket_info(request)
@@ -23,7 +25,7 @@ class SessionDataCollector:
         self.comparison_info(request)
         return self.get_response(request)
 
-    def basket_info(self, request):
+    def basket_info(self, request: WSGIRequest):
         """Собирает данные по корзине (кол-во товаров, общая стоимость).
         Если в кэше отсутствуют, то получает их из БД, сохраняет и
         присваивает атрибутам (goods_in_basket, basket_total_sum)
@@ -41,7 +43,7 @@ class SessionDataCollector:
         request.goods_in_basket = meta['goods_quantity']
         request.basket_total_sum = meta['total_sum']
 
-    def order_info(self, request):
+    def order_info(self, request: WSGIRequest):
         """Собирает данные по заказу (наличие незавершенного заказа).
         Если в кэше отсутствует, то ищет его в БД, сохраняет и
         присваивает атрибуту (is_incomplete_order) запроса (request)
@@ -55,7 +57,7 @@ class SessionDataCollector:
         request.is_not_confirmed_order = order_cache['is_not_confirmed']
         request.is_not_payed_order = order_cache['is_not_payed']
 
-    def comparison_info(self, request):
+    def comparison_info(self, request: WSGIRequest):
         """Получает данные о количестве товаров в пользовательском
         списке сравнения."""
         session_key = request.session.session_key
