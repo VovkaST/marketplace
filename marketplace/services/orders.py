@@ -88,12 +88,13 @@ def get_order_summary(order: Orders) -> dict:
     }
 
 
-def complete_order(session, user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
+def complete_order(session: str, user: User, order: Orders) -> Tuple[Orders, List[OrderItems]]:
     """Сохраняет позиции Заказа, подсчитывает общую сумму
     заказа, помещает ее в экземпляр order. Возвращает измененный
     order и созданные экземпляры OrderItems, помечает Заказ
     как "Подтвержденный" (confirmed = True).
 
+    :param session: Идентификатор сессии.
     :param user: экземпляр авторизованного пользователя.
     :param order: экземпляр Заказа.
     """
@@ -117,4 +118,3 @@ def complete_order(session, user: User, order: Orders) -> Tuple[Orders, List[Ord
         order.confirmed = True
         Basket.objects.delete_user_basket(user_id=user.id)
     return order, items
-

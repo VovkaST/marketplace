@@ -17,7 +17,7 @@ class ComparisonView(CategoryMixin, PageInfoMixin, CacheSettingsMixin, generic.T
         user = self.request.user if self.request.user.is_authenticated else None
         context.update(get_comparison_context(user=user, session=self.request.session.session_key))
         context.update({
-            'cache_key': user.username or self.request.session.session_key,
+            'cache_key': user.username if user else self.request.session.session_key,
         })
         return context
 

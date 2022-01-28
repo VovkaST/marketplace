@@ -33,7 +33,7 @@ class GoodsQuerySet(SoftDeleter):
 class BasketQuerySet(models.QuerySet):
     """QuerySet Корзины"""
 
-    def user_basket(self, session_id: str, user_id: int = None):
+    def user_basket(self, session_id: str = None, user_id: int = None):
         """Фильтр получения Корзины пользователя по его идентификатору
         (user_id), имени сессии (session_id).
 
