@@ -14,12 +14,6 @@ APPS_MAP = {
 }
 
 
-@celery_app.task
-def import_file(protocol_id: int, model_name: str, update: bool) -> dict:
-    total, created, updated = 0, 0, 0
-    success, error_msg = True, None
-
-
 class ImportFileTask(celery_app.Task):
     def on_success(self, retval, task_id, args, kwargs):
         protocol_id = kwargs['protocol_id']
@@ -27,10 +21,9 @@ class ImportFileTask(celery_app.Task):
 
 
 @celery_app.task(bind=True, base=ImportFileTask)
-def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
+def import_file(task_instance, protocol_id: int, model_name: str, update: bool, delimiter: str) -> dict:
     total, created, updated = 0, 0, 0
     errors = list()
-    success, error_msg = True, None
     protocol = ImportProtocol.objects.get(id=protocol_id)
     app, class_name = APPS_MAP[model_name]
 
@@ -52,10 +45,6 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
                     try:
                         obj.save()
                     except Exception as exc:
-                        success = False
-                        error_msg = exc.args[0]
-                        created += 1
-                    except Exception as exc:
                         errors.append({
                             'error': exc.args[0],
                             'row_number': row_number,
@@ -64,7 +53,7 @@ def import_file(protocol_id: int, model_name: str, update: bool, delimiter: str)
     protocol.total_objects = total
     protocol.new_objects = created
     protocol.updated_objects = updated
-    protocol.task_id = self.request.id
+    protocol.task_id = task_instance.request.id
     protocol.save(force_update=True, update_fields=['total_objects', 'new_objects', 'updated_objects', 'task_id'])
     return {
         'success': not bool(errors),
