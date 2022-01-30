@@ -17,7 +17,13 @@ APPS_MAP = {
 class ImportFileTask(celery_app.Task):
     def on_success(self, retval, task_id, args, kwargs):
         protocol_id = kwargs['protocol_id']
-        ImportProtocol.objects.filter(id=protocol_id).update(is_imported=True, result=json.dumps(retval))
+        ImportProtocol.objects.filter(id=protocol_id).update(
+            is_imported=True,
+            total_objects=retval.get('total', 0),
+            new_objects=retval.get('created', 0),
+            updated_objects=retval.get('updated', 0),
+            result=json.dumps(retval),
+        )
 
 
 @celery_app.task(bind=True, base=ImportFileTask)
@@ -44,6 +50,8 @@ def import_file(task_instance, protocol_id: int, model_name: str, update: bool, 
                 if not obj_in_db or (obj_in_db and update):
                     try:
                         obj.save()
+                        if not obj_in_db:
+                            created += 1
                     except Exception as exc:
                         errors.append({
                             'error': exc.args[0],
@@ -54,7 +62,10 @@ def import_file(task_instance, protocol_id: int, model_name: str, update: bool, 
     protocol.new_objects = created
     protocol.updated_objects = updated
     protocol.task_id = task_instance.request.id
-    protocol.save(force_update=True, update_fields=['total_objects', 'new_objects', 'updated_objects', 'task_id'])
+    protocol.save(
+        force_update=True,
+        update_fields=['total_objects', 'new_objects', 'updated_objects', 'task_id']
+    ),
     return {
         'success': not bool(errors),
         'errors': errors,
