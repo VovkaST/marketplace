@@ -60,7 +60,13 @@
                                 </div>
                             </div>
                             <div class="Cart-block Cart-block_row errors_row">
-                                {{ form.errors.as_text }}
+                                {% if form.errors %}
+                                    <ul class="Cart-product__errors">
+                                        {% for error in form.errors.values %}
+                                             <li>{{ error.as_text }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </div>
                         </div>
                     {% endwith %}{% endfor %}

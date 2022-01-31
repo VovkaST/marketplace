@@ -982,6 +982,15 @@
 }
 .Cart-block.errors_row {
   width: 100%;
+  margin-right: 30px;
+}
+.Cart-product__errors {
+  width: 100%;
+  border: 1px solid #ff00004d;
+  margin: 0;
+  padding: 10px 20px;
+  font-style: italic;
+  color: #b75555;
 }
 @media screen and (max-width: 990px) {
   .Cart-product {
