@@ -2,7 +2,9 @@ from django import forms
 
 from django.forms import Select
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
+from services.basket import is_enough_shop_balances
 from services.sellers import get_choices_sellers_by_good
 
 
@@ -32,6 +34,13 @@ class SellerForm(forms.Form):
         if good_id is not None:
             self.fields['seller'].choices = get_choices_sellers_by_good(good=good_id)
             self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
+
+    def is_valid(self):
+        reservation_id = self.cleaned_data.get('reservation_id')
+        needle_quantity = self.cleaned_data.get('quantity')
+        if not is_enough_shop_balances(reservation_id, needle_quantity):
+            self.add_error('__all__', _('Not enough balances.'))
+        return super().is_valid()
 
 
 BasketFormSet = forms.formset_factory(

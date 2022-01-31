@@ -10,7 +10,6 @@ from django.db.models import (
 )
 from django.utils.translation import gettext as _
 
-from app_basket.forms import BasketFormSet
 from app_basket.models import Basket
 from app_sellers.models import (
     Balances,
@@ -21,13 +20,14 @@ from marketplace.settings import DECIMAL_SUM_TEMPLATE
 from services.cache import basket_cache_clear
 
 
-def is_enough_shop_balances(basket) -> bool:
-    """Check balances for sufficiency of goods.
+def is_enough_shop_balances(reservation_id: int, needle_quantity: int) -> bool:
+    """Проверка наличия запрашиваемого количества товара на балансе продавца.
 
-    :param basket: Iterable user`s basket items.
-    :return: Is balances is enough or not.
+    :param reservation_id: Идентификатор баланса.
+    :param needle_quantity: Запрашиваемоу количество.
     """
-    return all([goods_item.quantity >= goods_item.balance.quantity for goods_item in basket])
+    available = Balances.objects.filter(id=reservation_id).values('quantity').first()
+    return available.get('quantity', 0) >= needle_quantity
 
 
 def patch_item_quantity(user_id: int, session: str, reservation_id: str, quantity: int = 1) -> Tuple[dict, str]:
