@@ -35,14 +35,18 @@ class SellerForm(forms.Form):
             self.fields['seller'].choices = get_choices_sellers_by_good(good=good_id)
             self.fields['quantity'].widget.attrs.update({'max': self.initial['max_quantity']})
 
-    def is_valid(self):
-        reservation_id = self.cleaned_data.get('reservation_id')
-        needle_quantity = self.cleaned_data.get('quantity')
-        if not is_enough_shop_balances(reservation_id, needle_quantity):
-            self.add_error('__all__', _('Not enough balances.'))
-        return super().is_valid()
+
+class BasketBaseFormSet(forms.BaseFormSet):
+    def clean(self):
+        for form in self.forms:
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            reservation_id = form.cleaned_data.get('reservation_id')
+            needle_quantity = form.cleaned_data.get('quantity')
+            if not is_enough_shop_balances(reservation_id, needle_quantity):
+                form.add_error('__all__', _('Not enough balances.'))
 
 
 BasketFormSet = forms.formset_factory(
-    form=SellerForm, min_num=1, extra=0, can_delete=True, validate_min=True
+    form=SellerForm, formset=BasketBaseFormSet, min_num=1, extra=0, can_delete=True, validate_min=True
 )

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n cache static %}
+{% load i18n cache static tags %}
 
 {% block csrf %}{% csrf_token %}{% endblock %}
 
@@ -21,7 +21,7 @@
             {% if items %}
                 <form action="{% url 'basket' %}" method="post">
                     {% csrf_token %}
-                    {% for item in items %}{% with formset.forms.pop as form %}
+                    {% for item in items %}{% with formset.forms|get_list_item:forloop.counter0 as form %}
                         <div class="Cart-product form basket-item-row">
                             <div class="Cart-block Cart-block_row">
                                 <div class="Cart-block Cart-block_pict">
@@ -59,7 +59,9 @@
                                     </button>
                                 </div>
                             </div>
-                            {{ form.errors }}
+                            <div class="Cart-block Cart-block_row errors_row">
+                                {{ form.errors.as_text }}
+                            </div>
                         </div>
                     {% endwith %}{% endfor %}
                     {{ formset.management_form }}

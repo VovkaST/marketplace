@@ -30,6 +30,15 @@ def get(dictionary: dict, key):
     return dictionary.get(key, '-')
 
 
+@register.filter
+def get_list_item(values_list: list, index: int):
+    """Тэг для получения первого элемента списка.
+    :param values_list: Список значений.
+    :param index: Индекс элемента.
+    """
+    return values_list[index]
+
+
 @register.simple_tag
 @stringfilter
 def transliterate(string: str) -> str:
