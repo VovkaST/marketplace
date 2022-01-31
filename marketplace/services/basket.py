@@ -249,30 +249,3 @@ def merge_baskets(old_session: str, new_session: str, user: User):
         Basket.objects.filter(id__in=duplicates).delete()
     if duplicates or anon_user_goods:
         basket_cache_clear(session_id=old_session)
-
-
-def init_basket_formset(items: List[dict]) -> BasketFormSet:
-    """Инициализирует формсет товаров в пользовательской корзине.
-    В словарь данных добавляет предварительно заполненную форму
-    из формсета.
-
-    :param items: Список словарей данных, содержащих сведения о
-    товарах в пользовательской корзине.
-    """
-    initial = [
-        {
-            'reservation_id': item.get('reservation_id'),
-            'quantity': item.get('quantity'),
-            'good_id': item.get('good_id'),
-            'max_quantity': item.get('available', 1),
-            'seller': item['seller']['id'],
-        }
-        for item in items
-    ]
-    formset = BasketFormSet(
-        initial=initial,
-        prefix='basket_item'
-    )
-    if initial:
-        [items[i].update({'form': form}) for i, form in enumerate(formset)]
-    return formset

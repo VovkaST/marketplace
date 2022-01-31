@@ -1,7 +1,9 @@
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import generic
 
+from app_basket.forms import BasketFormSet
 from main.views import (
     CategoryMixin,
     PageInfoMixin,
@@ -10,7 +12,6 @@ from services.basket import (
     add_item_to_basket,
     delete_item_from_basket,
     get_basket_meta,
-    init_basket_formset,
     patch_item_seller,
     patch_item_quantity,
 )
@@ -34,19 +35,46 @@ class BasketMetaMixin:
         return meta
 
 
-class BasketView(CategoryMixin, PageInfoMixin, generic.TemplateView):
+class BasketView(CategoryMixin, PageInfoMixin, generic.FormView):
     template_name = 'app_basket/basket_detail.html'
     page_title = _('Basket')
+    form_class = BasketFormSet
+    success_url = reverse_lazy('order_create')
+    prefix = 'basket_item'
+    _meta = {}
+
+    @property
+    def meta(self):
+        if not self._meta:
+            user = self.request.user
+            session = self.request.session.session_key
+            self._meta = get_basket_meta(session_id=session, user_id=user.id, items=True)
+        return self._meta
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'initial': [
+                {
+                    'reservation_id': item.get('reservation_id'),
+                    'quantity': item.get('quantity'),
+                    'good_id': item.get('good_id'),
+                    'max_quantity': item.get('available', 1),
+                    'seller': item['seller']['id'],
+                }
+                for item in self.meta['items']
+            ]
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         session = self.request.session.session_key
-        meta = get_basket_meta(session_id=session, user_id=user.id, items=True)
         context.update({
             'cache_key': user.username if user.is_authenticated else session,
-            'items_formset': init_basket_formset(items=meta['items']),
-            **meta,
+            'formset': context.pop('form'),
+            **self.meta,
         })
         return context
 

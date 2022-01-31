@@ -18,7 +18,6 @@ class SellerForm(forms.Form):
     reservation_id = forms.CharField(widget=forms.HiddenInput())
     quantity = forms.IntegerField(
         min_value=1,
-        max_value=1,
         widget=forms.TextInput(
             attrs={
                 'class': 'basket-item__quantity Amount-input form-input',
