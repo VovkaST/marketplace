@@ -1,7 +1,9 @@
+from collections import defaultdict
 from decimal import Decimal
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Iterable
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.db.models import (
     DecimalField,
     F,
@@ -101,8 +103,11 @@ def patch_item_seller(user_id: int, session: str, reservation_id: str, seller: i
                 'image': None,
             },
         }
+    except IntegrityError as exc:
+        if 'UNIQUE constraint failed' in exc.args[0]:
+            error = _('Good with such seller is already exists in you basket.')
     except Exception as exc:
-        error = exc.args[0],
+        error = exc.args[0]
     return obj_data, error
 
 
@@ -188,6 +193,7 @@ def get_basket_meta(session_id: str, user_id: int = None, items: bool = False) -
             .user_basket(user_id=user_id, session_id=session_id) \
             .select_related('reservation__good', 'reservation__seller')
         goods_quantity = len(data)
+        goods_sellers = defaultdict(list)
         for item in data:
             total_price = Decimal(item.quantity) * item.reservation.price
             item_data = {
@@ -205,10 +211,15 @@ def get_basket_meta(session_id: str, user_id: int = None, items: bool = False) -
                     'name': item.reservation.seller.name,
                     'image': None,
                 },
-                'other_sellers': get_available_sellers(good=item.reservation.good)
             }
+            goods_sellers[item.reservation.good_id].append(item.reservation.seller.id)
             items_list.append(item_data)
             total_sum += total_price
+        for item in items_list:
+            item['other_sellers'] = get_available_sellers(
+                good_id=item['good_id'],
+                exclude=set(goods_sellers[item['good_id']]) - {item['seller']['id']}
+            )
     return {
         'goods_quantity': goods_quantity,
         'total_sum': total_sum,
@@ -216,11 +227,17 @@ def get_basket_meta(session_id: str, user_id: int = None, items: bool = False) -
     }
 
 
-def get_available_sellers(good: Goods) -> Dict[int, str]:
+def get_available_sellers(good_id: int, exclude: Iterable[int] = None) -> List[Tuple[int, str]]:
+    if exclude is None:
+        exclude = list()
     sellers = Sellers.objects\
-        .filter(balance_owner__good_id=good.id, balance_owner__quantity__gt=0)\
+        .filter(balance_owner__good_id=good_id, balance_owner__quantity__gt=0)\
         .values('id', 'name', 'balance_owner__price')
-    return {seller['id']: f'{seller["name"]} ({seller["balance_owner__price"]})' for seller in sellers}
+    return [
+        (seller['id'], f'{seller["name"]} ({seller["balance_owner__price"]})')
+        for seller in sellers
+        if seller['id'] not in exclude
+    ]
 
 
 def merge_baskets(old_session: str, new_session: str, user: User):

@@ -63,7 +63,8 @@ class BasketView(CategoryMixin, PageInfoMixin, generic.FormView):
                     'seller': item['seller']['id'],
                 }
                 for item in self.meta['items']
-            ]
+            ],
+            'sellers_initial': [item['other_sellers'] for item in self.meta['items']]
         })
         return kwargs
 
