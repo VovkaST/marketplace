@@ -1,15 +1,32 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from app_sellers.models import (
     Balances,
     Goods,
     GoodsDescriptionsValues,
-    GoodsImage,
     RatingStar,
     Reviews,
     Sellers,
 )
 from services.cache import reset_seller_page_cache
+
+
+class GoodsDescriptionsFilter(admin.SimpleListFilter):
+    title = _('Description type')
+    parameter_name = 'type'
+
+    def queryset(self, request, queryset):
+        if self.value() == 'cat':
+            return queryset.filter(feature__isnull=True)
+        if self.value() == 'val':
+            return queryset.filter(feature__isnull=False)
+
+    def lookups(self, request, model_admin):
+        return (
+            ('cat', _('Categories')),
+            ('val', _('Values')),
+        )
 
 
 @admin.register(Sellers)
@@ -22,6 +39,12 @@ class SellersAdmin(admin.ModelAdmin):
 @admin.register(GoodsDescriptionsValues)
 class GoodsDescriptionsValuesAdmin(admin.ModelAdmin):
     list_display = ('value', 'feature', )
+    list_filter = (GoodsDescriptionsFilter, )
+
+    def get_field_queryset(self, db, db_field, request):
+        if db_field.name == 'feature':
+            return db_field.remote_field.model.objects.filter(feature__isnull=True)
+        return super().get_field_queryset(db, db_field, request)
 
 
 @admin.register(Goods)
