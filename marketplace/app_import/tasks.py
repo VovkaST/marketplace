@@ -35,11 +35,11 @@ def import_file(task_instance, protocol_id: int, model_name: str, update: bool, 
 
     model = apps.get_model(app_label=app, model_name=class_name)
     with open(file=protocol.filename.path, encoding='utf-8', mode='r') as datafile:
-        headers = next(datafile).split(delimiter)
+        headers = next(datafile).strip().split(delimiter)
         with transaction.atomic():
             for row_number, row in enumerate(datafile, start=2):
                 obj = model()
-                data = dict(zip(headers, row.split(delimiter)))
+                data = dict(zip(headers, row.strip().split(delimiter)))
                 obj.set_values(data=data)
 
                 n_key = obj.natural_key()
