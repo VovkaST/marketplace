@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views import generic
 from main.views import CategoryMixin, PageInfoMixin
 
+from celery import uuid
+
 
 class ImportView(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.FormView):
     template_name = "app_import/import.html"
@@ -45,13 +47,16 @@ class ImportView(CategoryMixin, PageInfoMixin, LoginRequiredMixin, generic.FormV
         form.instance.user = self.request.user
         protocol = form.save()
 
+        protocol.task_id = uuid()
+        protocol.save()
+
         task_kwargs = {
             "protocol_id": protocol.id,
             "model_name": form.cleaned_data["target_model"],
             "update": form.cleaned_data["update_data"],
             "delimiter": form.cleaned_data["delimiter"],
         }
-        tasks.import_file.delay(**task_kwargs)
+        tasks.import_file.apply_async(kwargs=task_kwargs, task_id=protocol.task_id)
         return super().form_valid(form=form)
 
 

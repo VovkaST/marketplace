@@ -20,4 +20,3 @@ class ImportForm(forms.ModelForm):
     class Meta:
         model = ImportProtocol
         fields = ['filename', 'target_model', 'update_data']
-
